@@ -42,6 +42,8 @@ export default function ActivitiesPage() {
     // disimpan sebagai data lokal supaya aktivitas tidak batal tercatat.
     let photoValue = photo;
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
       const res = await fetch("/api/upload-photo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -49,33 +51,41 @@ export default function ActivitiesPage() {
           dataUrl: photo,
           filename: `aktivitas-${session.memberId}-${Date.now()}.jpg`,
         }),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
       const data = await res.json();
       if (data.ok && data.url) {
         photoValue = data.url;
+      } else if (data.error) {
+        console.warn("Upload foto ke Google Drive gagal, pakai foto lokal:", data.error);
       }
     } catch (err) {
-      // Google Drive belum dikonfigurasi atau sedang offline — lanjut pakai foto lokal.
+      console.warn("Upload foto ke Google Drive gagal/timeout, pakai foto lokal:", err);
     }
 
-    store.addActivity({
-      memberId: session.memberId,
-      memberName: session.name,
-      type,
-      date,
-      customerName: customerName.trim(),
-      customerPhone: customerPhone.trim(),
-      note: note.trim(),
-      photo: photoValue,
-    });
-    setCustomerName("");
-    setCustomerPhone("");
-    setNote("");
-    setPhoto(null);
-    setDate(today());
-    refresh();
-    setJustStamped(true);
-    setTimeout(() => setJustStamped(false), 1600);
+    try {
+      store.addActivity({
+        memberId: session.memberId,
+        memberName: session.name,
+        type,
+        date,
+        customerName: customerName.trim(),
+        customerPhone: customerPhone.trim(),
+        note: note.trim(),
+        photo: photoValue,
+      });
+      setCustomerName("");
+      setCustomerPhone("");
+      setNote("");
+      setPhoto(null);
+      setDate(today());
+      refresh();
+      setJustStamped(true);
+      setTimeout(() => setJustStamped(false), 1600);
+    } catch (err) {
+      setError(err.message || "Aktivitas gagal disimpan. Coba lagi.");
+    }
     setSubmitting(false);
   }
 
