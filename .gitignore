@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+.env
+.env.local
+.DS_Store
+*.log
+
+# Jangan pernah commit file kunci kredensial Google Service Account
+# (biasanya diunduh dengan nama seperti "nama-project-xxxxxxxxxxxx.json")
+*.json.key
+hale-monument-*.json
+*-service-account*.json
+*service-account*.json
+credentials.json
+gcp-key.json

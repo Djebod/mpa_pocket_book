@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  background-color: #ffffff;
+  color: #1E2723;
+}
+
+body {
+  background-image: radial-gradient(circle at 1px 1px, rgba(11, 74, 48, 0.045) 1px, transparent 0);
+  background-size: 18px 18px;
+}
+
+::selection {
+  background-color: #009850;
+  color: #ffffff;
+}
+
+/* Perforated / passbook divider */
+.perforated {
+  position: relative;
+}
+.perforated::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  height: 1px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(11, 74, 48, 0.25) 0,
+    rgba(11, 74, 48, 0.25) 5px,
+    transparent 5px,
+    transparent 11px
+  );
+}
+
+/* Stamp mark used for logged activities */
+.stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid currentColor;
+  border-radius: 9999px;
+  transform: rotate(-6deg);
+  font-family: var(--font-plex-mono);
+  letter-spacing: 0.08em;
+}
+
+/* Binder tab shape for side navigation items */
+.tab-notch {
+  clip-path: polygon(0 0, 100% 0, 92% 100%, 0% 100%);
+}
+
+.leader-dots {
+  border-bottom: 1px dotted rgba(11, 74, 48, 0.35);
+  flex: 1;
+  margin: 0 8px;
+  height: 1px;
+  transform: translateY(-4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid #009850;
+  outline-offset: 2px;
+}
