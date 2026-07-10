@@ -18,12 +18,13 @@ function ProductFileDisplay({ file }) {
   const isImage = file.mimeType?.startsWith("image/");
 
   if (isPdf) {
-    // Menampilkan PDF lewat link download langsung (bukan halaman
-    // /preview Google Drive) — browser modern (Chrome, Edge, Safari, dll)
-    // sudah punya PDF viewer bawaan dan akan merendernya langsung di
-    // dalam <iframe>. Ini lebih andal daripada preview Google Drive, yang
-    // kadang menampilkan error 403 tergantung kebijakan/cookie Google.
-    const embedSrc = file.downloadUrl || file.url;
+    // Google Docs Viewer dipakai untuk menampilkan PDF sebagai dokumen
+    // di dalam halaman (bukan link download langsung, yang memicu
+    // Content-Disposition: attachment dan malah auto-download alih-alih
+    // tampil). Kalau file masih lokal (belum ke Drive, tidak ada
+    // previewUrl), fallback ke data URL-nya langsung — browser modern
+    // biasanya tetap bisa merender PDF dari data URL di dalam iframe.
+    const embedSrc = file.previewUrl || file.url;
     return (
       <div className="mt-4">
         <div className="w-full aspect-[4/5] sm:aspect-[16/10] rounded-md overflow-hidden border border-ink/10 bg-paper-dark/30">
