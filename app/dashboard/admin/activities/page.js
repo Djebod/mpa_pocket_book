@@ -33,6 +33,17 @@ export default function AdminActivitiesPage() {
     refresh();
   }
 
+  function handleClearAll() {
+    const first = confirm(
+      `Hapus SEMUA data aktivitas (${activities.length} aktivitas)? Ini akan menghapus seluruhnya dari sistem dan Google Sheets, tidak bisa dibatalkan.`
+    );
+    if (!first) return;
+    const second = confirm("Konfirmasi sekali lagi — benar-benar hapus SEMUA aktivitas?");
+    if (!second) return;
+    store.clearAllActivities();
+    refresh();
+  }
+
   const filtered = useMemo(() => {
     return activities.filter((a) => {
       if (filterMember !== "all" && a.memberId !== filterMember) return false;
@@ -57,12 +68,21 @@ export default function AdminActivitiesPage() {
     <div>
       <div className="flex items-start justify-between gap-4 flex-wrap mb-1">
         <h1 className="font-display italic text-3xl text-ink">Ringkasan Aktivitas</h1>
-        <button
-          onClick={() => exportActivitiesToExcel(filtered)}
-          className="bg-ink text-paper text-xs font-semibold px-4 py-2.5 rounded-md hover:bg-ink-light transition-colors shrink-0"
-        >
-          ⬇ Download Excel
-        </button>
+        <div className="flex gap-2 shrink-0">
+          <button
+            onClick={() => exportActivitiesToExcel(filtered)}
+            className="bg-ink text-paper text-xs font-semibold px-4 py-2.5 rounded-md hover:bg-ink-light transition-colors"
+          >
+            ⬇ Download Excel
+          </button>
+          <button
+            onClick={handleClearAll}
+            disabled={activities.length === 0}
+            className="bg-rust text-paper text-xs font-semibold px-4 py-2.5 rounded-md hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Hapus Semua Aktivitas
+          </button>
+        </div>
       </div>
       <p className="text-sm text-ink/60 mb-8">
         Pantau seluruh aktivitas member Mulia Putri Agency — dashboard report, data lengkap, dan detail per member.
