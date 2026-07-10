@@ -10,12 +10,18 @@ const MEMBER_TABS = [
   { href: "/dashboard/activities", label: "Aktivitas" },
   { href: "/dashboard/products", label: "Produk" },
   { href: "/dashboard/team", label: "Tim Saya" },
+  { href: "/dashboard/commission", label: "Komisi & Kompensasi" },
+  { href: "/dashboard/promo", label: "Promo" },
+  { href: "/dashboard/tutorials", label: "Tutorial Digital" },
 ];
 
 const ADMIN_TABS = [
   { href: "/dashboard/admin/members", label: "Kelola Member" },
   { href: "/dashboard/admin/activities", label: "Ringkasan Aktivitas" },
   { href: "/dashboard/admin/products", label: "Kelola Produk" },
+  { href: "/dashboard/admin/commission", label: "Kelola Komisi" },
+  { href: "/dashboard/admin/promo", label: "Kelola Promo" },
+  { href: "/dashboard/admin/tutorials", label: "Kelola Tutorial" },
 ];
 
 export default function AppShell({ children }) {

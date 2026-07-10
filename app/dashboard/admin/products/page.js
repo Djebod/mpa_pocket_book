@@ -7,6 +7,7 @@ import ProductFileInput from "@/components/ProductFileInput";
 const emptyForm = {
   name: "",
   category: "",
+  subCategory: "",
   summary: "",
   summaryFile: null,
   ilustrasi: "",
@@ -14,6 +15,7 @@ const emptyForm = {
   caraMenjual: "",
   caraMenjualFile: null,
   videoUrl: "",
+  supportingFileUrl: "",
 };
 
 export default function AdminProductsPage() {
@@ -54,6 +56,7 @@ export default function AdminProductsPage() {
     setForm({
       name: product.name,
       category: product.category,
+      subCategory: product.subCategory || "",
       summary: product.summary,
       summaryFile: product.summaryFile || null,
       ilustrasi: product.ilustrasi || "",
@@ -61,6 +64,7 @@ export default function AdminProductsPage() {
       caraMenjual: product.caraMenjual || "",
       caraMenjualFile: product.caraMenjualFile || null,
       videoUrl: product.videoUrl || "",
+      supportingFileUrl: product.supportingFileUrl || "",
     });
     setEditingId(product.id);
     setError("");
@@ -102,6 +106,17 @@ export default function AdminProductsPage() {
               className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
             />
           </div>
+          <div>
+            <label className="block text-sm font-semibold text-ink mb-1.5">
+              Sub Kategori <span className="font-normal text-ink/45">(opsional)</span>
+            </label>
+            <input
+              value={form.subCategory}
+              onChange={(e) => setForm({ ...form, subCategory: e.target.value })}
+              placeholder="Contoh: Individu / Keluarga"
+              className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
+            />
+          </div>
         </div>
 
         <div className="mb-5 space-y-3">
@@ -138,15 +153,30 @@ export default function AdminProductsPage() {
         </div>
 
         <div className="mb-5">
-          <label className="block text-sm font-semibold text-ink mb-1.5">Link Video (embed URL)</label>
+          <label className="block text-sm font-semibold text-ink mb-1.5">Link Video YouTube</label>
           <input
             value={form.videoUrl}
             onChange={(e) => setForm({ ...form, videoUrl: e.target.value })}
-            placeholder="https://www.youtube.com/embed/xxxxxxxx"
+            placeholder="https://www.youtube.com/watch?v=xxxxxxxx"
             className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
           />
           <p className="text-xs text-ink/45 mt-1">
-            Gunakan tautan format "embed", contoh: youtube.com/embed/ID_VIDEO
+            Boleh paste link YouTube apa saja (watch, youtu.be, shorts) — otomatis disesuaikan.
+          </p>
+        </div>
+
+        <div className="mb-5">
+          <label className="block text-sm font-semibold text-ink mb-1.5">
+            Supporting File <span className="font-normal text-ink/45">(link Google Drive, opsional)</span>
+          </label>
+          <input
+            value={form.supportingFileUrl}
+            onChange={(e) => setForm({ ...form, supportingFileUrl: e.target.value })}
+            placeholder="https://drive.google.com/..."
+            className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
+          />
+          <p className="text-xs text-ink/45 mt-1">
+            Copy-paste link Google Drive dari sumber luar — saat diklik member akan diarahkan ke link ini.
           </p>
         </div>
 
@@ -172,7 +202,10 @@ export default function AdminProductsPage() {
         {products.map((p) => (
           <div key={p.id} className="flex items-start justify-between gap-4 bg-card border border-ink/10 rounded-lg px-5 py-4 shadow-stamp">
             <div className="min-w-0">
-              <p className="font-mono text-[11px] uppercase tracking-wide text-brass mb-1">{p.category}</p>
+              <p className="font-mono text-[11px] uppercase tracking-wide text-brass mb-1">
+                {p.category}
+                {p.subCategory ? ` · ${p.subCategory}` : ""}
+              </p>
               <p className="font-display text-lg text-ink mb-1">{p.name}</p>
               <p className="text-sm text-charcoal/60 line-clamp-1">{p.summary}</p>
             </div>

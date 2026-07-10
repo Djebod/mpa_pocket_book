@@ -4,61 +4,16 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import * as store from "@/lib/store";
+import { toYouTubeEmbedUrl } from "@/lib/youtube";
+import { FileDisplay } from "@/components/FileDisplay";
 
 const TABS = [
   { key: "summary", label: "Summary Produk" },
   { key: "ilustrasi", label: "Ilustrasi Produk" },
   { key: "caraMenjual", label: "Cara Menjual" },
   { key: "video", label: "Video Penjelasan" },
+  { key: "supporting", label: "File Pendukung" },
 ];
-
-function ProductFileDisplay({ file }) {
-  if (!file) return null;
-  const isPdf = file.mimeType === "application/pdf";
-  const isImage = file.mimeType?.startsWith("image/");
-
-  if (isPdf) {
-    // Google Docs Viewer dipakai untuk menampilkan PDF sebagai dokumen
-    // di dalam halaman (bukan link download langsung, yang memicu
-    // Content-Disposition: attachment dan malah auto-download alih-alih
-    // tampil). Kalau file masih lokal (belum ke Drive, tidak ada
-    // previewUrl), fallback ke data URL-nya langsung — browser modern
-    // biasanya tetap bisa merender PDF dari data URL di dalam iframe.
-    const embedSrc = file.previewUrl || file.url;
-    return (
-      <div className="mt-4">
-        <div className="w-full aspect-[4/5] sm:aspect-[16/10] rounded-md overflow-hidden border border-ink/10 bg-paper-dark/30">
-          <iframe src={embedSrc} title={file.name || "Lampiran PDF"} className="w-full h-full" />
-        </div>
-        <p className="text-xs text-ink/45 mt-2">
-          Kalau PDF tidak tampil di atas, gunakan tombol download di bawah ini.
-        </p>
-        <a
-          href={file.downloadUrl || file.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          download={file.name || undefined}
-          className="mt-2 inline-flex items-center gap-2 bg-ink text-paper text-sm font-semibold px-4 py-2.5 rounded-md hover:bg-ink-light transition-colors"
-        >
-          📄 Download PDF{file.name ? ` — ${file.name}` : ""}
-        </a>
-      </div>
-    );
-  }
-
-  if (isImage) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={file.url}
-        alt={file.name || "Lampiran produk"}
-        className="mt-4 max-w-full h-auto rounded-md border border-ink/10"
-      />
-    );
-  }
-
-  return null;
-}
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -95,6 +50,7 @@ export default function ProductDetailPage() {
 
       <p className="font-mono text-[11px] uppercase tracking-wide text-brass mt-4 mb-1.5">
         {product.category}
+        {product.subCategory ? ` · ${product.subCategory}` : ""}
       </p>
       <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-6">{product.name}</h1>
 
@@ -118,19 +74,19 @@ export default function ProductDetailPage() {
         {tab === "summary" && (
           <div>
             <p className="text-sm leading-relaxed text-charcoal/85 whitespace-pre-line">{product.summary}</p>
-            <ProductFileDisplay file={product.summaryFile} />
+            <FileDisplay file={product.summaryFile} />
           </div>
         )}
         {tab === "ilustrasi" && (
           <div>
             <p className="text-sm leading-relaxed text-charcoal/85 whitespace-pre-line">{product.ilustrasi}</p>
-            <ProductFileDisplay file={product.ilustrasiFile} />
+            <FileDisplay file={product.ilustrasiFile} />
           </div>
         )}
         {tab === "caraMenjual" && (
           <div>
             <p className="text-sm leading-relaxed text-charcoal/85 whitespace-pre-line">{product.caraMenjual}</p>
-            <ProductFileDisplay file={product.caraMenjualFile} />
+            <FileDisplay file={product.caraMenjualFile} />
           </div>
         )}
         {tab === "video" && (
@@ -138,7 +94,7 @@ export default function ProductDetailPage() {
             {product.videoUrl ? (
               <div className="aspect-video w-full rounded-md overflow-hidden bg-ink/10">
                 <iframe
-                  src={product.videoUrl}
+                  src={toYouTubeEmbedUrl(product.videoUrl)}
                   title={`Video penjelasan ${product.name}`}
                   className="w-full h-full"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -147,6 +103,22 @@ export default function ProductDetailPage() {
               </div>
             ) : (
               <p className="text-sm text-ink/50">Belum ada video untuk produk ini.</p>
+            )}
+          </div>
+        )}
+        {tab === "supporting" && (
+          <div>
+            {product.supportingFileUrl ? (
+              <a
+                href={product.supportingFileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-ink text-paper text-sm font-semibold px-4 py-2.5 rounded-md hover:bg-ink-light transition-colors"
+              >
+                🔗 Buka File Pendukung di Google Drive
+              </a>
+            ) : (
+              <p className="text-sm text-ink/50">Belum ada file pendukung untuk produk ini.</p>
             )}
           </div>
         )}

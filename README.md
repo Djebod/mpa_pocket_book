@@ -8,7 +8,20 @@ member, produk, dan laporan aktivitas — lengkap dengan export ke Excel.
 ## Fitur
 
 - **Login** email & password, password tersimpan ter-enkripsi (hashed).
-- **Katalog Produk** dengan 4 sub-menu per produk.
+- **Katalog Produk** dengan 4 sub-menu per produk, plus **File Pendukung**
+  (link Google Drive), **Sub Kategori**, dan **filter + pencarian**
+  (Kategori, Sub Kategori, kata kunci) di halaman katalog.
+- **Video Penjelasan** menerima link YouTube apa pun (watch, youtu.be,
+  shorts) — otomatis disesuaikan ke format yang bisa ditampilkan.
+- **Lampiran Foto/PDF** pada field Summary/Ilustrasi/Cara Menjual produk
+  — foto tampil langsung (ukuran menyesuaikan aslinya), PDF tampil
+  sebagai dokumen inline (lewat Google Docs Viewer) + tombol download.
+- **Komisi Produk & Kompensasi** — halaman tunggal (dikelola Admin):
+  deskripsi + banyak lampiran PDF/foto.
+- **Promo** — daftar promo (dikelola Admin): Type Promo + banyak
+  lampiran PDF/foto per promo.
+- **Tutorial Digital** — daftar tutorial (dikelola Admin): judul + link
+  Google Drive, klik untuk membuka.
 - **Aktivitas Member**: catat Visit Customer / Recruit / Role Play / Join
   Visit / Other, lengkap dengan **Nama Nasabah**, **No. Telpon Nasabah**,
   catatan, dan foto wajib. Bisa **diedit di hari yang sama** aktivitas
@@ -138,8 +151,8 @@ request.
 ### 2. Siapkan Google Sheet
 
 1. Buat spreadsheet baru di [Google Sheets](https://sheets.google.com).
-2. Buat 3 tab (sheet) dengan nama **persis**: `Members`, `Products`,
-   `Activities`.
+2. Buat 6 tab (sheet) dengan nama **persis**: `Members`, `Products`,
+   `Activities`, `Promo`, `Tutorials`, `Commission`.
 3. Baris pertama tiap tab tidak perlu diisi manual — akan terisi otomatis
    header-nya saat pertama kali data disimpan lewat aplikasi (lihat
    `SHEET_HEADERS` di `lib/google/sheetsClient.js` untuk daftar kolomnya).
