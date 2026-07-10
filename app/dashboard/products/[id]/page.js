@@ -18,22 +18,26 @@ function ProductFileDisplay({ file }) {
   const isImage = file.mimeType?.startsWith("image/");
 
   if (isPdf) {
-    // previewUrl (format resmi Drive) dipakai untuk menampilkan PDF
-    // langsung di halaman lewat iframe. Kalau file masih lokal (belum
-    // ter-upload ke Drive), browser tetap bisa merender data URL PDF
-    // langsung lewat iframe menggunakan viewer PDF bawaan browser.
-    const embedSrc = file.previewUrl || file.url;
+    // Menampilkan PDF lewat link download langsung (bukan halaman
+    // /preview Google Drive) — browser modern (Chrome, Edge, Safari, dll)
+    // sudah punya PDF viewer bawaan dan akan merendernya langsung di
+    // dalam <iframe>. Ini lebih andal daripada preview Google Drive, yang
+    // kadang menampilkan error 403 tergantung kebijakan/cookie Google.
+    const embedSrc = file.downloadUrl || file.url;
     return (
       <div className="mt-4">
         <div className="w-full aspect-[4/5] sm:aspect-[16/10] rounded-md overflow-hidden border border-ink/10 bg-paper-dark/30">
           <iframe src={embedSrc} title={file.name || "Lampiran PDF"} className="w-full h-full" />
         </div>
+        <p className="text-xs text-ink/45 mt-2">
+          Kalau PDF tidak tampil di atas, gunakan tombol download di bawah ini.
+        </p>
         <a
           href={file.downloadUrl || file.url}
           target="_blank"
           rel="noopener noreferrer"
           download={file.name || undefined}
-          className="mt-3 inline-flex items-center gap-2 bg-ink text-paper text-sm font-semibold px-4 py-2.5 rounded-md hover:bg-ink-light transition-colors"
+          className="mt-2 inline-flex items-center gap-2 bg-ink text-paper text-sm font-semibold px-4 py-2.5 rounded-md hover:bg-ink-light transition-colors"
         >
           📄 Download PDF{file.name ? ` — ${file.name}` : ""}
         </a>
