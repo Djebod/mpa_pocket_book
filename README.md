@@ -172,20 +172,79 @@ GOOGLE_DRIVE_FOLDER_ID=...        (dari langkah 3)
 Untuk di Vercel, tambahkan 4 variabel yang sama di **Project Settings →
 Environment Variables**, lalu redeploy.
 
-### 5. Yang sudah otomatis jalan vs yang masih perlu disambungkan
+### 5. Foto ke Google Drive: kenapa perlu langkah tambahan
 
-- ✅ **Foto aktivitas**: begitu 4 env variable di atas terisi, form "Catat
-  Aktivitas" otomatis mencoba upload foto ke folder Drive tersebut lewat
-  `/api/upload-photo`, dan menyimpan URL Drive-nya (bukan lagi teks base64
-  raksasa). Kalau env belum diisi / gagal, otomatis fallback ke penyimpanan
-  lokal seperti biasa — tidak ada fitur yang rusak.
-- 🔧 **Data Member / Produk / Aktivitas**: endpoint API-nya sudah siap dan
-  bisa dites langsung (`GET /api/members`, `GET /api/products`,
-  `GET /api/activities`, serta `POST` ke masing-masing untuk menyimpan).
-  Menyambungkan `lib/store.js` supaya otomatis baca/tulis lewat endpoint
-  ini (bukan lagi localStorage) adalah langkah lanjutan yang bisa saya
-  bantu kerjakan berikutnya — beri tahu saya kalau Anda sudah selesai
-  membuat Service Account & Sheet-nya, dan saya sambungkan sisanya.
+Kalau Anda memakai akun Google **personal** (Gmail biasa, bukan Google
+Workspace berbayar), upload foto lewat Service Account akan gagal dengan
+pesan **"Service Accounts do not have storage quota"**. Ini bukan bug —
+ini batasan resmi Google: Service Account tidak punya kuota penyimpanan
+sendiri di Drive biasa, jadi tidak bisa membuat file baru di sana (beda
+dengan Sheets, yang cuma mengedit isi file yang sudah ada, tidak butuh
+kuota).
+
+Solusinya: pakai token OAuth dari akun Google **asli** Anda (yang punya
+kuota sungguhan), khusus untuk upload foto. Ikuti langkah ini sekali saja:
+
+#### a. Buat OAuth Client ID (beda dari Service Account)
+
+1. Di [Google Cloud Console](https://console.cloud.google.com/) → **APIs &
+   Services** → **Credentials** → **+ Create Credentials** → **OAuth
+   client ID**.
+2. Kalau diminta konfigurasi **OAuth consent screen** dulu, isi seadanya
+   (App name bebas, User support email isi email Anda, Developer contact
+   isi email Anda) → **Save and Continue** terus sampai selesai. Pilih
+   **User Type: External**, dan tambahkan email Anda sendiri di bagian
+   **Test users**.
+3. Kembali ke **Create OAuth client ID** → **Application type**: pilih
+   **Web application**.
+4. Di **Authorized redirect URIs**, tambahkan:
+   ```
+   https://developers.google.com/oauthplayground
+   ```
+5. Klik **Create**. Salin **Client ID** dan **Client Secret** yang muncul.
+
+#### b. Ambil Refresh Token lewat OAuth Playground
+
+1. Buka [developers.google.com/oauthplayground](https://developers.google.com/oauthplayground/).
+2. Klik ikon ⚙️ (gear) di pojok kanan atas → centang **"Use your own OAuth
+   credentials"** → isi **Client ID** & **Client Secret** dari langkah (a).
+3. Di panel kiri (**Step 1**), cari **Drive API v3**, centang scope
+   `https://www.googleapis.com/auth/drive.file`.
+4. Klik **Authorize APIs** → login dengan akun Google Anda (yang punya
+   folder Drive tujuan) → **Allow**.
+5. Di **Step 2**, klik **Exchange authorization code for tokens**.
+6. Salin nilai **Refresh token** yang muncul.
+
+#### c. Isi environment variables
+
+Tambahkan 3 variabel ini (di `.env.local` untuk lokal, atau Vercel
+Environment Variables untuk live):
+```
+GOOGLE_OAUTH_CLIENT_ID=...       (dari langkah a)
+GOOGLE_OAUTH_CLIENT_SECRET=...   (dari langkah a)
+GOOGLE_OAUTH_REFRESH_TOKEN=...   (dari langkah b)
+```
+
+Dengan ini, `GOOGLE_DRIVE_FOLDER_ID` cukup folder biasa di akun Google
+Anda sendiri (tidak perlu di-Share ke Service Account lagi) — aplikasi
+akan upload foto atas nama akun Anda sendiri, yang punya kuota
+penyimpanan normal.
+
+
+
+### 7. Status saat ini: apa yang sudah otomatis jalan
+
+- ✅ **Data Member / Produk / Aktivitas**: `lib/store.js` otomatis menarik
+  data dari Google Sheets saat aplikasi dibuka, dan mendorong setiap
+  perubahan (tambah/ubah/hapus) ke Sheets di latar belakang. Endpoint
+  `/api/members`, `/api/products`, `/api/activities` bisa dites langsung
+  di browser untuk melihat data mentahnya.
+- ✅ **Foto aktivitas**: begitu env variable OAuth2 (bagian 5 di atas)
+  terisi, form "Catat Aktivitas" otomatis mengunggah foto ke Google Drive
+  lewat `/api/upload-photo`, dan menyimpan URL Drive-nya (bukan lagi teks
+  base64 raksasa) ke kolom `photoUrl`. Kalau belum dikonfigurasi / gagal,
+  otomatis fallback ke penyimpanan lokal browser sementara — tidak ada
+  fitur yang rusak, cuma foto belum ikut ter-backup ke Drive.
 
 ## Update Selanjutnya
 
