@@ -53,7 +53,7 @@ npm run dev
 Buka `http://localhost:3000`.
 
 **Akun contoh (data sementara):**
-- Super Admin: `syam.rakhmany@gmail.com` / `Dolar@13`
+- Super Admin: `syam.rakhmany@gmail.com` / `paparazi`
 - Member: `siti.rahma@muliaputri.com` / `agen123`
 - Member: `budi.santoso@muliaputri.com` / `agen123`
 
