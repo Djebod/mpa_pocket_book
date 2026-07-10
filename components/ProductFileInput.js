@@ -72,7 +72,13 @@ export default function ProductFileInput({ value, onChange, label = "Lampiran Fo
 
     try {
       const dataUrl = isImage ? await compressImage(file) : await readAsDataURL(file);
-      let result = { url: dataUrl, downloadUrl: dataUrl, mimeType: isPdf ? "application/pdf" : "image/jpeg", name: file.name };
+      let result = {
+        url: dataUrl,
+        downloadUrl: dataUrl,
+        mimeType: isPdf ? "application/pdf" : "image/jpeg",
+        name: file.name,
+        hostedOnDrive: false,
+      };
 
       try {
         const res = await fetch("/api/upload-photo", {
@@ -87,10 +93,19 @@ export default function ProductFileInput({ value, onChange, label = "Lampiran Fo
             downloadUrl: data.downloadUrl || data.viewUrl,
             mimeType: data.mimeType || result.mimeType,
             name: file.name,
+            hostedOnDrive: true,
           };
+        } else {
+          setError(
+            `File tersimpan sementara di browser ini saja — gagal diunggah ke Google Drive (${
+              data.error || "sebab tidak diketahui"
+            }). Klik "Ganti File" untuk coba lagi setelah masalah Drive diperbaiki.`
+          );
         }
       } catch (err) {
-        console.warn("Upload ke Google Drive gagal, pakai file lokal:", err);
+        setError(
+          `File tersimpan sementara di browser ini saja — gagal terhubung ke Google Drive (${err.message}). PDF/foto berukuran besar yang tidak ter-upload ke Drive TIDAK akan ikut tersimpan ke Google Sheets.`
+        );
       }
 
       onChange(result);
@@ -103,6 +118,9 @@ export default function ProductFileInput({ value, onChange, label = "Lampiran Fo
 
   const isPdfValue = value?.mimeType === "application/pdf";
   const isImageValue = value?.mimeType?.startsWith("image/");
+  const isDriveHosted =
+    value?.hostedOnDrive === true ||
+    (value?.hostedOnDrive === undefined && typeof value?.url === "string" && value.url.startsWith("https://drive.google.com"));
 
   return (
     <div>
@@ -121,6 +139,11 @@ export default function ProductFileInput({ value, onChange, label = "Lampiran Fo
           )}
           <div className="text-xs text-ink/60 min-w-0">
             <p className="truncate max-w-[200px]">{value.name || "File terlampir"}</p>
+            {isDriveHosted ? (
+              <p className="text-sage font-semibold mt-0.5">✓ Tersimpan di Google Drive</p>
+            ) : (
+              <p className="text-rust font-semibold mt-0.5">⚠ Belum ter-upload ke Drive</p>
+            )}
             <button type="button" onClick={() => onChange(null)} className="text-rust underline underline-offset-2 mt-1">
               Hapus lampiran
             </button>
