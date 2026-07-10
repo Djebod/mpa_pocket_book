@@ -15,10 +15,23 @@ export default function AdminActivitiesPage() {
   const [to, setTo] = useState("");
   const [preview, setPreview] = useState(null);
 
-  useEffect(() => {
+  function refresh() {
     setActivities(store.getActivities());
     setMembers(store.getMembers());
-  }, []);
+  }
+
+  useEffect(refresh, []);
+
+  function handleDelete(activity) {
+    if (
+      !confirm(
+        `Hapus aktivitas "${activity.type}" milik ${activity.memberName} tanggal ${activity.date}? Tindakan ini tidak bisa dibatalkan.`
+      )
+    )
+      return;
+    store.deleteActivity(activity.id);
+    refresh();
+  }
 
   const filtered = useMemo(() => {
     return activities.filter((a) => {
@@ -142,7 +155,7 @@ export default function AdminActivitiesPage() {
               <th className="px-4 py-3">No. Telpon</th>
               <th className="px-4 py-3">Catatan</th>
               <th className="px-4 py-3">Foto</th>
-            </tr>
+              <th className="px-4 py-3"></th>
           </thead>
           <tbody>
             {filtered.map((a) => (
@@ -169,11 +182,19 @@ export default function AdminActivitiesPage() {
                     "—"
                   )}
                 </td>
+                <td className="px-4 py-3 text-right whitespace-nowrap">
+                  <button
+                    onClick={() => handleDelete(a)}
+                    className="text-xs font-semibold text-rust/70 hover:text-rust"
+                  >
+                    Hapus
+                  </button>
+                </td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-ink/40">
+                <td colSpan={8} className="px-4 py-8 text-center text-ink/40">
                   Tidak ada aktivitas yang cocok dengan filter.
                 </td>
               </tr>

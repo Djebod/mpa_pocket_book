@@ -121,12 +121,6 @@ export default function ActivitiesPage() {
     setSubmitting(false);
   }
 
-  function handleDelete(id) {
-    store.deleteActivity(id);
-    if (editingId === id) resetForm();
-    refresh();
-  }
-
   return (
     <div>
       <h1 className="font-display italic text-3xl text-ink mb-1">Aktivitas</h1>
@@ -263,24 +257,15 @@ export default function ActivitiesPage() {
                   )}
                   {act.note && <p className="text-sm text-charcoal/80">{act.note}</p>}
                 </div>
-                <div className="flex flex-col items-end gap-2 shrink-0">
-                  {editable && (
-                    <button
-                      onClick={() => startEdit(act)}
-                      className="text-xs text-ink/60 hover:text-brass"
-                      aria-label="Ubah aktivitas"
-                    >
-                      Ubah
-                    </button>
-                  )}
+                {editable && (
                   <button
-                    onClick={() => handleDelete(act.id)}
-                    className="text-xs text-rust/70 hover:text-rust"
-                    aria-label="Hapus aktivitas"
+                    onClick={() => startEdit(act)}
+                    className="text-xs text-ink/60 hover:text-brass shrink-0"
+                    aria-label="Ubah aktivitas"
                   >
-                    Hapus
+                    Ubah
                   </button>
-                </div>
+                )}
               </li>
             );
           })}

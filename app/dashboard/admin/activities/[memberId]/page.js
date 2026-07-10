@@ -14,12 +14,20 @@ export default function AdminMemberActivityDetailPage() {
   const [counts, setCounts] = useState({});
   const [preview, setPreview] = useState(null);
 
-  useEffect(() => {
+  function refresh() {
     const members = store.getMembers();
     setMember(members.find((m) => m.id === memberId) || null);
     setActivities(store.getActivitiesByMember(memberId));
     setCounts(store.countActivitiesByType(memberId));
-  }, [memberId]);
+  }
+
+  useEffect(refresh, [memberId]);
+
+  function handleDelete(act) {
+    if (!confirm(`Hapus aktivitas "${act.type}" tanggal ${act.date}? Tindakan ini tidak bisa dibatalkan.`)) return;
+    store.deleteActivity(act.id);
+    refresh();
+  }
 
   if (member === undefined) {
     return <p className="font-mono text-sm text-ink/50">Memuat…</p>;
@@ -101,6 +109,12 @@ export default function AdminMemberActivityDetailPage() {
                 )}
                 {act.note && <p className="text-sm text-charcoal/80">{act.note}</p>}
               </div>
+              <button
+                onClick={() => handleDelete(act)}
+                className="text-xs font-semibold text-rust/70 hover:text-rust shrink-0"
+              >
+                Hapus
+              </button>
             </li>
           ))}
         </ul>
