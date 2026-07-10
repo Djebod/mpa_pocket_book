@@ -4,6 +4,15 @@ import { useRef, useState } from "react";
 
 const MAX_DIMENSION = 1600;
 const JPEG_QUALITY = 0.75;
+// Batas ukuran file PDF sebelum diunggah. PDF tidak bisa dikompres
+// otomatis seperti foto (tidak ada "resize" untuk dokumen), dan server
+// (Vercel) punya batas ukuran request sekitar 4.5MB — di atas itu upload
+// akan gagal dengan error "Request Entity Too Large".
+const MAX_PDF_SIZE_BYTES = 4 * 1024 * 1024; // 4MB
+
+function formatMB(bytes) {
+  return (bytes / (1024 * 1024)).toFixed(1);
+}
 
 function compressImage(file) {
   return new Promise((resolve, reject) => {
@@ -70,11 +79,21 @@ export default function ProductFileInput({ value, onChange, label = "Lampiran Fo
       return;
     }
 
+    if (isPdf && file.size > MAX_PDF_SIZE_BYTES) {
+      setError(
+        `File PDF terlalu besar (${formatMB(file.size)}MB). Maksimal 4MB. Coba kompres dulu PDF-nya (misalnya lewat ilovepdf.com atau smallpdf.com), lalu upload ulang.`
+      );
+      setProcessing(false);
+      e.target.value = "";
+      return;
+    }
+
     try {
       const dataUrl = isImage ? await compressImage(file) : await readAsDataURL(file);
       let result = {
         url: dataUrl,
         downloadUrl: dataUrl,
+        previewUrl: null,
         mimeType: isPdf ? "application/pdf" : "image/jpeg",
         name: file.name,
         hostedOnDrive: false,
@@ -86,11 +105,26 @@ export default function ProductFileInput({ value, onChange, label = "Lampiran Fo
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ dataUrl, filename: file.name }),
         });
-        const data = await res.json();
+
+        let data;
+        try {
+          data = await res.json();
+        } catch {
+          // Respons bukan JSON — biasanya ini terjadi kalau ukuran file
+          // melebihi batas server (Vercel menolak sebelum kode kita sempat
+          // jalan, jadi jawabannya bukan JSON error buatan kita).
+          throw new Error(
+            res.status === 413
+              ? "Ukuran file terlalu besar untuk server (maksimal ±4MB)."
+              : `Server merespons tidak terduga (status ${res.status}).`
+          );
+        }
+
         if (data.ok && data.viewUrl) {
           result = {
             url: data.viewUrl,
             downloadUrl: data.downloadUrl || data.viewUrl,
+            previewUrl: data.previewUrl || null,
             mimeType: data.mimeType || result.mimeType,
             name: file.name,
             hostedOnDrive: true,

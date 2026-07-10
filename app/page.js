@@ -39,7 +39,7 @@ export default function LoginPage() {
           <p className="font-mono text-xs tracking-[0.25em] text-brass uppercase mb-2">
             Mulia Putri Agency
           </p>
-          <h1 className="font-display italic text-4xl text-ink">Pocket Book</h1>
+          <h1 className="font-display italic text-3xl sm:text-4xl text-ink">Pocket Book</h1>
           <p className="text-sm text-ink/60 mt-2">
             Buku saku digital agen — produk, panduan jual, dan catatan aktivitas.
           </p>

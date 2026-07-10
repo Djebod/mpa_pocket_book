@@ -75,7 +75,7 @@ export default function AdminProductsPage() {
 
   return (
     <div>
-      <h1 className="font-display italic text-3xl text-ink mb-1">Kelola Produk</h1>
+      <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-1">Kelola Produk</h1>
       <p className="text-sm text-ink/60 mb-8">
         Isi keempat sub-menu produk: Summary, Ilustrasi, Cara Menjual, dan Video Penjelasan. Tiap
         field teks juga bisa dilampiri foto atau PDF (misalnya brosur produk).

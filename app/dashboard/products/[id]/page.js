@@ -18,16 +18,26 @@ function ProductFileDisplay({ file }) {
   const isImage = file.mimeType?.startsWith("image/");
 
   if (isPdf) {
+    // previewUrl (format resmi Drive) dipakai untuk menampilkan PDF
+    // langsung di halaman lewat iframe. Kalau file masih lokal (belum
+    // ter-upload ke Drive), browser tetap bisa merender data URL PDF
+    // langsung lewat iframe menggunakan viewer PDF bawaan browser.
+    const embedSrc = file.previewUrl || file.url;
     return (
-      <a
-        href={file.downloadUrl || file.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        download={file.name || undefined}
-        className="mt-4 inline-flex items-center gap-2 bg-ink text-paper text-sm font-semibold px-4 py-2.5 rounded-md hover:bg-ink-light transition-colors"
-      >
-        📄 Download PDF{file.name ? ` — ${file.name}` : ""}
-      </a>
+      <div className="mt-4">
+        <div className="w-full aspect-[4/5] sm:aspect-[16/10] rounded-md overflow-hidden border border-ink/10 bg-paper-dark/30">
+          <iframe src={embedSrc} title={file.name || "Lampiran PDF"} className="w-full h-full" />
+        </div>
+        <a
+          href={file.downloadUrl || file.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          download={file.name || undefined}
+          className="mt-3 inline-flex items-center gap-2 bg-ink text-paper text-sm font-semibold px-4 py-2.5 rounded-md hover:bg-ink-light transition-colors"
+        >
+          📄 Download PDF{file.name ? ` — ${file.name}` : ""}
+        </a>
+      </div>
     );
   }
 
@@ -81,7 +91,7 @@ export default function ProductDetailPage() {
       <p className="font-mono text-[11px] uppercase tracking-wide text-brass mt-4 mb-1.5">
         {product.category}
       </p>
-      <h1 className="font-display italic text-3xl text-ink mb-6">{product.name}</h1>
+      <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-6">{product.name}</h1>
 
       <div className="flex gap-1 border-b border-ink/15 mb-6 overflow-x-auto">
         {TABS.map((t) => (

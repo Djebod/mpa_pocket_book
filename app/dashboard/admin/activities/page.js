@@ -67,7 +67,7 @@ export default function AdminActivitiesPage() {
   return (
     <div>
       <div className="flex items-start justify-between gap-4 flex-wrap mb-1">
-        <h1 className="font-display italic text-3xl text-ink">Ringkasan Aktivitas</h1>
+        <h1 className="font-display italic text-2xl sm:text-3xl text-ink">Ringkasan Aktivitas</h1>
         <div className="flex gap-2 shrink-0">
           <button
             onClick={() => exportActivitiesToExcel(filtered)}

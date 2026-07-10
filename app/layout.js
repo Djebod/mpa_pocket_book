@@ -30,6 +30,12 @@ export const metadata = {
     "Buku saku digital agen: produk asuransi, panduan penjualan, dan catatan aktivitas harian.",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="id" className={`${fraunces.variable} ${publicSans.variable} ${plexMono.variable}`}>

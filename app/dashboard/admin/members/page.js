@@ -79,7 +79,7 @@ export default function AdminMembersPage() {
   return (
     <div>
       <div className="flex items-start justify-between gap-4 flex-wrap mb-1">
-        <h1 className="font-display italic text-3xl text-ink">Kelola Member</h1>
+        <h1 className="font-display italic text-2xl sm:text-3xl text-ink">Kelola Member</h1>
         <button
           onClick={() => exportMembersToExcel(members)}
           className="bg-ink text-paper text-xs font-semibold px-4 py-2.5 rounded-md hover:bg-ink-light transition-colors shrink-0"

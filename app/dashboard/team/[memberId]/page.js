@@ -65,7 +65,7 @@ export default function TeamMemberDetailPage() {
         ← Tim Saya
       </Link>
 
-      <h1 className="font-display italic text-3xl text-ink mt-4 mb-1">{member.name}</h1>
+      <h1 className="font-display italic text-2xl sm:text-3xl text-ink mt-4 mb-1">{member.name}</h1>
       <p className="text-sm text-ink/60 font-mono mb-8">{member.email}</p>
 
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-8">

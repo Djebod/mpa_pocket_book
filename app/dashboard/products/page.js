@@ -13,7 +13,7 @@ export default function ProductsPage() {
 
   return (
     <div>
-      <h1 className="font-display italic text-3xl text-ink mb-1">Katalog Produk</h1>
+      <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-1">Katalog Produk</h1>
       <p className="text-sm text-ink/60 mb-8">
         Pilih produk untuk melihat summary, ilustrasi, cara menjual, dan video penjelasan.
       </p>

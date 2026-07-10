@@ -123,7 +123,7 @@ export default function ActivitiesPage() {
 
   return (
     <div>
-      <h1 className="font-display italic text-3xl text-ink mb-1">Aktivitas</h1>
+      <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-1">Aktivitas</h1>
       <p className="text-sm text-ink/60 mb-8">Catat aktivitas harian Anda lengkap dengan foto bukti.</p>
 
       <form

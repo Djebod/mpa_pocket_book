@@ -22,7 +22,7 @@ export default function MemberDashboardPage() {
   return (
     <div>
       <div className="flex items-baseline justify-between mb-1">
-        <h1 className="font-display italic text-3xl text-ink">Halo, {session?.name?.split(" ")[0]}</h1>
+        <h1 className="font-display italic text-2xl sm:text-3xl text-ink">Halo, {session?.name?.split(" ")[0]}</h1>
         <span className="font-mono text-xs text-ink/50">{total} aktivitas tercatat</span>
       </div>
       <p className="text-sm text-ink/60 mb-8">Ringkasan aktivitas Anda di Mulia Putri Agency.</p>

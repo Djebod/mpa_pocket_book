@@ -55,7 +55,7 @@ export default function AdminMemberActivityDetailPage() {
 
       <div className="flex items-start justify-between gap-4 flex-wrap mt-4 mb-1">
         <div>
-          <h1 className="font-display italic text-3xl text-ink">{member.name}</h1>
+          <h1 className="font-display italic text-2xl sm:text-3xl text-ink">{member.name}</h1>
           <p className="text-sm text-ink/60 font-mono">{member.email}</p>
         </div>
         <button
