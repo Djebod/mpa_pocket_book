@@ -176,6 +176,7 @@ export default function AdminActivitiesPage() {
               <th className="px-4 py-3">Catatan</th>
               <th className="px-4 py-3">Foto</th>
               <th className="px-4 py-3"></th>
+            </tr>
           </thead>
           <tbody>
             {filtered.map((a) => (
