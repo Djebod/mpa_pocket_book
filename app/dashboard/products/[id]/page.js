@@ -12,6 +12,39 @@ const TABS = [
   { key: "video", label: "Video Penjelasan" },
 ];
 
+function ProductFileDisplay({ file }) {
+  if (!file) return null;
+  const isPdf = file.mimeType === "application/pdf";
+  const isImage = file.mimeType?.startsWith("image/");
+
+  if (isPdf) {
+    return (
+      <a
+        href={file.downloadUrl || file.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        download={file.name || undefined}
+        className="mt-4 inline-flex items-center gap-2 bg-ink text-paper text-sm font-semibold px-4 py-2.5 rounded-md hover:bg-ink-light transition-colors"
+      >
+        📄 Download PDF{file.name ? ` — ${file.name}` : ""}
+      </a>
+    );
+  }
+
+  if (isImage) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={file.url}
+        alt={file.name || "Lampiran produk"}
+        className="mt-4 max-w-full h-auto rounded-md border border-ink/10"
+      />
+    );
+  }
+
+  return null;
+}
+
 export default function ProductDetailPage() {
   const { id } = useParams();
   const [product, setProduct] = useState(undefined);
@@ -68,13 +101,22 @@ export default function ProductDetailPage() {
 
       <div className="bg-card border border-ink/10 rounded-lg rounded-tl-none px-6 py-6 shadow-stamp min-h-[220px]">
         {tab === "summary" && (
-          <p className="text-sm leading-relaxed text-charcoal/85 whitespace-pre-line">{product.summary}</p>
+          <div>
+            <p className="text-sm leading-relaxed text-charcoal/85 whitespace-pre-line">{product.summary}</p>
+            <ProductFileDisplay file={product.summaryFile} />
+          </div>
         )}
         {tab === "ilustrasi" && (
-          <p className="text-sm leading-relaxed text-charcoal/85 whitespace-pre-line">{product.ilustrasi}</p>
+          <div>
+            <p className="text-sm leading-relaxed text-charcoal/85 whitespace-pre-line">{product.ilustrasi}</p>
+            <ProductFileDisplay file={product.ilustrasiFile} />
+          </div>
         )}
         {tab === "caraMenjual" && (
-          <p className="text-sm leading-relaxed text-charcoal/85 whitespace-pre-line">{product.caraMenjual}</p>
+          <div>
+            <p className="text-sm leading-relaxed text-charcoal/85 whitespace-pre-line">{product.caraMenjual}</p>
+            <ProductFileDisplay file={product.caraMenjualFile} />
+          </div>
         )}
         {tab === "video" && (
           <div>

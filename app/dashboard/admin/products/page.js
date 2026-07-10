@@ -2,13 +2,17 @@
 
 import { useEffect, useState } from "react";
 import * as store from "@/lib/store";
+import ProductFileInput from "@/components/ProductFileInput";
 
 const emptyForm = {
   name: "",
   category: "",
   summary: "",
+  summaryFile: null,
   ilustrasi: "",
+  ilustrasiFile: null,
   caraMenjual: "",
+  caraMenjualFile: null,
   videoUrl: "",
 };
 
@@ -51,8 +55,11 @@ export default function AdminProductsPage() {
       name: product.name,
       category: product.category,
       summary: product.summary,
+      summaryFile: product.summaryFile || null,
       ilustrasi: product.ilustrasi || "",
+      ilustrasiFile: product.ilustrasiFile || null,
       caraMenjual: product.caraMenjual || "",
+      caraMenjualFile: product.caraMenjualFile || null,
       videoUrl: product.videoUrl || "",
     });
     setEditingId(product.id);
@@ -70,7 +77,8 @@ export default function AdminProductsPage() {
     <div>
       <h1 className="font-display italic text-3xl text-ink mb-1">Kelola Produk</h1>
       <p className="text-sm text-ink/60 mb-8">
-        Isi keempat sub-menu produk: Summary, Ilustrasi, Cara Menjual, dan Video Penjelasan.
+        Isi keempat sub-menu produk: Summary, Ilustrasi, Cara Menjual, dan Video Penjelasan. Tiap
+        field teks juga bisa dilampiri foto atau PDF (misalnya brosur produk).
       </p>
 
       <form onSubmit={handleSubmit} className="bg-card border border-ink/10 rounded-lg shadow-stamp px-6 py-6 mb-10 perforated">
@@ -96,34 +104,37 @@ export default function AdminProductsPage() {
           </div>
         </div>
 
-        <div className="mb-5">
-          <label className="block text-sm font-semibold text-ink mb-1.5">Summary Produk</label>
+        <div className="mb-5 space-y-3">
+          <label className="block text-sm font-semibold text-ink">Summary Produk</label>
           <textarea
             value={form.summary}
             onChange={(e) => setForm({ ...form, summary: e.target.value })}
             rows={3}
             className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
           />
+          <ProductFileInput value={form.summaryFile} onChange={(f) => setForm({ ...form, summaryFile: f })} />
         </div>
 
-        <div className="mb-5">
-          <label className="block text-sm font-semibold text-ink mb-1.5">Ilustrasi Produk</label>
+        <div className="mb-5 space-y-3">
+          <label className="block text-sm font-semibold text-ink">Ilustrasi Produk</label>
           <textarea
             value={form.ilustrasi}
             onChange={(e) => setForm({ ...form, ilustrasi: e.target.value })}
             rows={3}
             className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
           />
+          <ProductFileInput value={form.ilustrasiFile} onChange={(f) => setForm({ ...form, ilustrasiFile: f })} />
         </div>
 
-        <div className="mb-5">
-          <label className="block text-sm font-semibold text-ink mb-1.5">Cara Menjual Produk</label>
+        <div className="mb-5 space-y-3">
+          <label className="block text-sm font-semibold text-ink">Cara Menjual Produk</label>
           <textarea
             value={form.caraMenjual}
             onChange={(e) => setForm({ ...form, caraMenjual: e.target.value })}
             rows={4}
             className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
           />
+          <ProductFileInput value={form.caraMenjualFile} onChange={(f) => setForm({ ...form, caraMenjualFile: f })} />
         </div>
 
         <div className="mb-5">
