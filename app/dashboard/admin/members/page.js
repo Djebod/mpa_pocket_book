@@ -6,7 +6,7 @@ import * as store from "@/lib/store";
 import { isSuperAdminEmail } from "@/lib/admins";
 import { exportMembersToExcel } from "@/lib/exportExcel";
 
-const emptyForm = { name: "", email: "", phone: "", password: "", role: "member" };
+const emptyForm = { name: "", email: "", phone: "", password: "", role: "member", directLeaderId: "" };
 
 export default function AdminMembersPage() {
   const { session } = useAuth();
@@ -62,6 +62,7 @@ export default function AdminMembersPage() {
       phone: member.phone || "",
       password: "",
       role: store.getEffectiveRole(member),
+      directLeaderId: member.directLeaderId || "",
     });
     setEditingId(member.id);
     setError("");
@@ -141,6 +142,28 @@ export default function AdminMembersPage() {
               <option value="admin">Admin</option>
             </select>
           </div>
+          <div>
+            <label className="block text-sm font-semibold text-ink mb-1.5">
+              Direct Leader <span className="font-normal text-ink/45">(opsional)</span>
+            </label>
+            <select
+              value={form.directLeaderId}
+              onChange={(e) => setForm({ ...form, directLeaderId: e.target.value })}
+              className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
+            >
+              <option value="">— Tidak ada —</option>
+              {members
+                .filter((m) => m.id !== editingId)
+                .map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name}
+                  </option>
+                ))}
+            </select>
+            <p className="text-xs text-ink/45 mt-1">
+              Direct Leader bisa melihat aktivitas member ini. Member lain (selain Admin) tidak bisa.
+            </p>
+          </div>
         </div>
 
         {error && <p className="text-sm text-rust mb-4">{error}</p>}
@@ -173,6 +196,7 @@ export default function AdminMembersPage() {
               <th className="px-4 py-3">Email</th>
               <th className="px-4 py-3">No. HP</th>
               <th className="px-4 py-3">Role</th>
+              <th className="px-4 py-3">Direct Leader</th>
               <th className="px-4 py-3"></th>
             </tr>
           </thead>
@@ -201,6 +225,9 @@ export default function AdminMembersPage() {
                     >
                       {role === "admin" ? "Admin" : "Member"}
                     </span>
+                  </td>
+                  <td className="px-4 py-3 text-charcoal/70">
+                    {members.find((x) => x.id === m.directLeaderId)?.name || "—"}
                   </td>
                   <td className="px-4 py-3 text-right whitespace-nowrap">
                     <button onClick={() => handleEdit(m)} className="text-xs font-semibold text-ink/60 hover:text-brass mr-3">

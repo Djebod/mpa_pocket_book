@@ -11,7 +11,13 @@ member, produk, dan laporan aktivitas — lengkap dengan export ke Excel.
 - **Katalog Produk** dengan 4 sub-menu per produk.
 - **Aktivitas Member**: catat Visit Customer / Recruit / Role Play / Join
   Visit / Other, lengkap dengan **Nama Nasabah**, **No. Telpon Nasabah**,
-  catatan, dan foto wajib.
+  catatan, dan foto wajib. Bisa **diedit di hari yang sama** aktivitas
+  dicatat.
+- **Direct Leader**: tiap member bisa diberi satu Direct Leader (member
+  lain). Direct Leader bisa melihat riwayat aktivitas anak buahnya lewat
+  halaman **Tim Saya** — member lain (bukan diri sendiri, bukan Direct
+  Leader) tidak bisa melihatnya, kecuali Admin (Admin selalu bisa melihat
+  semua).
 - **Dashboard Member**: lihat jumlah aktivitas per jenis + riwayat.
 - **Dashboard Admin**:
   - Kelola Member — tambah/ubah/hapus, termasuk **mengubah level member

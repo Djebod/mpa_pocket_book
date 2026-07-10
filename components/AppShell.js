@@ -8,6 +8,7 @@ const MEMBER_TABS = [
   { href: "/dashboard", label: "Ringkasan" },
   { href: "/dashboard/activities", label: "Aktivitas" },
   { href: "/dashboard/products", label: "Produk" },
+  { href: "/dashboard/team", label: "Tim Saya" },
 ];
 
 const ADMIN_TABS = [
