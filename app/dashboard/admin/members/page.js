@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/app/providers";
 import * as store from "@/lib/store";
 import { isSuperAdminEmail } from "@/lib/admins";
@@ -14,6 +14,9 @@ export default function AdminMembersPage() {
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState("name");
+  const [sortDir, setSortDir] = useState("asc");
 
   function refresh() {
     if (!session) return;
@@ -21,6 +24,53 @@ export default function AdminMembersPage() {
   }
 
   useEffect(refresh, [session]);
+
+  function handleSort(key) {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  }
+
+  function sortIndicator(key) {
+    if (sortKey !== key) return "";
+    return sortDir === "asc" ? " ▲" : " ▼";
+  }
+
+  const visibleMembers = useMemo(() => {
+    const leaderName = (id) => members.find((x) => x.id === id)?.name || "";
+    const q = search.trim().toLowerCase();
+
+    let list = members;
+    if (q) {
+      list = list.filter((m) =>
+        `${m.name} ${m.email} ${m.phone || ""}`.toLowerCase().includes(q)
+      );
+    }
+
+    const getValue = (m) => {
+      switch (sortKey) {
+        case "email":
+          return m.email || "";
+        case "phone":
+          return m.phone || "";
+        case "role":
+          return store.getEffectiveRole(m);
+        case "directLeader":
+          return leaderName(m.directLeaderId);
+        case "name":
+        default:
+          return m.name || "";
+      }
+    };
+
+    return [...list].sort((a, b) => {
+      const cmp = getValue(a).toLowerCase().localeCompare(getValue(b).toLowerCase());
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+  }, [members, search, sortKey, sortDir]);
 
   function resetForm() {
     setForm(emptyForm);
@@ -187,21 +237,39 @@ export default function AdminMembersPage() {
         </div>
       </form>
 
-      <h2 className="font-display text-lg text-ink mb-3">Daftar Member ({members.length})</h2>
+      <div className="flex items-center justify-between gap-4 flex-wrap mb-3">
+        <h2 className="font-display text-lg text-ink">Daftar Member ({visibleMembers.length})</h2>
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Cari nama, email, atau no. HP..."
+          className="w-full sm:w-72 rounded-md border border-ink/20 bg-paper px-3.5 py-2 text-sm focus:border-brass focus:outline-none"
+        />
+      </div>
       <div className="overflow-x-auto bg-card border border-ink/10 rounded-lg shadow-stamp">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-left border-b border-ink/10 text-ink/50 text-xs uppercase tracking-wide">
-              <th className="px-4 py-3">Nama</th>
-              <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3">No. HP</th>
-              <th className="px-4 py-3">Role</th>
-              <th className="px-4 py-3">Direct Leader</th>
+            <tr className="text-left border-b border-ink/10 text-ink/50 text-xs uppercase tracking-wide select-none">
+              <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("name")}>
+                Nama{sortIndicator("name")}
+              </th>
+              <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("email")}>
+                Email{sortIndicator("email")}
+              </th>
+              <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("phone")}>
+                No. HP{sortIndicator("phone")}
+              </th>
+              <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("role")}>
+                Role{sortIndicator("role")}
+              </th>
+              <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("directLeader")}>
+                Direct Leader{sortIndicator("directLeader")}
+              </th>
               <th className="px-4 py-3"></th>
             </tr>
           </thead>
           <tbody>
-            {members.map((m) => {
+            {visibleMembers.map((m) => {
               const role = store.getEffectiveRole(m);
               const canDelete = session && store.canDeleteMember(session.email, m);
               const isSuper = isSuperAdminEmail(m.email);

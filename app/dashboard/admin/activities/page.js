@@ -14,6 +14,22 @@ export default function AdminActivitiesPage() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [preview, setPreview] = useState(null);
+  const [sortKey, setSortKey] = useState("date");
+  const [sortDir, setSortDir] = useState("desc");
+
+  function handleSort(key) {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  }
+
+  function sortIndicator(key) {
+    if (sortKey !== key) return "";
+    return sortDir === "asc" ? " ▲" : " ▼";
+  }
 
   function refresh() {
     setActivities(store.getActivities());
@@ -45,14 +61,35 @@ export default function AdminActivitiesPage() {
   }
 
   const filtered = useMemo(() => {
-    return activities.filter((a) => {
+    const list = activities.filter((a) => {
       if (filterMember !== "all" && a.memberId !== filterMember) return false;
       if (filterType !== "all" && a.type !== filterType) return false;
       if (from && a.date < from) return false;
       if (to && a.date > to) return false;
       return true;
     });
-  }, [activities, filterMember, filterType, from, to]);
+
+    const getValue = (a) => {
+      switch (sortKey) {
+        case "member":
+          return a.memberName || "";
+        case "type":
+          return a.type || "";
+        case "customerName":
+          return a.customerName || "";
+        case "customerPhone":
+          return a.customerPhone || "";
+        case "date":
+        default:
+          return a.date || "";
+      }
+    };
+
+    return [...list].sort((a, b) => {
+      const cmp = getValue(a).toLowerCase().localeCompare(getValue(b).toLowerCase());
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+  }, [activities, filterMember, filterType, from, to, sortKey, sortDir]);
 
   const perMember = useMemo(() => {
     const map = {};
@@ -167,12 +204,22 @@ export default function AdminActivitiesPage() {
       <div className="overflow-x-auto bg-card border border-ink/10 rounded-lg shadow-stamp">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-left border-b border-ink/10 text-ink/50 text-xs uppercase tracking-wide">
-              <th className="px-4 py-3">Tanggal</th>
-              <th className="px-4 py-3">Member</th>
-              <th className="px-4 py-3">Jenis</th>
-              <th className="px-4 py-3">Nama Nasabah</th>
-              <th className="px-4 py-3">No. Telpon</th>
+            <tr className="text-left border-b border-ink/10 text-ink/50 text-xs uppercase tracking-wide select-none">
+              <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("date")}>
+                Tanggal{sortIndicator("date")}
+              </th>
+              <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("member")}>
+                Member{sortIndicator("member")}
+              </th>
+              <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("type")}>
+                Jenis{sortIndicator("type")}
+              </th>
+              <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("customerName")}>
+                Nama Nasabah{sortIndicator("customerName")}
+              </th>
+              <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("customerPhone")}>
+                No. Telpon{sortIndicator("customerPhone")}
+              </th>
               <th className="px-4 py-3">Catatan</th>
               <th className="px-4 py-3">Foto</th>
               <th className="px-4 py-3"></th>
