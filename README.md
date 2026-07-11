@@ -21,7 +21,14 @@ member, produk, dan laporan aktivitas — lengkap dengan export ke Excel.
 - **Promo** — daftar promo (dikelola Admin): Type Promo + banyak
   lampiran PDF/foto per promo.
 - **Tutorial Digital** — daftar tutorial (dikelola Admin): judul + link
-  Google Drive, klik untuk membuka.
+  Google Drive, klik untuk membuka. Ada pencarian + urut A-Z.
+- **Konsep Warisan** — halaman tunggal (dikelola Admin): deskripsi +
+  banyak lampiran PDF/foto.
+- **Tabel Medical** — halaman tunggal (dikelola Admin): deskripsi +
+  banyak lampiran PDF/foto.
+- **Recruit** — halaman tunggal (dikelola Admin): panduan proses recruit
+  + lampiran materi (PDF/foto, bisa langsung dilihat & diunduh). Link di
+  dalam teks deskripsi otomatis bisa diklik.
 - **Aktivitas Member**: catat Visit Customer / Recruit / Role Play / Join
   Visit / Other, lengkap dengan **Nama Nasabah**, **No. Telpon Nasabah**,
   catatan, dan foto wajib. Bisa **diedit di hari yang sama** aktivitas
@@ -151,8 +158,9 @@ request.
 ### 2. Siapkan Google Sheet
 
 1. Buat spreadsheet baru di [Google Sheets](https://sheets.google.com).
-2. Buat 6 tab (sheet) dengan nama **persis**: `Members`, `Products`,
-   `Activities`, `Promo`, `Tutorials`, `Commission`.
+2. Buat 9 tab (sheet) dengan nama **persis**: `Members`, `Products`,
+   `Activities`, `Promo`, `Tutorials`, `Commission`, `Warisan`,
+   `Medical`, `Recruit`.
 3. Baris pertama tiap tab tidak perlu diisi manual — akan terisi otomatis
    header-nya saat pertama kali data disimpan lewat aplikasi (lihat
    `SHEET_HEADERS` di `lib/google/sheetsClient.js` untuk daftar kolomnya).

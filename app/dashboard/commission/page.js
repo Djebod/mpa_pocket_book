@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import * as store from "@/lib/store";
 import { FileListDisplay } from "@/components/FileDisplay";
+import Linkified from "@/components/Linkified";
 
 export default function CommissionPage() {
   const [commission, setCommission] = useState(undefined);
@@ -18,9 +19,7 @@ export default function CommissionPage() {
 
       <div className="bg-card border border-ink/10 rounded-lg shadow-stamp px-6 py-6 perforated">
         {commission?.description && (
-          <p className="text-sm leading-relaxed text-charcoal/85 whitespace-pre-line mb-4">
-            {commission.description}
-          </p>
+          <Linkified text={commission.description} className="text-sm leading-relaxed text-charcoal/85 mb-4" />
         )}
         <FileListDisplay files={commission?.files || []} />
         {!commission?.description && (!commission?.files || commission.files.length === 0) && (

@@ -13,6 +13,9 @@ const MEMBER_TABS = [
   { href: "/dashboard/commission", label: "Komisi & Kompensasi" },
   { href: "/dashboard/promo", label: "Promo" },
   { href: "/dashboard/tutorials", label: "Tutorial Digital" },
+  { href: "/dashboard/warisan", label: "Konsep Warisan" },
+  { href: "/dashboard/medical", label: "Tabel Medical" },
+  { href: "/dashboard/recruit", label: "Recruit" },
 ];
 
 const ADMIN_TABS = [
@@ -22,6 +25,9 @@ const ADMIN_TABS = [
   { href: "/dashboard/admin/commission", label: "Kelola Komisi" },
   { href: "/dashboard/admin/promo", label: "Kelola Promo" },
   { href: "/dashboard/admin/tutorials", label: "Kelola Tutorial" },
+  { href: "/dashboard/admin/warisan", label: "Kelola Konsep Warisan" },
+  { href: "/dashboard/admin/medical", label: "Kelola Tabel Medical" },
+  { href: "/dashboard/admin/recruit", label: "Kelola Recruit" },
 ];
 
 export default function AppShell({ children }) {
