@@ -54,12 +54,12 @@ export default function ProductDetailPage() {
       </p>
       <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-6">{product.name}</h1>
 
-      <div className="flex gap-1 border-b border-ink/15 mb-6 overflow-x-auto">
+      <div className="flex gap-1 border-b border-ink/15 mb-6 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
         {TABS.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`tab-notch whitespace-nowrap px-4 py-2.5 text-sm font-semibold transition-colors ${
+            className={`tab-notch whitespace-nowrap px-3.5 sm:px-4 py-3 sm:py-2.5 text-sm font-semibold transition-colors ${
               tab === t.key
                 ? "bg-card text-ink border border-b-0 border-ink/15"
                 : "text-ink/50 hover:text-ink"
@@ -70,22 +70,22 @@ export default function ProductDetailPage() {
         ))}
       </div>
 
-      <div className="bg-card border border-ink/10 rounded-lg rounded-tl-none px-6 py-6 shadow-stamp min-h-[220px]">
+      <div className="bg-card border border-ink/10 rounded-lg rounded-tl-none px-4 sm:px-6 py-5 sm:py-6 shadow-stamp min-h-[220px]">
         {tab === "summary" && (
           <div>
-            <p className="text-sm leading-relaxed text-charcoal/85 whitespace-pre-line">{product.summary}</p>
+            <p className="text-[15px] sm:text-sm leading-relaxed text-charcoal/85 whitespace-pre-line">{product.summary}</p>
             <FileDisplay file={product.summaryFile} />
           </div>
         )}
         {tab === "ilustrasi" && (
           <div>
-            <p className="text-sm leading-relaxed text-charcoal/85 whitespace-pre-line">{product.ilustrasi}</p>
+            <p className="text-[15px] sm:text-sm leading-relaxed text-charcoal/85 whitespace-pre-line">{product.ilustrasi}</p>
             <FileDisplay file={product.ilustrasiFile} />
           </div>
         )}
         {tab === "caraMenjual" && (
           <div>
-            <p className="text-sm leading-relaxed text-charcoal/85 whitespace-pre-line">{product.caraMenjual}</p>
+            <p className="text-[15px] sm:text-sm leading-relaxed text-charcoal/85 whitespace-pre-line">{product.caraMenjual}</p>
             <FileDisplay file={product.caraMenjualFile} />
           </div>
         )}

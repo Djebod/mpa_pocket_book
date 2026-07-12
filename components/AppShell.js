@@ -9,6 +9,7 @@ const MEMBER_TABS = [
   { href: "/dashboard", label: "Ringkasan" },
   { href: "/dashboard/activities", label: "Aktivitas" },
   { href: "/dashboard/products", label: "Produk" },
+  { href: "/dashboard/rekomendasi", label: "Rekomendasi Produk" },
   { href: "/dashboard/team", label: "Tim Saya" },
   { href: "/dashboard/commission", label: "Komisi & Kompensasi" },
   { href: "/dashboard/promo", label: "Promo" },

@@ -17,7 +17,7 @@ export default function RecruitPage() {
       <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-1">Recruit</h1>
       <p className="text-sm text-ink/60 mb-8">Panduan lengkap proses recruit agen baru Mulia Putri Agency.</p>
 
-      <div className="bg-card border border-ink/10 rounded-lg shadow-stamp px-6 py-6 perforated">
+      <div className="bg-card border border-ink/10 rounded-lg shadow-stamp px-4 sm:px-6 py-5 sm:py-6 perforated">
         <FileListDisplay files={data?.files || []} />
         {data?.description && (
           <Linkified text={data.description} className="text-sm leading-relaxed text-charcoal/85 mt-6" />

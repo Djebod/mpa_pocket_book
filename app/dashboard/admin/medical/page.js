@@ -32,7 +32,7 @@ export default function AdminMedicalPage() {
         (PDF/foto) pendukungnya.
       </p>
 
-      <form onSubmit={handleSubmit} className="bg-card border border-ink/10 rounded-lg shadow-stamp px-6 py-6 perforated relative">
+      <form onSubmit={handleSubmit} className="bg-card border border-ink/10 rounded-lg shadow-stamp px-4 sm:px-6 py-5 sm:py-6 perforated relative">
         {saved && (
           <div className="absolute top-5 right-6 stamp text-sage px-3 py-1 text-xs font-semibold uppercase">
             Tersimpan ✓
