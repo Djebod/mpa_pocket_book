@@ -1,11 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { KB, TREE, CATEGORIES, WIZARD_DISCLAIMER } from "@/lib/productWizard";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { KB, TREE, CATEGORIES, WIZARD_DISCLAIMER, matchCatalogProduct } from "@/lib/productWizard";
+import * as store from "@/lib/store";
 
-function ProductCard({ code, note, dimmed = false }) {
+function ProductCard({ code, note, dimmed = false, products }) {
   const product = KB[code];
   if (!product) return null;
+  const matched = matchCatalogProduct(products, code, product.name);
+
   return (
     <div
       className={`rounded-lg border px-4 py-4 ${
@@ -23,6 +27,24 @@ function ProductCard({ code, note, dimmed = false }) {
           {note}
         </p>
       )}
+
+      {matched ? (
+        <Link
+          href={`/dashboard/products/${matched.id}`}
+          className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-brass hover:text-brass-light underline underline-offset-2"
+        >
+          Lihat di Katalog Produk →
+        </Link>
+      ) : (
+        <button
+          type="button"
+          disabled
+          title="Belum ada produk dengan nama serupa di Katalog Produk"
+          className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-ink/30 cursor-not-allowed"
+        >
+          Tidak tersedia di Katalog Produk
+        </button>
+      )}
     </div>
   );
 }
@@ -33,6 +55,11 @@ export default function RekomendasiProdukPage() {
   const [stack, setStack] = useState([]);
   const [breadcrumb, setBreadcrumb] = useState([]);
   const [result, setResult] = useState(null);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    setProducts(store.getProducts());
+  }, []);
 
   function reset() {
     setCategoryId(null);
@@ -156,14 +183,14 @@ export default function RekomendasiProdukPage() {
             REKOMENDASI
           </span>
 
-          <ProductCard code={result.code} note={result.note} />
+          <ProductCard code={result.code} note={result.note} products={products} />
 
           {result.alt && result.alt.length > 0 && (
             <div className="mt-4">
               <p className="text-xs font-semibold text-ink/50 uppercase tracking-wide mb-2">Alternatif</p>
               <div className="space-y-2">
                 {result.alt.map((a, i) => (
-                  <ProductCard key={i} code={a.code} note={a.note} dimmed />
+                  <ProductCard key={i} code={a.code} note={a.note} dimmed products={products} />
                 ))}
               </div>
             </div>
