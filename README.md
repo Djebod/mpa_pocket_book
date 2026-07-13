@@ -25,8 +25,6 @@ laporan aktivitas — lengkap dengan export ke Excel.
   lampiran PDF/foto per promo.
 - **Tutorial Digital** — daftar tutorial (dikelola Admin): judul + link
   Google Drive, klik untuk membuka. Ada pencarian + urut A-Z.
-- **Tabel Medical** — halaman tunggal (dikelola Admin): deskripsi +
-  banyak lampiran PDF/foto.
 - **Recruit** — halaman tunggal (dikelola Admin): panduan proses recruit
   + lampiran materi (PDF/foto, bisa langsung dilihat & diunduh). Link di
   dalam teks deskripsi otomatis bisa diklik.
@@ -35,8 +33,8 @@ laporan aktivitas — lengkap dengan export ke Excel.
   **Ringkasan Aktivitas** sebagai kartu yang bisa diklik.
 - **Menu Administratif** — sidebar admin diringkas jadi satu link
   ("Menu Administratif") yang membuka halaman index berisi daftar semua
-  menu Kelola (Member, Produk, Promo & Kontes, Recruit, Tabel Medical,
-  Tutorial) sebagai kartu yang bisa diklik.
+  menu Kelola (Member, Produk, Promo & Kontes, Recruit, Tutorial)
+  sebagai kartu yang bisa diklik.
 - **Time Value Calculator** — kalkulator nilai waktu uang (PV, FV,
   pembayaran, bunga, periode) untuk simulasi cepat ke nasabah. File
   kalkulatornya sendiri (`public/kalkulator-nilai-waktu-uang.html`,
@@ -44,12 +42,14 @@ laporan aktivitas — lengkap dengan export ke Excel.
   ini apa adanya.
 - Menu di sidebar (member maupun Admin) **terurut alfabetis A-Z**.
 - **Aktivitas Member (sistem poin)**: 2 kategori aktivitas —
-  **Calon Nasabah** (Fact Finding 3 poin, Presentation 5 poin, Closing 10
-  poin) dan **Calon Agen** (Fact Finding 3 poin, Presentation 5 poin,
-  Recruit 10 poin), masing-masing dengan bukti sendiri (foto, atau nomor
-  polis untuk Closing). Poin baru terhitung sebagai **Valid Point**
-  setelah Admin menekan tombol **"Valid"** — sebelum itu poin tampil
-  sebagai **Unconfirmed Point**. Kedua angka ini tampil di sisi member
+  **Calon Nasabah** (field **Nama Nasabah** + **Nomor Telepon**, lalu
+  Fact Finding 3 poin, Presentation 5 poin, Closing 10 poin) dan
+  **Calon Agen** (field **Nama Calon Agen** + **Nomor Telepon**, lalu
+  Fact Finding 3 poin, Presentation 5 poin, Recruit 10 poin),
+  masing-masing dengan bukti sendiri (foto, atau nomor polis untuk
+  Closing). Poin baru terhitung sebagai **Valid Point** setelah Admin
+  menekan tombol **"Valid"** — sebelum itu poin tampil sebagai
+  **Unconfirmed Point**. Kedua angka ini tampil di sisi member
   (Ringkasan & Aktivitas) maupun Admin (Ringkasan Aktivitas & detail per
   member). Aktivitas bisa **diedit di hari yang sama** (edit otomatis
   membatalkan validasi, perlu divalidasi ulang).
@@ -178,8 +178,8 @@ request.
 ### 2. Siapkan Google Sheet
 
 1. Buat spreadsheet baru di [Google Sheets](https://sheets.google.com).
-2. Buat 7 tab (sheet) dengan nama **persis**: `Members`, `Products`,
-   `Activities`, `Promo`, `Tutorials`, `Medical`, `Recruit`.
+2. Buat 6 tab (sheet) dengan nama **persis**: `Members`, `Products`,
+   `Activities`, `Promo`, `Tutorials`, `Recruit`.
 3. Baris pertama tiap tab tidak perlu diisi manual — akan terisi otomatis
    header-nya saat pertama kali data disimpan lewat aplikasi (lihat
    `SHEET_HEADERS` di `lib/google/sheetsClient.js` untuk daftar kolomnya).

@@ -108,6 +108,12 @@ export default function TeamMemberDetailPage() {
                     <ValidationBadge validated={act.validated} small />
                     <span className="font-mono text-[11px] text-ink/45">{act.date}</span>
                   </div>
+                  {(act.contactName || act.contactPhone) && (
+                    <p className="text-sm text-ink/70 font-medium">
+                      {act.contactName || "—"}
+                      {act.contactPhone && <span className="text-ink/45 font-normal"> · {act.contactPhone}</span>}
+                    </p>
+                  )}
                   {act.policyNumber && (
                     <p className="text-sm text-ink/70 font-medium">Nomor Polis: {act.policyNumber}</p>
                   )}

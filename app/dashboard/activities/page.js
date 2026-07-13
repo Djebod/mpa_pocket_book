@@ -15,6 +15,8 @@ export default function ActivitiesPage() {
   const [summary, setSummary] = useState({ validPoints: 0, unconfirmedPoints: 0 });
   const [selected, setSelected] = useState(null); // { categoryKey, typeKey } | null
   const [date, setDate] = useState(today());
+  const [contactName, setContactName] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
   const [photo, setPhoto] = useState(null);
   const [policyNumber, setPolicyNumber] = useState("");
   const [note, setNote] = useState("");
@@ -36,6 +38,8 @@ export default function ActivitiesPage() {
   function resetForm() {
     setSelected(null);
     setDate(today());
+    setContactName("");
+    setContactPhone("");
     setPhoto(null);
     setPolicyNumber("");
     setNote("");
@@ -46,6 +50,8 @@ export default function ActivitiesPage() {
   function startLog(categoryKey, typeKey) {
     setSelected({ categoryKey, typeKey });
     setDate(today());
+    setContactName("");
+    setContactPhone("");
     setPhoto(null);
     setPolicyNumber("");
     setNote("");
@@ -59,6 +65,8 @@ export default function ActivitiesPage() {
   function startEdit(act) {
     setSelected({ categoryKey: act.category, typeKey: act.type });
     setDate(act.date || today());
+    setContactName(act.contactName || "");
+    setContactPhone(act.contactPhone || "");
     setPhoto(act.photo || null);
     setPolicyNumber(act.policyNumber || "");
     setNote(act.note || "");
@@ -101,6 +109,10 @@ export default function ActivitiesPage() {
       return;
     }
 
+    if (!contactName.trim()) {
+      setError(`${selectedCategory?.contactLabel || "Nama"} wajib diisi.`);
+      return;
+    }
     if (config.proofType === "photo" && !photo) {
       setError("Foto bukti wajib dilampirkan.");
       return;
@@ -119,6 +131,8 @@ export default function ActivitiesPage() {
         type: selected.typeKey,
         points: config.points,
         date,
+        contactName: contactName.trim(),
+        contactPhone: contactPhone.trim(),
         photo: photoValue || "",
         policyNumber: policyNumber.trim(),
         note: note.trim(),
@@ -224,6 +238,26 @@ export default function ActivitiesPage() {
                 className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
               />
             </div>
+            <div>
+              <label className="block text-sm font-semibold text-ink mb-1.5">
+                {selectedCategory?.contactLabel || "Nama"}
+              </label>
+              <input
+                value={contactName}
+                onChange={(e) => setContactName(e.target.value)}
+                placeholder={selected.categoryKey === "agen" ? "Contoh: Budi Santoso" : "Contoh: Bapak Andi Wijaya"}
+                className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-ink mb-1.5">Nomor Telepon</label>
+              <input
+                value={contactPhone}
+                onChange={(e) => setContactPhone(e.target.value)}
+                placeholder="Contoh: 0812-3456-7890"
+                className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
+              />
+            </div>
             {selectedConfig.proofType === "policy" && (
               <div>
                 <label className="block text-sm font-semibold text-ink mb-1.5">Nomor Polis</label>
@@ -303,6 +337,12 @@ export default function ActivitiesPage() {
                     <ValidationBadge validated={act.validated} small />
                     <span className="font-mono text-[11px] text-ink/45">{act.date}</span>
                   </div>
+                  {(act.contactName || act.contactPhone) && (
+                    <p className="text-sm text-ink/70 font-medium">
+                      {act.contactName || "—"}
+                      {act.contactPhone && <span className="text-ink/45 font-normal"> · {act.contactPhone}</span>}
+                    </p>
+                  )}
                   {act.policyNumber && (
                     <p className="text-sm text-ink/70 font-medium">Nomor Polis: {act.policyNumber}</p>
                   )}

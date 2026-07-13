@@ -235,6 +235,7 @@ export default function AdminActivitiesPage() {
               <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("type")}>
                 Aktivitas{sortIndicator("type")}
               </th>
+              <th className="px-4 py-3">Kontak</th>
               <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("points")}>
                 Poin{sortIndicator("points")}
               </th>
@@ -259,6 +260,11 @@ export default function AdminActivitiesPage() {
                 </td>
                 <td className="px-4 py-3">
                   <Stamp type={typeLabel(a)} category={a.category} small />
+                </td>
+                <td className="px-4 py-3 text-charcoal/70">
+                  {a.contactName && <p className="text-xs">{a.contactName}</p>}
+                  {a.contactPhone && <p className="text-xs text-ink/45 font-mono">{a.contactPhone}</p>}
+                  {!a.contactName && !a.contactPhone && "—"}
                 </td>
                 <td className="px-4 py-3 font-mono text-xs font-semibold text-brass">{a.points}</td>
                 <td className="px-4 py-3 text-charcoal/70">
@@ -302,7 +308,7 @@ export default function AdminActivitiesPage() {
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-4 py-8 text-center text-ink/40">
+                <td colSpan={9} className="px-4 py-8 text-center text-ink/40">
                   Tidak ada aktivitas yang cocok dengan filter.
                 </td>
               </tr>

@@ -7,7 +7,6 @@ const ADMIN_SECTIONS = [
   { href: "/dashboard/admin/products", label: "Kelola Produk", desc: "Kelola katalog produk: nama, kategori, deskripsi, lampiran." },
   { href: "/dashboard/admin/promo", label: "Kelola Promo & Kontes", desc: "Kelola daftar promo & kontes beserta lampirannya." },
   { href: "/dashboard/admin/recruit", label: "Kelola Recruit", desc: "Kelola panduan proses recruit agen baru." },
-  { href: "/dashboard/admin/medical", label: "Kelola Tabel Medical", desc: "Kelola informasi tabel medical." },
   { href: "/dashboard/admin/tutorials", label: "Kelola Tutorial", desc: "Kelola daftar tutorial digital & link Google Drive." },
 ];
 

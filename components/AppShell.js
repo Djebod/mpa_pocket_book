@@ -12,7 +12,6 @@ const MEMBER_TABS = [
   { href: "/dashboard/promo", label: "Promo & Kontes" },
   { href: "/dashboard/recruit", label: "Recruit" },
   { href: "/dashboard/rekomendasi", label: "Rekomendasi Produk" },
-  { href: "/dashboard/medical", label: "Tabel Medical" },
   { href: "/dashboard/time-value-calculator", label: "Time Value Calculator" },
   { href: "/dashboard/tutorials", label: "Tutorial Digital" },
 ];
