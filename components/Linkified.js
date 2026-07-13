@@ -6,7 +6,7 @@ const URL_MATCH_REGEX = /^https?:\/\//;
 /**
  * Menampilkan teks biasa, tapi link http(s) di dalamnya otomatis jadi
  * bisa diklik (dibuka di tab baru). Dipakai di halaman-halaman deskripsi
- * (Komisi, Konsep Warisan, Tabel Medical, Recruit, dll) yang sering
+ * (Komisi, Tabel Medical, Recruit, dll) yang sering
  * menyertakan link Google Form / WhatsApp di dalam teksnya.
  */
 export default function Linkified({ text, className = "" }) {

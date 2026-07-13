@@ -55,7 +55,7 @@ export default function AdminPromoPage() {
 
   return (
     <div>
-      <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-1">Kelola Promo</h1>
+      <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-1">Kelola Promo & Kontes</h1>
       <p className="text-sm text-ink/60 mb-8">
         Tambahkan jenis promo (contoh: "Promo Bulanan") lengkap dengan lampiran PDF/foto materinya.
       </p>

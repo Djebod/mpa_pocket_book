@@ -8,10 +8,12 @@ member, produk, dan laporan aktivitas — lengkap dengan export ke Excel.
 ## Fitur
 
 - **Login** email & password, password tersimpan ter-enkripsi (hashed).
-- **Katalog Produk** — tiap produk berisi Nama, Kategori, Sub Kategori,
-  **1 kolom Deskripsi**, dan **banyak lampiran PDF/foto** (konsep sama
-  seperti halaman Promo). Halaman katalog punya **filter Kategori + Sub
-  Kategori** dan **pencarian**.
+- **Katalog Produk** — tampilan default menampilkan **Piramida Asuransi**
+  (gambar ringkasan kebutuhan nasabah); klik "Lihat Semua Produk" atau
+  isi pencarian/filter untuk menjelajah katalog. Tiap produk berisi
+  Nama, Kategori, Sub Kategori, **1 kolom Deskripsi**, dan **banyak
+  lampiran PDF/foto** (konsep sama seperti halaman Promo & Kontes).
+  Filter Kategori + Sub Kategori dan pencarian tersedia.
 - **Rekomendasi Produk** — wizard tap-pilih untuk agen: jawab 2-4
   pertanyaan tentang kebutuhan nasabah (proteksi kesehatan, sakit
   kritis, jiwa berjangka, warisan, dana pendidikan, dana pensiun,
@@ -21,17 +23,16 @@ member, produk, dan laporan aktivitas — lengkap dengan export ke Excel.
   halaman render).
 - **Komisi Produk & Kompensasi** — halaman tunggal (dikelola Admin):
   deskripsi + banyak lampiran PDF/foto.
-- **Promo** — daftar promo (dikelola Admin): Type Promo + banyak
+- **Promo & Kontes** — daftar promo (dikelola Admin): Type Promo + banyak
   lampiran PDF/foto per promo.
 - **Tutorial Digital** — daftar tutorial (dikelola Admin): judul + link
   Google Drive, klik untuk membuka. Ada pencarian + urut A-Z.
-- **Konsep Warisan** — halaman tunggal (dikelola Admin): deskripsi +
-  banyak lampiran PDF/foto.
 - **Tabel Medical** — halaman tunggal (dikelola Admin): deskripsi +
   banyak lampiran PDF/foto.
 - **Recruit** — halaman tunggal (dikelola Admin): panduan proses recruit
   + lampiran materi (PDF/foto, bisa langsung dilihat & diunduh). Link di
   dalam teks deskripsi otomatis bisa diklik.
+- Menu di sidebar (member maupun Admin) **terurut alfabetis A-Z**.
 - **Aktivitas Member**: catat Visit Customer / Recruit / Role Play / Join
   Visit / Other, lengkap dengan **Nama Nasabah**, **No. Telpon Nasabah**,
   catatan, dan foto wajib. Bisa **diedit di hari yang sama** aktivitas
@@ -161,9 +162,9 @@ request.
 ### 2. Siapkan Google Sheet
 
 1. Buat spreadsheet baru di [Google Sheets](https://sheets.google.com).
-2. Buat 9 tab (sheet) dengan nama **persis**: `Members`, `Products`,
-   `Activities`, `Promo`, `Tutorials`, `Commission`, `Warisan`,
-   `Medical`, `Recruit`.
+2. Buat 8 tab (sheet) dengan nama **persis**: `Members`, `Products`,
+   `Activities`, `Promo`, `Tutorials`, `Commission`, `Medical`,
+   `Recruit`.
 3. Baris pertama tiap tab tidak perlu diisi manual — akan terisi otomatis
    header-nya saat pertama kali data disimpan lewat aplikasi (lihat
    `SHEET_HEADERS` di `lib/google/sheetsClient.js` untuk daftar kolomnya).
