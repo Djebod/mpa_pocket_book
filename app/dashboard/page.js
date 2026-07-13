@@ -5,19 +5,21 @@ import Link from "next/link";
 import { useAuth } from "@/app/providers";
 import * as store from "@/lib/store";
 import Stamp from "@/components/Stamp";
+import ValidationBadge from "@/components/ValidationBadge";
 
 export default function MemberDashboardPage() {
   const { session } = useAuth();
-  const [counts, setCounts] = useState({});
+  const [summary, setSummary] = useState({ validPoints: 0, unconfirmedPoints: 0 });
   const [recent, setRecent] = useState([]);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     if (!session) return;
-    setCounts(store.countActivitiesByType(session.memberId));
-    setRecent(store.getActivitiesByMember(session.memberId).slice(0, 5));
+    setSummary(store.getMemberPointsSummary(session.memberId));
+    const activities = store.getActivitiesByMember(session.memberId);
+    setTotal(activities.length);
+    setRecent(activities.slice(0, 5));
   }, [session]);
-
-  const total = Object.values(counts).reduce((a, b) => a + b, 0);
 
   return (
     <div>
@@ -27,16 +29,15 @@ export default function MemberDashboardPage() {
       </div>
       <p className="text-sm text-ink/60 mb-8">Ringkasan aktivitas Anda di Mulia Putri Agency.</p>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-10">
-        {store.getActivityTypes().map((type) => (
-          <div
-            key={type}
-            className="bg-card border border-ink/10 rounded-lg px-4 py-5 shadow-stamp perforated"
-          >
-            <p className="font-mono text-3xl text-ink">{counts[type] ?? 0}</p>
-            <p className="text-xs font-semibold text-ink/60 mt-1">{type}</p>
-          </div>
-        ))}
+      <div className="grid grid-cols-2 gap-4 mb-10">
+        <div className="bg-ink text-paper rounded-lg px-5 py-5 shadow-stamp">
+          <p className="font-mono text-3xl">{summary.validPoints}</p>
+          <p className="text-xs text-paper/70 mt-1">Valid Point</p>
+        </div>
+        <div className="bg-card border border-brass/30 rounded-lg px-5 py-5 shadow-stamp">
+          <p className="font-mono text-3xl text-brass">{summary.unconfirmedPoints}</p>
+          <p className="text-xs text-ink/60 mt-1">Unconfirmed Point</p>
+        </div>
       </div>
 
       <div className="flex items-center justify-between mb-3">
@@ -52,24 +53,29 @@ export default function MemberDashboardPage() {
         </div>
       ) : (
         <ul className="space-y-3">
-          {recent.map((act) => (
-            <li
-              key={act.id}
-              className="flex items-center gap-4 bg-card border border-ink/10 rounded-lg px-4 py-3 shadow-stamp"
-            >
-              {act.photo && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={act.photo} alt="" className="w-12 h-12 rounded object-cover shrink-0" />
-              )}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Stamp type={act.type} small />
-                  <span className="font-mono text-[11px] text-ink/45">{act.date}</span>
+          {recent.map((act) => {
+            const config = store.getActivityTypeConfig(act.category, act.type);
+            return (
+              <li
+                key={act.id}
+                className="flex items-center gap-4 bg-card border border-ink/10 rounded-lg px-4 py-3 shadow-stamp"
+              >
+                {act.photo && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={act.photo} alt="" className="w-12 h-12 rounded object-cover shrink-0" />
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Stamp type={config?.label || act.type} category={act.category} small />
+                    <span className="font-mono text-[11px] text-brass font-semibold">{act.points} poin</span>
+                    <ValidationBadge validated={act.validated} small />
+                    <span className="font-mono text-[11px] text-ink/45">{act.date}</span>
+                  </div>
+                  {act.note && <p className="text-sm text-charcoal/80 mt-1 truncate">{act.note}</p>}
                 </div>
-                {act.note && <p className="text-sm text-charcoal/80 mt-1 truncate">{act.note}</p>}
-              </div>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

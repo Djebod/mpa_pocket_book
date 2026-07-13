@@ -5,69 +5,79 @@ import { useAuth } from "@/app/providers";
 import * as store from "@/lib/store";
 import PhotoInput from "@/components/PhotoInput";
 import Stamp from "@/components/Stamp";
+import ValidationBadge from "@/components/ValidationBadge";
 
 const today = () => new Date().toISOString().slice(0, 10);
-
-const emptyForm = {
-  type: store.getActivityTypes()[0],
-  date: today(),
-  customerName: "",
-  customerPhone: "",
-  note: "",
-  photo: null,
-};
 
 export default function ActivitiesPage() {
   const { session } = useAuth();
   const [activities, setActivities] = useState([]);
-  const [form, setForm] = useState(emptyForm);
+  const [summary, setSummary] = useState({ validPoints: 0, unconfirmedPoints: 0 });
+  const [selected, setSelected] = useState(null); // { categoryKey, typeKey } | null
+  const [date, setDate] = useState(today());
+  const [photo, setPhoto] = useState(null);
+  const [policyNumber, setPolicyNumber] = useState("");
+  const [note, setNote] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
-  const [justStamped, setJustStamped] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [justStamped, setJustStamped] = useState(false);
+
+  const categories = store.getActivityCategories();
 
   function refresh() {
     if (!session) return;
     setActivities(store.getActivitiesByMember(session.memberId));
+    setSummary(store.getMemberPointsSummary(session.memberId));
   }
 
   useEffect(refresh, [session]);
 
   function resetForm() {
-    setForm(emptyForm);
+    setSelected(null);
+    setDate(today());
+    setPhoto(null);
+    setPolicyNumber("");
+    setNote("");
     setEditingId(null);
     setError("");
   }
 
-  function startEdit(act) {
-    setForm({
-      type: act.type,
-      date: act.date,
-      customerName: act.customerName || "",
-      customerPhone: act.customerPhone || "",
-      note: act.note || "",
-      photo: act.photo || null,
-    });
-    setEditingId(act.id);
+  function startLog(categoryKey, typeKey) {
+    setSelected({ categoryKey, typeKey });
+    setDate(today());
+    setPhoto(null);
+    setPolicyNumber("");
+    setNote("");
+    setEditingId(null);
     setError("");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => {
+      document.getElementById("activity-form")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 50);
   }
 
-  async function uploadPhotoIfNeeded(photo) {
-    // Kalau foto sudah berupa URL Drive (tidak diubah saat edit), tidak
-    // perlu upload ulang — hanya data URL base64 baru yang perlu diproses.
-    if (!photo || !photo.startsWith("data:")) return photo;
+  function startEdit(act) {
+    setSelected({ categoryKey: act.category, typeKey: act.type });
+    setDate(act.date || today());
+    setPhoto(act.photo || null);
+    setPolicyNumber(act.policyNumber || "");
+    setNote(act.note || "");
+    setEditingId(act.id);
+    setError("");
+    setTimeout(() => {
+      document.getElementById("activity-form")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 50);
+  }
 
+  async function uploadPhotoIfNeeded(value) {
+    if (!value || !value.startsWith("data:")) return value;
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 12000);
       const res = await fetch("/api/upload-photo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          dataUrl: photo,
-          filename: `aktivitas-${session.memberId}-${Date.now()}.jpg`,
-        }),
+        body: JSON.stringify({ dataUrl: value, filename: `aktivitas-${session.memberId}-${Date.now()}.jpg` }),
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
@@ -77,32 +87,46 @@ export default function ActivitiesPage() {
     } catch (err) {
       console.warn("Upload foto ke Google Drive gagal/timeout, pakai foto lokal:", err);
     }
-    return photo;
+    return value;
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
-    if (!form.photo) {
-      setError("Foto bukti aktivitas wajib dilampirkan.");
+    if (!selected) return;
+
+    const config = store.getActivityTypeConfig(selected.categoryKey, selected.typeKey);
+    if (!config) {
+      setError("Jenis aktivitas tidak ditemukan.");
+      return;
+    }
+
+    if (config.proofType === "photo" && !photo) {
+      setError("Foto bukti wajib dilampirkan.");
+      return;
+    }
+    if (config.proofType === "policy" && !policyNumber.trim()) {
+      setError("Nomor polis wajib diisi.");
       return;
     }
 
     setSubmitting(true);
-    const photoValue = await uploadPhotoIfNeeded(form.photo);
+    const photoValue = await uploadPhotoIfNeeded(photo);
 
     try {
       const payload = {
-        type: form.type,
-        date: form.date,
-        customerName: form.customerName.trim(),
-        customerPhone: form.customerPhone.trim(),
-        note: form.note.trim(),
-        photo: photoValue,
+        category: selected.categoryKey,
+        type: selected.typeKey,
+        points: config.points,
+        date,
+        photo: photoValue || "",
+        policyNumber: policyNumber.trim(),
+        note: note.trim(),
       };
 
       if (editingId) {
-        store.updateActivity(editingId, payload);
+        // Mengubah aktivitas yang sudah ada -> perlu divalidasi ulang oleh Admin.
+        store.updateActivity(editingId, { ...payload, validated: false, validatedAt: null, validatedBy: null });
       } else {
         store.addActivity({
           memberId: session.memberId,
@@ -121,108 +145,137 @@ export default function ActivitiesPage() {
     setSubmitting(false);
   }
 
+  const selectedConfig = selected ? store.getActivityTypeConfig(selected.categoryKey, selected.typeKey) : null;
+  const selectedCategory = selected ? categories.find((c) => c.key === selected.categoryKey) : null;
+
   return (
     <div>
       <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-1">Aktivitas</h1>
-      <p className="text-sm text-ink/60 mb-8">Catat aktivitas harian Anda lengkap dengan foto bukti.</p>
+      <p className="text-sm text-ink/60 mb-6">
+        Catat aktivitas Anda untuk mendapatkan poin. Poin masuk sebagai <strong>Valid Point</strong> setelah
+        diverifikasi Admin.
+      </p>
 
-      <form
-        onSubmit={handleSubmit}
-        className="bg-card border border-ink/10 rounded-lg shadow-stamp px-6 py-6 mb-10 perforated relative"
-      >
-        {justStamped && (
-          <div className="absolute top-5 right-6 stamp text-sage px-3 py-1 text-xs font-semibold uppercase">
-            {editingId ? "Tersimpan ✓" : "Tercatat ✓"}
-          </div>
-        )}
-        <h2 className="font-display text-lg text-ink mb-4">
-          {editingId ? "Ubah Aktivitas" : "Catat Aktivitas Baru"}
-        </h2>
-        <div className="grid sm:grid-cols-2 gap-5 mb-5">
-          <div>
-            <label className="block text-sm font-semibold text-ink mb-1.5">Jenis Aktivitas</label>
-            <select
-              value={form.type}
-              onChange={(e) => setForm({ ...form, type: e.target.value })}
-              className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
-            >
-              {store.getActivityTypes().map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
+      {/* Ringkasan poin */}
+      <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="bg-ink text-paper rounded-lg px-5 py-5 shadow-stamp">
+          <p className="font-mono text-3xl">{summary.validPoints}</p>
+          <p className="text-xs text-paper/70 mt-1">Valid Point</p>
+        </div>
+        <div className="bg-card border border-brass/30 rounded-lg px-5 py-5 shadow-stamp">
+          <p className="font-mono text-3xl text-brass">{summary.unconfirmedPoints}</p>
+          <p className="text-xs text-ink/60 mt-1">Unconfirmed Point</p>
+        </div>
+      </div>
+
+      {/* 2 kategori */}
+      <div className="grid sm:grid-cols-2 gap-4 mb-8">
+        {categories.map((cat) => (
+          <div key={cat.key} className="bg-card border border-ink/10 rounded-lg shadow-stamp overflow-hidden">
+            <div className="px-5 py-4 border-b border-ink/10 bg-paper-dark/30">
+              <h2 className="font-display text-lg text-ink">{cat.label}</h2>
+              <p className="text-xs text-ink/50">{cat.sublabel}</p>
+            </div>
+            <div className="divide-y divide-ink/5">
+              {cat.types.map((t) => (
+                <div key={t.key} className="flex items-center justify-between gap-3 px-5 py-3.5">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-charcoal">{t.label}</p>
+                    <p className="text-xs text-ink/45">{t.points} poin · {t.proofLabel}</p>
+                  </div>
+                  <button
+                    onClick={() => startLog(cat.key, t.key)}
+                    className="shrink-0 text-xs font-semibold bg-brass text-ink px-3.5 py-2 rounded-md hover:bg-brass-light transition-colors"
+                  >
+                    Catat
+                  </button>
+                </div>
               ))}
-            </select>
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-semibold text-ink mb-1.5">Tanggal</label>
-            <input
-              type="date"
-              value={form.date}
-              onChange={(e) => setForm({ ...form, date: e.target.value })}
+        ))}
+      </div>
+
+      {/* Form pencatatan */}
+      {selected && selectedConfig && (
+        <form
+          id="activity-form"
+          onSubmit={handleSubmit}
+          className="bg-card border border-brass/40 rounded-lg shadow-stamp px-4 sm:px-6 py-5 sm:py-6 mb-10 perforated relative"
+        >
+          {justStamped && (
+            <div className="absolute top-5 right-6 stamp text-sage px-3 py-1 text-xs font-semibold uppercase">
+              {editingId ? "Tersimpan ✓" : "Tercatat ✓"}
+            </div>
+          )}
+          <div className="flex items-center gap-2 flex-wrap mb-4">
+            <Stamp type={selectedConfig.label} category={selected.categoryKey} />
+            <span className="font-mono text-xs text-ink/50">{selectedCategory?.label}</span>
+            <span className="font-mono text-xs text-brass font-semibold">{selectedConfig.points} poin</span>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-5 mb-5">
+            <div>
+              <label className="block text-sm font-semibold text-ink mb-1.5">Tanggal</label>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
+              />
+            </div>
+            {selectedConfig.proofType === "policy" && (
+              <div>
+                <label className="block text-sm font-semibold text-ink mb-1.5">Nomor Polis</label>
+                <input
+                  value={policyNumber}
+                  onChange={(e) => setPolicyNumber(e.target.value)}
+                  placeholder="Contoh: 0123456789"
+                  className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="mb-5">
+            <label className="block text-sm font-semibold text-ink mb-1.5">Catatan (opsional)</label>
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              rows={2}
               className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
             />
           </div>
-          <div>
-            <label className="block text-sm font-semibold text-ink mb-1.5">Nama Nasabah</label>
-            <input
-              value={form.customerName}
-              onChange={(e) => setForm({ ...form, customerName: e.target.value })}
-              placeholder="Contoh: Bapak Andi Wijaya"
-              className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
-            />
+
+          <div className="mb-5">
+            <PhotoInput value={photo} onChange={setPhoto} required={selectedConfig.proofType === "photo"} />
+            {selectedConfig.proofType === "policy" && (
+              <p className="text-xs text-ink/45 mt-1.5">Foto di atas opsional untuk jenis aktivitas ini.</p>
+            )}
           </div>
-          <div>
-            <label className="block text-sm font-semibold text-ink mb-1.5">No. Telpon Nasabah</label>
-            <input
-              value={form.customerPhone}
-              onChange={(e) => setForm({ ...form, customerPhone: e.target.value })}
-              placeholder="Contoh: 0812-3456-7890"
-              className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
-            />
-          </div>
-        </div>
 
-        <div className="mb-5">
-          <label className="block text-sm font-semibold text-ink mb-1.5">Catatan (opsional)</label>
-          <textarea
-            value={form.note}
-            onChange={(e) => setForm({ ...form, note: e.target.value })}
-            rows={2}
-            placeholder="Contoh: kunjungan ke Bapak Andi membahas produk kesehatan"
-            className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
-          />
-        </div>
+          {error && (
+            <p className="text-sm text-rust mb-4" role="alert">
+              {error}
+            </p>
+          )}
 
-        <div className="mb-5">
-          <PhotoInput value={form.photo} onChange={(photo) => setForm({ ...form, photo })} />
-        </div>
-
-        {error && (
-          <p className="text-sm text-rust mb-4" role="alert">
-            {error}
-          </p>
-        )}
-
-        <div className="flex gap-3">
-          <button
-            type="submit"
-            disabled={submitting}
-            className="bg-brass text-ink font-semibold text-sm px-5 py-2.5 rounded-md hover:bg-brass-light transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {submitting ? "Menyimpan…" : editingId ? "Simpan Perubahan" : "Catat Aktivitas"}
-          </button>
-          {editingId && (
+          <div className="flex gap-3">
             <button
-              type="button"
-              onClick={resetForm}
-              className="text-sm font-semibold text-ink/60 hover:text-ink px-3"
+              type="submit"
+              disabled={submitting}
+              className="bg-brass text-ink font-semibold text-sm px-5 py-2.5 rounded-md hover:bg-brass-light transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
+              {submitting ? "Menyimpan…" : editingId ? "Simpan Perubahan" : "Catat Aktivitas"}
+            </button>
+            <button type="button" onClick={resetForm} className="text-sm font-semibold text-ink/60 hover:text-ink px-3">
               Batal
             </button>
-          )}
-        </div>
-      </form>
+          </div>
+        </form>
+      )}
 
+      {/* Riwayat */}
       <h2 className="font-display text-lg text-ink mb-3">Riwayat Aktivitas ({activities.length})</h2>
 
       {activities.length === 0 ? (
@@ -232,6 +285,7 @@ export default function ActivitiesPage() {
       ) : (
         <ul className="space-y-3">
           {activities.map((act) => {
+            const config = store.getActivityTypeConfig(act.category, act.type);
             const editable = store.isActivityEditableToday(act);
             return (
               <li
@@ -244,16 +298,13 @@ export default function ActivitiesPage() {
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <Stamp type={act.type} small />
+                    <Stamp type={config?.label || act.type} category={act.category} small />
+                    <span className="font-mono text-[11px] text-brass font-semibold">{act.points} poin</span>
+                    <ValidationBadge validated={act.validated} small />
                     <span className="font-mono text-[11px] text-ink/45">{act.date}</span>
                   </div>
-                  {(act.customerName || act.customerPhone) && (
-                    <p className="text-sm text-ink/70 font-medium">
-                      {act.customerName || "—"}
-                      {act.customerPhone && (
-                        <span className="text-ink/45 font-normal"> · {act.customerPhone}</span>
-                      )}
-                    </p>
+                  {act.policyNumber && (
+                    <p className="text-sm text-ink/70 font-medium">Nomor Polis: {act.policyNumber}</p>
                   )}
                   {act.note && <p className="text-sm text-charcoal/80">{act.note}</p>}
                 </div>

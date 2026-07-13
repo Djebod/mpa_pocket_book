@@ -3,19 +3,32 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import * as store from "@/lib/store";
+import { useAuth } from "@/app/providers";
 import Stamp from "@/components/Stamp";
+import ValidationBadge from "@/components/ValidationBadge";
 import { exportActivitiesToExcel } from "@/lib/exportExcel";
 
 export default function AdminActivitiesPage() {
+  const { session } = useAuth();
   const [activities, setActivities] = useState([]);
   const [members, setMembers] = useState([]);
   const [filterMember, setFilterMember] = useState("all");
-  const [filterType, setFilterType] = useState("all");
+  const [filterCategory, setFilterCategory] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all"); // all | valid | unconfirmed
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [preview, setPreview] = useState(null);
   const [sortKey, setSortKey] = useState("date");
   const [sortDir, setSortDir] = useState("desc");
+
+  const categories = store.getActivityCategories();
+
+  function refresh() {
+    setActivities(store.getActivities());
+    setMembers(store.getMembers());
+  }
+
+  useEffect(refresh, []);
 
   function handleSort(key) {
     if (sortKey === key) {
@@ -31,12 +44,16 @@ export default function AdminActivitiesPage() {
     return sortDir === "asc" ? " ▲" : " ▼";
   }
 
-  function refresh() {
-    setActivities(store.getActivities());
-    setMembers(store.getMembers());
+  function handleValidate(activity) {
+    store.validateActivity(activity.id, session?.name);
+    refresh();
   }
 
-  useEffect(refresh, []);
+  function handleUnvalidate(activity) {
+    if (!confirm("Batalkan validasi aktivitas ini? Poinnya akan kembali jadi Unconfirmed.")) return;
+    store.unvalidateActivity(activity.id);
+    refresh();
+  }
 
   function handleDelete(activity) {
     if (
@@ -63,7 +80,9 @@ export default function AdminActivitiesPage() {
   const filtered = useMemo(() => {
     const list = activities.filter((a) => {
       if (filterMember !== "all" && a.memberId !== filterMember) return false;
-      if (filterType !== "all" && a.type !== filterType) return false;
+      if (filterCategory !== "all" && a.category !== filterCategory) return false;
+      if (filterStatus === "valid" && !a.validated) return false;
+      if (filterStatus === "unconfirmed" && a.validated) return false;
       if (from && a.date < from) return false;
       if (to && a.date > to) return false;
       return true;
@@ -73,12 +92,12 @@ export default function AdminActivitiesPage() {
       switch (sortKey) {
         case "member":
           return a.memberName || "";
+        case "category":
+          return a.category || "";
         case "type":
           return a.type || "";
-        case "customerName":
-          return a.customerName || "";
-        case "customerPhone":
-          return a.customerPhone || "";
+        case "points":
+          return String(a.points ?? 0).padStart(6, "0");
         case "date":
         default:
           return a.date || "";
@@ -89,17 +108,14 @@ export default function AdminActivitiesPage() {
       const cmp = getValue(a).toLowerCase().localeCompare(getValue(b).toLowerCase());
       return sortDir === "asc" ? cmp : -cmp;
     });
-  }, [activities, filterMember, filterType, from, to, sortKey, sortDir]);
+  }, [activities, filterMember, filterCategory, filterStatus, from, to, sortKey, sortDir]);
 
-  const perMember = useMemo(() => {
-    const map = {};
-    filtered.forEach((a) => {
-      const key = a.memberId;
-      if (!map[key]) map[key] = { name: a.memberName, count: 0 };
-      map[key].count += 1;
-    });
-    return Object.entries(map).sort((a, b) => b[1].count - a[1].count);
-  }, [filtered]);
+  const pointsSummary = useMemo(() => store.summarizePoints(filtered), [filtered]);
+
+  function typeLabel(a) {
+    const config = store.getActivityTypeConfig(a.category, a.type);
+    return config?.label || a.type;
+  }
 
   return (
     <div>
@@ -122,10 +138,10 @@ export default function AdminActivitiesPage() {
         </div>
       </div>
       <p className="text-sm text-ink/60 mb-8">
-        Pantau seluruh aktivitas member Mulia Putri Agency — dashboard report, data lengkap, dan detail per member.
+        Pantau seluruh aktivitas member, validasi poin, dan lihat detail per member.
       </p>
 
-      <div className="bg-card border border-ink/10 rounded-lg shadow-stamp px-5 py-5 mb-6 grid sm:grid-cols-4 gap-4">
+      <div className="bg-card border border-ink/10 rounded-lg shadow-stamp px-5 py-5 mb-6 grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <div>
           <label className="block text-xs font-semibold text-ink/60 mb-1.5">Member</label>
           <select
@@ -142,18 +158,30 @@ export default function AdminActivitiesPage() {
           </select>
         </div>
         <div>
-          <label className="block text-xs font-semibold text-ink/60 mb-1.5">Jenis Aktivitas</label>
+          <label className="block text-xs font-semibold text-ink/60 mb-1.5">Kategori</label>
           <select
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
             className="w-full rounded-md border border-ink/20 bg-paper px-3 py-2 text-sm focus:border-brass focus:outline-none"
           >
-            <option value="all">Semua Jenis</option>
-            {store.getActivityTypes().map((t) => (
-              <option key={t} value={t}>
-                {t}
+            <option value="all">Semua Kategori</option>
+            {categories.map((c) => (
+              <option key={c.key} value={c.key}>
+                {c.label}
               </option>
             ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-ink/60 mb-1.5">Status</label>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="w-full rounded-md border border-ink/20 bg-paper px-3 py-2 text-sm focus:border-brass focus:outline-none"
+          >
+            <option value="all">Semua Status</option>
+            <option value="valid">Valid</option>
+            <option value="unconfirmed">Menunggu Validasi</option>
           </select>
         </div>
         <div>
@@ -181,23 +209,13 @@ export default function AdminActivitiesPage() {
           <p className="font-mono text-3xl">{filtered.length}</p>
           <p className="text-xs text-paper/70 mt-1">Total aktivitas (sesuai filter)</p>
         </div>
-        <div className="sm:col-span-2 bg-card border border-ink/10 rounded-lg px-5 py-5 shadow-stamp">
-          <p className="text-xs font-semibold text-ink/60 mb-3">Total per Member — klik untuk lihat detail</p>
-          {perMember.length === 0 ? (
-            <p className="text-sm text-ink/40">Tidak ada data.</p>
-          ) : (
-            <ul className="space-y-1.5">
-              {perMember.map(([memberId, info]) => (
-                <li key={memberId} className="flex items-center text-sm">
-                  <Link href={`/dashboard/admin/activities/${memberId}`} className="text-charcoal/80 hover:text-brass hover:underline">
-                    {info.name}
-                  </Link>
-                  <span className="leader-dots" />
-                  <span className="font-mono text-ink">{info.count}</span>
-                </li>
-              ))}
-            </ul>
-          )}
+        <div className="bg-card border border-sage/30 rounded-lg px-5 py-5 shadow-stamp">
+          <p className="font-mono text-3xl text-sage">{pointsSummary.validPoints}</p>
+          <p className="text-xs text-ink/60 mt-1">Total Valid Point</p>
+        </div>
+        <div className="bg-card border border-brass/30 rounded-lg px-5 py-5 shadow-stamp">
+          <p className="font-mono text-3xl text-brass">{pointsSummary.unconfirmedPoints}</p>
+          <p className="text-xs text-ink/60 mt-1">Total Unconfirmed Point</p>
         </div>
       </div>
 
@@ -211,17 +229,17 @@ export default function AdminActivitiesPage() {
               <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("member")}>
                 Member{sortIndicator("member")}
               </th>
+              <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("category")}>
+                Kategori{sortIndicator("category")}
+              </th>
               <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("type")}>
-                Jenis{sortIndicator("type")}
+                Aktivitas{sortIndicator("type")}
               </th>
-              <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("customerName")}>
-                Nama Nasabah{sortIndicator("customerName")}
+              <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("points")}>
+                Poin{sortIndicator("points")}
               </th>
-              <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("customerPhone")}>
-                No. Telpon{sortIndicator("customerPhone")}
-              </th>
-              <th className="px-4 py-3">Catatan</th>
-              <th className="px-4 py-3">Foto</th>
+              <th className="px-4 py-3">Bukti</th>
+              <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3"></th>
             </tr>
           </thead>
@@ -235,22 +253,44 @@ export default function AdminActivitiesPage() {
                   </Link>
                 </td>
                 <td className="px-4 py-3">
-                  <Stamp type={a.type} small />
+                  <span className="text-xs text-ink/60">
+                    {categories.find((c) => c.key === a.category)?.label || a.category}
+                  </span>
                 </td>
-                <td className="px-4 py-3 text-charcoal/70">{a.customerName || "—"}</td>
-                <td className="px-4 py-3 text-charcoal/70 font-mono text-xs">{a.customerPhone || "—"}</td>
-                <td className="px-4 py-3 text-charcoal/70 max-w-xs">{a.note || "—"}</td>
                 <td className="px-4 py-3">
+                  <Stamp type={typeLabel(a)} category={a.category} small />
+                </td>
+                <td className="px-4 py-3 font-mono text-xs font-semibold text-brass">{a.points}</td>
+                <td className="px-4 py-3 text-charcoal/70">
+                  {a.policyNumber && <p className="text-xs mb-1">Polis: {a.policyNumber}</p>}
                   {a.photo ? (
                     <button onClick={() => setPreview(a.photo)}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={a.photo} alt="" className="w-10 h-10 rounded object-cover hover:opacity-80" />
                     </button>
                   ) : (
-                    "—"
+                    !a.policyNumber && "—"
                   )}
                 </td>
+                <td className="px-4 py-3">
+                  <ValidationBadge validated={a.validated} small />
+                </td>
                 <td className="px-4 py-3 text-right whitespace-nowrap">
+                  {a.validated ? (
+                    <button
+                      onClick={() => handleUnvalidate(a)}
+                      className="text-xs font-semibold text-ink/50 hover:text-ink mr-3"
+                    >
+                      Batalkan
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleValidate(a)}
+                      className="text-xs font-semibold text-sage hover:text-sage/80 mr-3"
+                    >
+                      Valid
+                    </button>
+                  )}
                   <button
                     onClick={() => handleDelete(a)}
                     className="text-xs font-semibold text-rust/70 hover:text-rust"

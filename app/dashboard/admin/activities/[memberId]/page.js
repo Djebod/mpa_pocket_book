@@ -3,25 +3,39 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "@/app/providers";
 import * as store from "@/lib/store";
 import Stamp from "@/components/Stamp";
+import ValidationBadge from "@/components/ValidationBadge";
 import { exportActivitiesToExcel } from "@/lib/exportExcel";
 
 export default function AdminMemberActivityDetailPage() {
   const { memberId } = useParams();
+  const { session } = useAuth();
   const [member, setMember] = useState(undefined);
   const [activities, setActivities] = useState([]);
-  const [counts, setCounts] = useState({});
+  const [summary, setSummary] = useState({ validPoints: 0, unconfirmedPoints: 0 });
   const [preview, setPreview] = useState(null);
 
   function refresh() {
     const members = store.getMembers();
     setMember(members.find((m) => m.id === memberId) || null);
     setActivities(store.getActivitiesByMember(memberId));
-    setCounts(store.countActivitiesByType(memberId));
+    setSummary(store.getMemberPointsSummary(memberId));
   }
 
   useEffect(refresh, [memberId]);
+
+  function handleValidate(act) {
+    store.validateActivity(act.id, session?.name);
+    refresh();
+  }
+
+  function handleUnvalidate(act) {
+    if (!confirm("Batalkan validasi aktivitas ini?")) return;
+    store.unvalidateActivity(act.id);
+    refresh();
+  }
 
   function handleDelete(act) {
     if (!confirm(`Hapus aktivitas "${act.type}" tanggal ${act.date}? Tindakan ini tidak bisa dibatalkan.`)) return;
@@ -66,13 +80,15 @@ export default function AdminMemberActivityDetailPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 my-8">
-        {store.getActivityTypes().map((type) => (
-          <div key={type} className="bg-card border border-ink/10 rounded-lg px-4 py-4 shadow-stamp perforated">
-            <p className="font-mono text-2xl text-ink">{counts[type] ?? 0}</p>
-            <p className="text-xs font-semibold text-ink/60 mt-1">{type}</p>
-          </div>
-        ))}
+      <div className="grid grid-cols-2 gap-4 my-8">
+        <div className="bg-ink text-paper rounded-lg px-5 py-5 shadow-stamp">
+          <p className="font-mono text-3xl">{summary.validPoints}</p>
+          <p className="text-xs text-paper/70 mt-1">Valid Point</p>
+        </div>
+        <div className="bg-card border border-brass/30 rounded-lg px-5 py-5 shadow-stamp">
+          <p className="font-mono text-3xl text-brass">{summary.unconfirmedPoints}</p>
+          <p className="text-xs text-ink/60 mt-1">Unconfirmed Point</p>
+        </div>
       </div>
 
       <h2 className="font-display text-lg text-ink mb-3">Riwayat Aktivitas ({activities.length})</h2>
@@ -83,40 +99,51 @@ export default function AdminMemberActivityDetailPage() {
         </div>
       ) : (
         <ul className="space-y-3">
-          {activities.map((act) => (
-            <li
-              key={act.id}
-              className="flex items-start gap-4 bg-card border border-ink/10 rounded-lg px-4 py-4 shadow-stamp"
-            >
-              {act.photo && (
-                <button onClick={() => setPreview(act.photo)} className="shrink-0">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={act.photo} alt="" className="w-16 h-16 rounded object-cover hover:opacity-80" />
-                </button>
-              )}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap mb-1">
-                  <Stamp type={act.type} small />
-                  <span className="font-mono text-[11px] text-ink/45">{act.date}</span>
-                </div>
-                {(act.customerName || act.customerPhone) && (
-                  <p className="text-sm text-ink/70 font-medium">
-                    {act.customerName || "—"}
-                    {act.customerPhone && (
-                      <span className="text-ink/45 font-normal"> · {act.customerPhone}</span>
-                    )}
-                  </p>
-                )}
-                {act.note && <p className="text-sm text-charcoal/80">{act.note}</p>}
-              </div>
-              <button
-                onClick={() => handleDelete(act)}
-                className="text-xs font-semibold text-rust/70 hover:text-rust shrink-0"
+          {activities.map((act) => {
+            const config = store.getActivityTypeConfig(act.category, act.type);
+            return (
+              <li
+                key={act.id}
+                className="flex items-start gap-4 bg-card border border-ink/10 rounded-lg px-4 py-4 shadow-stamp"
               >
-                Hapus
-              </button>
-            </li>
-          ))}
+                {act.photo && (
+                  <button onClick={() => setPreview(act.photo)} className="shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={act.photo} alt="" className="w-16 h-16 rounded object-cover hover:opacity-80" />
+                  </button>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <Stamp type={config?.label || act.type} category={act.category} small />
+                    <span className="font-mono text-[11px] text-brass font-semibold">{act.points} poin</span>
+                    <ValidationBadge validated={act.validated} small />
+                    <span className="font-mono text-[11px] text-ink/45">{act.date}</span>
+                  </div>
+                  {act.policyNumber && (
+                    <p className="text-sm text-ink/70 font-medium">Nomor Polis: {act.policyNumber}</p>
+                  )}
+                  {act.note && <p className="text-sm text-charcoal/80">{act.note}</p>}
+                </div>
+                <div className="flex flex-col items-end gap-2 shrink-0">
+                  {act.validated ? (
+                    <button onClick={() => handleUnvalidate(act)} className="text-xs font-semibold text-ink/50 hover:text-ink">
+                      Batalkan
+                    </button>
+                  ) : (
+                    <button onClick={() => handleValidate(act)} className="text-xs font-semibold text-sage hover:text-sage/80">
+                      Valid
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleDelete(act)}
+                    className="text-xs font-semibold text-rust/70 hover:text-rust"
+                  >
+                    Hapus
+                  </button>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
 

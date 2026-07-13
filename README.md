@@ -1,9 +1,9 @@
 # Pocket Book — Mulia Putri Agency
 
-Website buku saku digital untuk agen asuransi: katalog produk (Summary,
-Ilustrasi, Cara Menjual, Video Penjelasan per produk), pencatatan aktivitas
-member dengan foto + data nasabah, serta dashboard admin untuk mengelola
-member, produk, dan laporan aktivitas — lengkap dengan export ke Excel.
+Website buku saku digital untuk agen asuransi: katalog produk (deskripsi +
+lampiran multi file), pencatatan aktivitas member berbasis poin dengan
+validasi Admin, serta dashboard admin untuk mengelola member, produk, dan
+laporan aktivitas — lengkap dengan export ke Excel.
 
 ## Fitur
 
@@ -43,10 +43,16 @@ member, produk, dan laporan aktivitas — lengkap dengan export ke Excel.
   desain & logo sudah menyatu di dalamnya) ditampilkan lewat halaman
   ini apa adanya.
 - Menu di sidebar (member maupun Admin) **terurut alfabetis A-Z**.
-- **Aktivitas Member**: catat Visit Customer / Recruit / Role Play / Join
-  Visit / Other, lengkap dengan **Nama Nasabah**, **No. Telpon Nasabah**,
-  catatan, dan foto wajib. Bisa **diedit di hari yang sama** aktivitas
-  dicatat.
+- **Aktivitas Member (sistem poin)**: 2 kategori aktivitas —
+  **Calon Nasabah** (Fact Finding 3 poin, Presentation 5 poin, Closing 10
+  poin) dan **Calon Agen** (Fact Finding 3 poin, Presentation 5 poin,
+  Recruit 10 poin), masing-masing dengan bukti sendiri (foto, atau nomor
+  polis untuk Closing). Poin baru terhitung sebagai **Valid Point**
+  setelah Admin menekan tombol **"Valid"** — sebelum itu poin tampil
+  sebagai **Unconfirmed Point**. Kedua angka ini tampil di sisi member
+  (Ringkasan & Aktivitas) maupun Admin (Ringkasan Aktivitas & detail per
+  member). Aktivitas bisa **diedit di hari yang sama** (edit otomatis
+  membatalkan validasi, perlu divalidasi ulang).
 - **Direct Leader**: tiap member bisa diberi satu Direct Leader (member
   lain). Direct Leader bisa melihat riwayat aktivitas anak buahnya lewat
   halaman **Tim Saya** — member lain (bukan diri sendiri, bukan Direct
