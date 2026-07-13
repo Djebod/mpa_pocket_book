@@ -8,20 +8,17 @@ member, produk, dan laporan aktivitas — lengkap dengan export ke Excel.
 ## Fitur
 
 - **Login** email & password, password tersimpan ter-enkripsi (hashed).
-- **Katalog Produk** dengan 4 sub-menu per produk, plus **File Pendukung**
-  (link Google Drive), **Sub Kategori**, dan **filter + pencarian**
-  (Kategori, Sub Kategori, kata kunci) di halaman katalog.
+- **Katalog Produk** — tiap produk berisi Nama, Kategori, Sub Kategori,
+  **1 kolom Deskripsi**, dan **banyak lampiran PDF/foto** (konsep sama
+  seperti halaman Promo). Halaman katalog punya **filter Kategori + Sub
+  Kategori** dan **pencarian**.
 - **Rekomendasi Produk** — wizard tap-pilih untuk agen: jawab 2-4
   pertanyaan tentang kebutuhan nasabah (proteksi kesehatan, sakit
   kritis, jiwa berjangka, warisan, dana pendidikan, dana pensiun,
   distribusi kekayaan), dapat rekomendasi produk + alasan + jejak
-  keputusan. Data produk & alur pertanyaan ada di `lib/productWizard.js`
-  (terpisah dari halaman, gampang di-update tanpa sentuh kode render).
-- **Video Penjelasan** menerima link YouTube apa pun (watch, youtu.be,
-  shorts) — otomatis disesuaikan ke format yang bisa ditampilkan.
-- **Lampiran Foto/PDF** pada field Summary/Ilustrasi/Cara Menjual produk
-  — foto tampil langsung (ukuran menyesuaikan aslinya), PDF tampil
-  sebagai dokumen inline (lewat Google Docs Viewer) + tombol download.
+  keputusan + link ke produk serupa di Katalog Produk (kalau ada). Data
+  produk & alur pertanyaan ada di `lib/productWizard.js` (terpisah dari
+  halaman render).
 - **Komisi Produk & Kompensasi** — halaman tunggal (dikelola Admin):
   deskripsi + banyak lampiran PDF/foto.
 - **Promo** — daftar promo (dikelola Admin): Type Promo + banyak

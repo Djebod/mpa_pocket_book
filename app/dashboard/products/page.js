@@ -31,7 +31,7 @@ export default function ProductsPage() {
       if (subCategory !== "all" && p.subCategory !== subCategory) return false;
       if (search.trim()) {
         const q = search.trim().toLowerCase();
-        const haystack = `${p.name} ${p.category} ${p.subCategory || ""} ${p.summary || ""}`.toLowerCase();
+        const haystack = `${p.name} ${p.category} ${p.subCategory || ""} ${p.description || ""}`.toLowerCase();
         if (!haystack.includes(q)) return false;
       }
       return true;
@@ -47,7 +47,7 @@ export default function ProductsPage() {
     <div>
       <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-1">Katalog Produk</h1>
       <p className="text-sm text-ink/60 mb-8">
-        Pilih produk untuk melihat summary, ilustrasi, cara menjual, dan video penjelasan.
+        Pilih produk untuk melihat deskripsi lengkap dan file pendukungnya.
       </p>
 
       <div className="bg-card border border-ink/10 rounded-lg shadow-stamp px-5 py-5 mb-6 space-y-4">
@@ -123,7 +123,7 @@ export default function ProductsPage() {
                 {p.subCategory ? ` · ${p.subCategory}` : ""}
               </p>
               <h2 className="font-display text-xl text-ink mb-2 group-hover:italic">{p.name}</h2>
-              <p className="text-sm text-charcoal/70 line-clamp-2">{p.summary}</p>
+              <p className="text-sm text-charcoal/70 line-clamp-2">{p.description}</p>
             </Link>
           ))}
         </div>
