@@ -23,13 +23,21 @@ export default function ProductsPage() {
 
   const subCategories = useMemo(() => {
     const relevant = category === "all" ? products : products.filter((p) => p.category === category);
-    return Array.from(new Set(relevant.map((p) => p.subCategory).filter(Boolean))).sort();
+    const seen = new Map(); // key: versi lowercase+trim, value: penulisan asli yang tampil
+    relevant.forEach((p) => {
+      const raw = (p.subCategory || "").trim();
+      if (!raw) return;
+      const key = raw.toLowerCase();
+      if (!seen.has(key)) seen.set(key, raw);
+    });
+    return Array.from(seen.values()).sort();
   }, [products, category]);
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
       if (category !== "all" && p.category !== category) return false;
-      if (subCategory !== "all" && p.subCategory !== subCategory) return false;
+      if (subCategory !== "all" && (p.subCategory || "").trim().toLowerCase() !== subCategory.trim().toLowerCase())
+        return false;
       if (search.trim()) {
         const q = search.trim().toLowerCase();
         const haystack = `${p.name} ${p.category} ${p.subCategory || ""} ${p.description || ""}`.toLowerCase();

@@ -1,10 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import * as store from "@/lib/store";
 import MultiFileInput from "@/components/MultiFileInput";
 
-const emptyForm = { name: "", category: "", subCategory: "", description: "", files: [] };
+// Kategori adalah field "kunci" — sengaja dibatasi cuma 2 pilihan supaya
+// filter Katalog Produk tetap konsisten (tidak ada variasi penulisan).
+const CATEGORY_OPTIONS = ["Unit Link", "Non Unit Link"];
+
+const emptyForm = { name: "", category: CATEGORY_OPTIONS[0], subCategory: "", description: "", files: [] };
+
+/**
+ * Mencocokkan Sub Kategori yang baru diketik dengan daftar Sub Kategori
+ * yang sudah ada (dibandingkan tanpa peduli spasi di ujung & huruf
+ * besar/kecil) — supaya tidak ada entri dobel yang cuma beda spasi/huruf
+ * kapital (mis. "Asuransi Jiwa" vs "asuransi jiwa "), tapi Sub Kategori
+ * yang benar-benar baru tetap bisa ditambahkan bebas.
+ */
+function normalizeSubCategory(value, existingList) {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  const match = existingList.find((sc) => sc.toLowerCase() === trimmed.toLowerCase());
+  return match || trimmed;
+}
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState([]);
@@ -17,6 +35,20 @@ export default function AdminProductsPage() {
   }
 
   useEffect(refresh, []);
+
+  // Daftar Sub Kategori yang sudah pernah dipakai, sudah di-dedup
+  // (spasi & huruf besar/kecil diabaikan saat membandingkan), dipakai
+  // sebagai saran ketik (datalist) sekaligus acuan anti-duplikat.
+  const existingSubCategories = useMemo(() => {
+    const seen = new Map(); // key: lowercase trimmed, value: penulisan asli pertama kali muncul
+    products.forEach((p) => {
+      const raw = (p.subCategory || "").trim();
+      if (!raw) return;
+      const key = raw.toLowerCase();
+      if (!seen.has(key)) seen.set(key, raw);
+    });
+    return Array.from(seen.values()).sort();
+  }, [products]);
 
   function resetForm() {
     setForm(emptyForm);
@@ -31,10 +63,14 @@ export default function AdminProductsPage() {
       setError("Nama dan kategori produk wajib diisi.");
       return;
     }
+    const payload = {
+      ...form,
+      subCategory: normalizeSubCategory(form.subCategory, existingSubCategories),
+    };
     if (editingId) {
-      store.updateProduct(editingId, form);
+      store.updateProduct(editingId, payload);
     } else {
-      store.addProduct(form);
+      store.addProduct(payload);
     }
     refresh();
     resetForm();
@@ -43,7 +79,7 @@ export default function AdminProductsPage() {
   function handleEdit(product) {
     setForm({
       name: product.name,
-      category: product.category,
+      category: CATEGORY_OPTIONS.includes(product.category) ? product.category : CATEGORY_OPTIONS[0],
       subCategory: product.subCategory || "",
       description: product.description || "",
       files: product.files || [],
@@ -59,6 +95,9 @@ export default function AdminProductsPage() {
     if (editingId === id) resetForm();
   }
 
+  const editingProductHasUnknownCategory =
+    editingId && !CATEGORY_OPTIONS.includes(products.find((p) => p.id === editingId)?.category);
+
   return (
     <div>
       <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-1">Kelola Produk</h1>
@@ -69,6 +108,13 @@ export default function AdminProductsPage() {
 
       <form onSubmit={handleSubmit} className="bg-card border border-ink/10 rounded-lg shadow-stamp px-4 sm:px-6 py-5 sm:py-6 mb-10 perforated">
         <h2 className="font-display text-lg text-ink mb-4">{editingId ? "Ubah Produk" : "Tambah Produk Baru"}</h2>
+
+        {editingProductHasUnknownCategory && (
+          <p className="text-xs text-brass bg-brass/10 rounded-md px-3 py-2 mb-5">
+            Produk ini masih memakai kategori lama yang sudah tidak berlaku. Pilih salah satu dari 2 kategori di
+            bawah, lalu simpan.
+          </p>
+        )}
 
         <div className="grid sm:grid-cols-2 gap-5 mb-5">
           <div>
@@ -81,12 +127,17 @@ export default function AdminProductsPage() {
           </div>
           <div>
             <label className="block text-sm font-semibold text-ink mb-1.5">Kategori</label>
-            <input
+            <select
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
-              placeholder="Contoh: Asuransi Kesehatan"
-              className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
-            />
+              className="w-full rounded-md border border-ink/20 bg-paper px-3 py-2.5 text-sm focus:border-brass focus:outline-none"
+            >
+              {CATEGORY_OPTIONS.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-sm font-semibold text-ink mb-1.5">
@@ -96,8 +147,17 @@ export default function AdminProductsPage() {
               value={form.subCategory}
               onChange={(e) => setForm({ ...form, subCategory: e.target.value })}
               placeholder="Contoh: Individu / Keluarga"
+              list="sub-kategori-options"
               className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
             />
+            <datalist id="sub-kategori-options">
+              {existingSubCategories.map((sc) => (
+                <option key={sc} value={sc} />
+              ))}
+            </datalist>
+            <p className="text-xs text-ink/45 mt-1">
+              Ketik nama baru untuk sub kategori baru, atau pilih dari saran supaya tidak dobel.
+            </p>
           </div>
         </div>
 

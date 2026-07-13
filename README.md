@@ -11,9 +11,12 @@ laporan aktivitas — lengkap dengan export ke Excel.
 - **Katalog Produk** — tampilan default menampilkan **Piramida Asuransi**
   (gambar ringkasan kebutuhan nasabah); klik "Lihat Semua Produk" atau
   isi pencarian/filter untuk menjelajah katalog. Tiap produk berisi
-  Nama, Kategori, Sub Kategori, **1 kolom Deskripsi**, dan **banyak
-  lampiran PDF/foto** (konsep sama seperti halaman Promo & Kontes).
-  Filter Kategori + Sub Kategori dan pencarian tersedia.
+  Nama, **Kategori** (dropdown tetap, cuma "Unit Link" / "Non Unit
+  Link"), **Sub Kategori** (bebas isi, ada saran ketik dari sub kategori
+  yang sudah ada supaya tidak dobel — beda spasi/huruf besar-kecil tetap
+  dianggap sama), **1 kolom Deskripsi**, dan **banyak lampiran PDF/foto**
+  (konsep sama seperti halaman Promo & Kontes). Filter Kategori + Sub
+  Kategori dan pencarian tersedia.
 - **Rekomendasi Produk** — wizard tap-pilih untuk agen: jawab 2-4
   pertanyaan tentang kebutuhan nasabah (proteksi kesehatan, sakit
   kritis, jiwa berjangka, warisan, dana pendidikan, dana pensiun,
