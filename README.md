@@ -30,10 +30,18 @@ member, produk, dan laporan aktivitas — lengkap dengan export ke Excel.
 - **Recruit** — halaman tunggal (dikelola Admin): panduan proses recruit
   + lampiran materi (PDF/foto, bisa langsung dilihat & diunduh). Link di
   dalam teks deskripsi otomatis bisa diklik.
+- **Menu Monitoring** — di posisi #1 sidebar, mengelompokkan
+  **Ringkasan**, **Aktivitas**, **Tim Saya**, dan (khusus Admin)
+  **Ringkasan Aktivitas** sebagai kartu yang bisa diklik.
 - **Menu Administratif** — sidebar admin diringkas jadi satu link
   ("Menu Administratif") yang membuka halaman index berisi daftar semua
   menu Kelola (Member, Produk, Promo & Kontes, Recruit, Tabel Medical,
   Tutorial) sebagai kartu yang bisa diklik.
+- **Time Value Calculator** — kalkulator nilai waktu uang (PV, FV,
+  pembayaran, bunga, periode) untuk simulasi cepat ke nasabah. File
+  kalkulatornya sendiri (`public/kalkulator-nilai-waktu-uang.html`,
+  desain & logo sudah menyatu di dalamnya) ditampilkan lewat halaman
+  ini apa adanya.
 - Menu di sidebar (member maupun Admin) **terurut alfabetis A-Z**.
 - **Aktivitas Member**: catat Visit Customer / Recruit / Role Play / Join
   Visit / Other, lengkap dengan **Nama Nasabah**, **No. Telpon Nasabah**,

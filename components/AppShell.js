@@ -5,22 +5,19 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/app/providers";
 
+const MONITORING_TAB = { href: "/dashboard/monitoring", label: "Monitoring" };
+
 const MEMBER_TABS = [
-  { href: "/dashboard/activities", label: "Aktivitas" },
   { href: "/dashboard/products", label: "Produk" },
   { href: "/dashboard/promo", label: "Promo & Kontes" },
   { href: "/dashboard/recruit", label: "Recruit" },
   { href: "/dashboard/rekomendasi", label: "Rekomendasi Produk" },
-  { href: "/dashboard", label: "Ringkasan" },
   { href: "/dashboard/medical", label: "Tabel Medical" },
-  { href: "/dashboard/team", label: "Tim Saya" },
+  { href: "/dashboard/time-value-calculator", label: "Time Value Calculator" },
   { href: "/dashboard/tutorials", label: "Tutorial Digital" },
 ];
 
-const ADMIN_TABS = [
-  { href: "/dashboard/admin", label: "Menu Administratif" },
-  { href: "/dashboard/admin/activities", label: "Ringkasan Aktivitas" },
-];
+const ADMIN_TABS = [{ href: "/dashboard/admin", label: "Menu Administratif" }];
 
 export default function AppShell({ children }) {
   const { session, logout } = useAuth();
@@ -28,7 +25,10 @@ export default function AppShell({ children }) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const tabs = session?.role === "admin" ? [...MEMBER_TABS, ...ADMIN_TABS] : MEMBER_TABS;
+  const tabs = [
+    MONITORING_TAB,
+    ...(session?.role === "admin" ? [...MEMBER_TABS, ...ADMIN_TABS] : MEMBER_TABS),
+  ];
 
   function handleLogout() {
     logout();
