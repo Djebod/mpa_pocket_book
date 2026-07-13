@@ -68,17 +68,6 @@ export default function ProductsPage() {
           : "Kenali kebutuhan nasabah lewat Piramida Asuransi, atau langsung cari produk di bawah."}
       </p>
 
-      {!browsing && (
-        <div className="mb-6">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/piramida-asuransi.jpeg"
-            alt="Piramida Asuransi Mulia Putri Agency — solusi lengkap untuk setiap kebutuhan hidup"
-            className="w-full h-auto rounded-lg border border-ink/10 shadow-stamp"
-          />
-        </div>
-      )}
-
       <div className="bg-card border border-ink/10 rounded-lg shadow-stamp px-5 py-5 mb-6 space-y-4">
         <form onSubmit={handleSearchSubmit} className="flex gap-2">
           <input
@@ -150,6 +139,17 @@ export default function ProductsPage() {
           </button>
         )}
       </div>
+
+      {!browsing && (
+        <div className="mb-6">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/piramida-asuransi.jpeg"
+            alt="Piramida Asuransi Mulia Putri Agency — solusi lengkap untuk setiap kebutuhan hidup"
+            className="w-full h-auto rounded-lg border border-ink/10 shadow-stamp"
+          />
+        </div>
+      )}
 
       {browsing && (
         <>

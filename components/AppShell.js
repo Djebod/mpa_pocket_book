@@ -7,7 +7,6 @@ import { useAuth } from "@/app/providers";
 
 const MEMBER_TABS = [
   { href: "/dashboard/activities", label: "Aktivitas" },
-  { href: "/dashboard/commission", label: "Komisi & Kompensasi" },
   { href: "/dashboard/products", label: "Produk" },
   { href: "/dashboard/promo", label: "Promo & Kontes" },
   { href: "/dashboard/recruit", label: "Recruit" },
@@ -19,13 +18,7 @@ const MEMBER_TABS = [
 ];
 
 const ADMIN_TABS = [
-  { href: "/dashboard/admin/commission", label: "Kelola Komisi" },
-  { href: "/dashboard/admin/members", label: "Kelola Member" },
-  { href: "/dashboard/admin/products", label: "Kelola Produk" },
-  { href: "/dashboard/admin/promo", label: "Kelola Promo & Kontes" },
-  { href: "/dashboard/admin/recruit", label: "Kelola Recruit" },
-  { href: "/dashboard/admin/medical", label: "Kelola Tabel Medical" },
-  { href: "/dashboard/admin/tutorials", label: "Kelola Tutorial" },
+  { href: "/dashboard/admin", label: "Menu Administratif" },
   { href: "/dashboard/admin/activities", label: "Ringkasan Aktivitas" },
 ];
 

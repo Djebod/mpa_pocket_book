@@ -21,8 +21,6 @@ member, produk, dan laporan aktivitas — lengkap dengan export ke Excel.
   keputusan + link ke produk serupa di Katalog Produk (kalau ada). Data
   produk & alur pertanyaan ada di `lib/productWizard.js` (terpisah dari
   halaman render).
-- **Komisi Produk & Kompensasi** — halaman tunggal (dikelola Admin):
-  deskripsi + banyak lampiran PDF/foto.
 - **Promo & Kontes** — daftar promo (dikelola Admin): Type Promo + banyak
   lampiran PDF/foto per promo.
 - **Tutorial Digital** — daftar tutorial (dikelola Admin): judul + link
@@ -32,6 +30,10 @@ member, produk, dan laporan aktivitas — lengkap dengan export ke Excel.
 - **Recruit** — halaman tunggal (dikelola Admin): panduan proses recruit
   + lampiran materi (PDF/foto, bisa langsung dilihat & diunduh). Link di
   dalam teks deskripsi otomatis bisa diklik.
+- **Menu Administratif** — sidebar admin diringkas jadi satu link
+  ("Menu Administratif") yang membuka halaman index berisi daftar semua
+  menu Kelola (Member, Produk, Promo & Kontes, Recruit, Tabel Medical,
+  Tutorial) sebagai kartu yang bisa diklik.
 - Menu di sidebar (member maupun Admin) **terurut alfabetis A-Z**.
 - **Aktivitas Member**: catat Visit Customer / Recruit / Role Play / Join
   Visit / Other, lengkap dengan **Nama Nasabah**, **No. Telpon Nasabah**,
@@ -162,9 +164,8 @@ request.
 ### 2. Siapkan Google Sheet
 
 1. Buat spreadsheet baru di [Google Sheets](https://sheets.google.com).
-2. Buat 8 tab (sheet) dengan nama **persis**: `Members`, `Products`,
-   `Activities`, `Promo`, `Tutorials`, `Commission`, `Medical`,
-   `Recruit`.
+2. Buat 7 tab (sheet) dengan nama **persis**: `Members`, `Products`,
+   `Activities`, `Promo`, `Tutorials`, `Medical`, `Recruit`.
 3. Baris pertama tiap tab tidak perlu diisi manual — akan terisi otomatis
    header-nya saat pertama kali data disimpan lewat aplikasi (lihat
    `SHEET_HEADERS` di `lib/google/sheetsClient.js` untuk daftar kolomnya).
