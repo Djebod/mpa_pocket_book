@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kalkulator Perencanaan Keuangan</title>
+<style>
+  :root {
+    --bg: #0a1a14;
+    --bg-alt: #0f2419;
+    --card: #12291f;
+    --card-alt: #16301f;
+    --border: #234433;
+    --green: #22c55e;
+    --green-dim: #1a7a44;
+    --green-soft: rgba(34, 197, 94, 0.12);
+    --text: #eafff2;
+    --text-dim: #9fc9ae;
+    --text-faint: #6f9482;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 16px 60px;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 640px;
+  }
+
+  header.page-header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  header.page-header h1 {
+    font-size: 22px;
+    margin: 0 0 6px;
+    letter-spacing: 0.2px;
+  }
+
+  header.page-header p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 13.5px;
+  }
+
+  nav.tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  nav.tabs button {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 10px 8px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  nav.tabs button:hover {
+    border-color: var(--green-dim);
+    color: var(--text);
+  }
+
+  nav.tabs button.active {
+    background: var(--green-soft);
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  .module {
+    display: none;
+  }
+
+  .module.active {
+    display: block;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .card h2 {
+    font-size: 15px;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+
+  .card .card-sub {
+    font-size: 12.5px;
+    color: var(--text-faint);
+    margin: 0 0 16px;
+  }
+
+  .grid-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .field .input-group {
+    display: flex;
+    align-items: center;
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .field .input-group:focus-within {
+    border-color: var(--green);
+  }
+
+  .field .prefix {
+    padding: 10px 10px 10px 12px;
+    color: var(--text-faint);
+    font-size: 13.5px;
+    font-weight: 600;
+    user-select: none;
+  }
+
+  .field .suffix {
+    padding: 10px 12px 10px 8px;
+    color: var(--text-faint);
+    font-size: 13px;
+    user-select: none;
+  }
+
+  .field input {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 14.5px;
+    padding: 10px 10px 10px 4px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .field input.no-prefix {
+    padding-left: 12px;
+  }
+
+  .result-card {
+    background: linear-gradient(160deg, var(--card-alt), var(--card));
+    border: 1px solid var(--green-dim);
+  }
+
+  .result-label {
+    font-size: 12.5px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin: 0 0 8px;
+    font-weight: 700;
+  }
+
+  .result-value {
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--green);
+    letter-spacing: 0.2px;
+    word-break: break-word;
+  }
+
+  .breakdown {
+    margin-top: 16px;
+    border-top: 1px dashed var(--border);
+    padding-top: 14px;
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    font-size: 13px;
+  }
+
+  .breakdown-row .k {
+    color: var(--text-dim);
+  }
+
+  .breakdown-row .v {
+    color: var(--text);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .note {
+    margin-top: 14px;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--text-faint);
+    background: var(--bg-alt);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+
+  footer.disclaimer {
+    max-width: 640px;
+    width: 100%;
+    margin-top: 24px;
+    font-size: 11.5px;
+    line-height: 1.6;
+    color: var(--text-faint);
+    text-align: center;
+    padding: 14px 10px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 520px) {
+    .grid-inputs {
+      grid-template-columns: 1fr;
+    }
+    nav.tabs {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .result-value {
+      font-size: 26px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="page-header">
+      <h1>Kalkulator Perencanaan Keuangan</h1>
+      <p>Estimasi cepat kebutuhan proteksi &amp; dana masa depan</p>
+    </header>
+
+    <nav class="tabs" id="tabs"></nav>
+    <div id="modules"></div>
+
+    <footer class="disclaimer">
+      Kalkulator ini memberikan estimasi berdasarkan asumsi yang Anda masukkan
+      dan bukan merupakan nasihat keuangan atau penawaran produk. Hasil
+      sebenarnya dapat berbeda tergantung kondisi pasar dan pribadi. Untuk
+      keputusan keuangan, disarankan berkonsultasi dengan perencana keuangan
+      atau agen berlisensi.
+    </footer>
+  </div>
+
+<script>
+(function () {
+  "use strict";
+
+  var idFormatter = new Intl.NumberFormat("id-ID");
+
+  function formatRupiah(n) {
+    var v = Math.round(n);
+    if (!isFinite(v)) v = 0;
+    return "Rp" + idFormatter.format(v);
+  }
+
+  function formatThousands(n) {
+    var v = Math.round(n);
+    if (!isFinite(v)) v = 0;
+    return idFormatter.format(v);
+  }
+
+  function parseDigits(str) {
+    var digits = String(str || "").replace(/[^\d]/g, "");
+    return digits ? parseInt(digits, 10) : 0;
+  }
+
+  function parseFloatSafe(str) {
+    var v = parseFloat(String(str || "").replace(",", "."));
+    return isFinite(v) ? v : 0;
+  }
+
+  function yearsBetween(a, b) {
+    return Math.max(0, b - a);
+  }
+
+  var MODULES = [
+    {
+      id: "jiwa",
+      tabLabel: "Asuransi Jiwa",
+      cardTitle: "Uang Pertanggungan Asuransi Jiwa",
+      cardSub: "Metode Income Replacement — dana pengganti penghasilan untuk ahli waris.",
+      resultLabel: "Uang Pertanggungan Dibutuhkan",
+      fields: [
+        { id: "j_pengeluaran", label: "Pengeluaran bulanan saat ini", type: "money", def: 10000000 },
+        { id: "j_usiaSekarang", label: "Usia saat ini", type: "number", def: 30, suffix: "tahun" },
+        { id: "j_usiaAkhir", label: "Usia akhir masa produktif", type: "number", def: 60, suffix: "tahun" },
+        { id: "j_inflasi", label: "Asumsi inflasi per tahun", type: "number", def: 5, suffix: "%" }
+      ],
+      calculate: function (v) {
+        var incomeReplacement = 200 * v.j_pengeluaran;
+        var sisaMasaProduktif = yearsBetween(v.j_usiaSekarang, v.j_usiaAkhir);
+        var faktorInflasi = Math.pow(1 + v.j_inflasi / 100, sisaMasaProduktif);
+        var upDibutuhkan = incomeReplacement * faktorInflasi;
+        return {
+          main: upDibutuhkan,
+          breakdown: [
+            ["Income Replacement (200 × pengeluaran bulanan)", formatRupiah(incomeReplacement)],
+            ["Sisa masa produktif", sisaMasaProduktif + " tahun"],
+            ["Faktor koreksi inflasi", "×" + faktorInflasi.toFixed(4)],
+            ["Total UP dibutuhkan", formatRupiah(upDibutuhkan)]
+          ],
+          note: "Dengan asumsi hasil investasi sekitar 6% per tahun, bunga dari dana sebesar 200x pengeluaran bulanan Anda diperkirakan cukup untuk membiayai kebutuhan hidup ahli waris tanpa menggerus dana pokoknya. Nilai ini kemudian disesuaikan dengan inflasi hingga akhir masa produktif Anda saat ini."
+        };
+      }
+    },
+    {
+      id: "kritis",
+      tabLabel: "Sakit Kritis",
+      cardTitle: "Uang Pertanggungan Sakit Kritis",
+      cardSub: "Dana darurat untuk membiayai hidup selama masa pemulihan.",
+      resultLabel: "Uang Pertanggungan Sakit Kritis",
+      fields: [
+        { id: "k_pengeluaran", label: "Pengeluaran bulanan saat ini", type: "money", def: 10000000 },
+        { id: "k_usiaSekarang", label: "Usia saat ini", type: "number", def: 30, suffix: "tahun" },
+        { id: "k_usiaAkhir", label: "Usia akhir masa produktif", type: "number", def: 60, suffix: "tahun" },
+        { id: "k_inflasi", label: "Asumsi inflasi per tahun", type: "number", def: 5, suffix: "%" }
+      ],
+      calculate: function (v) {
+        var pengeluaranTahunan = v.k_pengeluaran * 12;
+        var danaDaruratKritis = 5 * pengeluaranTahunan;
+        var sisaMasaProduktif = yearsBetween(v.k_usiaSekarang, v.k_usiaAkhir);
+        var faktorInflasi = Math.pow(1 + v.k_inflasi / 100, sisaMasaProduktif);
+        var upKritis = danaDaruratKritis * faktorInflasi;
+        return {
+          main: upKritis,
+          breakdown: [
+            ["Pengeluaran tahunan (12 × bulanan)", formatRupiah(pengeluaranTahunan)],
+            ["Dana darurat kritis (5 × pengeluaran tahunan)", formatRupiah(danaDaruratKritis)],
+            ["Sisa masa produktif", sisaMasaProduktif + " tahun"],
+            ["Faktor koreksi inflasi", "×" + faktorInflasi.toFixed(4)],
+            ["Total UP sakit kritis", formatRupiah(upKritis)]
+          ],
+          note: "Saat terkena penyakit kritis, umumnya dibutuhkan dana darurat setara kurang lebih 5 tahun pengeluaran untuk membiayai hidup selama masa pemulihan tanpa penghasilan. Nilai ini disesuaikan dengan inflasi hingga akhir masa produktif Anda saat ini."
+        };
+      }
+    },
+    {
+      id: "pensiun",
+      tabLabel: "Dana Pensiun",
+      cardTitle: "Total Kebutuhan Dana Pensiun",
+      cardSub: "Total dana yang dibutuhkan untuk membiayai masa pensiun.",
+      resultLabel: "Total Dana Dibutuhkan Saat Pensiun",
+      fields: [
+        { id: "p_usiaSekarang", label: "Usia sekarang", type: "number", def: 30, suffix: "tahun" },
+        { id: "p_usiaPensiun", label: "Usia pensiun", type: "number", def: 55, suffix: "tahun" },
+        { id: "p_harapanHidup", label: "Perkiraan usia harapan hidup", type: "number", def: 80, suffix: "tahun" },
+        { id: "p_pengeluaran", label: "Pengeluaran bulanan (nilai sekarang)", type: "money", def: 8000000 },
+        { id: "p_inflasi", label: "Asumsi inflasi", type: "number", def: 5, suffix: "%/th" }
+      ],
+      calculate: function (v) {
+        var n = yearsBetween(v.p_usiaSekarang, v.p_usiaPensiun);
+        var m = yearsBetween(v.p_usiaPensiun, v.p_harapanHidup);
+        var pengeluaranSaatPensiun = v.p_pengeluaran * Math.pow(1 + v.p_inflasi / 100, n);
+        var pengeluaranTahunSaatPensiun = pengeluaranSaatPensiun * 12;
+        var totalDanaPensiun = pengeluaranTahunSaatPensiun * m;
+        return {
+          main: totalDanaPensiun,
+          breakdown: [
+            ["Pengeluaran bulanan saat pensiun (setelah inflasi)", formatRupiah(pengeluaranSaatPensiun)],
+            ["Pengeluaran tahunan saat pensiun", formatRupiah(pengeluaranTahunSaatPensiun)],
+            ["Lama masa pensiun", m + " tahun"],
+            ["Total dana dibutuhkan saat pensiun", formatRupiah(totalDanaPensiun)]
+          ],
+          note: "Perhitungan ini murni kebutuhan dana (tanpa memperhitungkan hasil investasi atau dana yang sudah Anda miliki saat ini), dari usia pensiun hingga perkiraan usia harapan hidup, dengan pengeluaran bulanan yang sudah disesuaikan inflasi."
+        };
+      }
+    },
+    {
+      id: "pendidikan",
+      tabLabel: "Dana Pendidikan",
+      cardTitle: "Total Kebutuhan Dana Pendidikan",
+      cardSub: "Proyeksi biaya pendidikan di masa depan.",
+      resultLabel: "Biaya Pendidikan di Masa Depan",
+      fields: [
+        { id: "d_biaya", label: "Total biaya pendidikan (harga sekarang)", type: "money", def: 150000000 },
+        { id: "d_tahun", label: "Berapa tahun lagi dana dibutuhkan", type: "number", def: 10, suffix: "tahun" },
+        { id: "d_inflasi", label: "Inflasi biaya pendidikan", type: "number", def: 10, suffix: "%/th" }
+      ],
+      calculate: function (v) {
+        var tahun = Math.max(0, v.d_tahun);
+        var biayaMasaDepan = v.d_biaya * Math.pow(1 + v.d_inflasi / 100, tahun);
+        return {
+          main: biayaMasaDepan,
+          breakdown: [
+            ["Biaya pendidikan sekarang", formatRupiah(v.d_biaya)],
+            ["Jangka waktu", tahun + " tahun"],
+            ["Biaya pendidikan di masa depan", formatRupiah(biayaMasaDepan)]
+          ],
+          note: "Biaya pendidikan cenderung naik lebih cepat dari inflasi umum. Proyeksi ini membantu memperkirakan berapa dana yang perlu disiapkan pada saat dana pendidikan benar-benar dibutuhkan."
+        };
+      }
+    }
+  ];
+
+  var tabsEl = document.getElementById("tabs");
+  var modulesEl = document.getElementById("modules");
+
+  function fieldHTML(f) {
+    var inputAttrs = 'id="' + f.id + '" autocomplete="off" inputmode="' + (f.type === "money" ? "numeric" : "decimal") + '"';
+    if (f.type === "money") {
+      return (
+        '<div class="field">' +
+        "<label>" + f.label + "</label>" +
+        '<div class="input-group">' +
+        '<span class="prefix">Rp</span>' +
+        '<input type="text" ' + inputAttrs + " />" +
+        "</div>" +
+        "</div>"
+      );
+    }
+    return (
+      '<div class="field">' +
+      "<label>" + f.label + "</label>" +
+      '<div class="input-group">' +
+      '<input type="text" class="no-prefix" ' + inputAttrs + " />" +
+      (f.suffix ? '<span class="suffix">' + f.suffix + "</span>" : "") +
+      "</div>" +
+      "</div>"
+    );
+  }
+
+  MODULES.forEach(function (mod, idx) {
+    var tabBtn = document.createElement("button");
+    tabBtn.textContent = mod.tabLabel;
+    tabBtn.className = idx === 0 ? "active" : "";
+    tabBtn.setAttribute("data-tab", mod.id);
+    tabBtn.addEventListener("click", function () {
+      switchTab(mod.id);
+    });
+    tabsEl.appendChild(tabBtn);
+
+    var section = document.createElement("section");
+    section.className = "module" + (idx === 0 ? " active" : "");
+    section.id = "module-" + mod.id;
+    section.innerHTML =
+      '<div class="card">' +
+      "<h2>" + mod.cardTitle + "</h2>" +
+      '<p class="card-sub">' + mod.cardSub + "</p>" +
+      '<div class="grid-inputs">' +
+      mod.fields.map(fieldHTML).join("") +
+      "</div>" +
+      "</div>" +
+      '<div class="card result-card">' +
+      '<p class="result-label">' + mod.resultLabel + "</p>" +
+      '<div class="result-value" id="result-' + mod.id + '">Rp0</div>' +
+      '<div class="breakdown" id="breakdown-' + mod.id + '"></div>' +
+      '<div class="note" id="note-' + mod.id + '"></div>' +
+      "</div>";
+    modulesEl.appendChild(section);
+  });
+
+  function switchTab(id) {
+    document.querySelectorAll("nav.tabs button").forEach(function (btn) {
+      btn.classList.toggle("active", btn.getAttribute("data-tab") === id);
+    });
+    document.querySelectorAll(".module").forEach(function (sec) {
+      sec.classList.toggle("active", sec.id === "module-" + id);
+    });
+  }
+
+  function attachMoneyInput(field) {
+    var el = document.getElementById(field.id);
+    el.value = formatThousands(field.def);
+    el.addEventListener("input", function () {
+      var digits = parseDigits(el.value);
+      el.value = digits ? formatThousands(digits) : "";
+      recalcAll();
+    });
+    el.addEventListener("blur", function () {
+      if (!el.value) el.value = "0";
+    });
+  }
+
+  function attachNumberInput(field) {
+    var el = document.getElementById(field.id);
+    el.value = String(field.def);
+    el.addEventListener("input", function () {
+      recalcAll();
+    });
+    el.addEventListener("blur", function () {
+      if (el.value.trim() === "" || isNaN(parseFloatSafe(el.value))) {
+        el.value = "0";
+        recalcAll();
+      }
+    });
+  }
+
+  MODULES.forEach(function (mod) {
+    mod.fields.forEach(function (f) {
+      if (f.type === "money") attachMoneyInput(f);
+      else attachNumberInput(f);
+    });
+  });
+
+  function readModuleValues(mod) {
+    var values = {};
+    mod.fields.forEach(function (f) {
+      var el = document.getElementById(f.id);
+      values[f.id] = f.type === "money" ? parseDigits(el.value) : parseFloatSafe(el.value);
+    });
+    return values;
+  }
+
+  function renderModuleResult(mod) {
+    var values = readModuleValues(mod);
+    var result = mod.calculate(values);
+
+    document.getElementById("result-" + mod.id).textContent = formatRupiah(result.main);
+
+    var breakdownEl = document.getElementById("breakdown-" + mod.id);
+    breakdownEl.innerHTML = result.breakdown
+      .map(function (row) {
+        return (
+          '<div class="breakdown-row"><span class="k">' +
+          row[0] +
+          '</span><span class="v">' +
+          row[1] +
+          "</span></div>"
+        );
+      })
+      .join("");
+
+    document.getElementById("note-" + mod.id).textContent = result.note;
+  }
+
+  function recalcAll() {
+    MODULES.forEach(renderModuleResult);
+  }
+
+  recalcAll();
+})();
+</script>
+</body>
+</html>

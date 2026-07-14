@@ -38,11 +38,11 @@ laporan aktivitas — lengkap dengan export ke Excel.
   ("Menu Administratif") yang membuka halaman index berisi daftar semua
   menu Kelola (Member, Produk, Promo & Kontes, Recruit, Tutorial)
   sebagai kartu yang bisa diklik.
-- **Time Value Calculator** — kalkulator nilai waktu uang (PV, FV,
-  pembayaran, bunga, periode) untuk simulasi cepat ke nasabah. File
-  kalkulatornya sendiri (`public/kalkulator-nilai-waktu-uang.html`,
-  desain & logo sudah menyatu di dalamnya) ditampilkan lewat halaman
-  ini apa adanya.
+- **Kalkulator Finansial** — kalkulator perencanaan keuangan 4 modul
+  (Asuransi Jiwa, Sakit Kritis, Dana Pensiun, Dana Pendidikan), hitung
+  otomatis real-time saat mengetik. File kalkulatornya sendiri
+  (`public/kalkulator-finansial.html`, satu file mandiri tanpa
+  dependensi luar) ditampilkan lewat halaman ini apa adanya.
 - Menu di sidebar (member maupun Admin) **terurut alfabetis A-Z**.
 - **Aktivitas Member (sistem poin)**: 2 kategori aktivitas —
   **Calon Nasabah** (field **Nama Nasabah** + **Nomor Telepon**, lalu
