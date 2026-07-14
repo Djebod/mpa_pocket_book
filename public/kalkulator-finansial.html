@@ -188,6 +188,13 @@
     border: 1px solid var(--green-dim);
   }
 
+  .result-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
   .result-label {
     font-size: 12.5px;
     color: var(--text-dim);
@@ -195,6 +202,26 @@
     letter-spacing: 0.4px;
     margin: 0 0 8px;
     font-weight: 700;
+  }
+
+  .download-btn {
+    shrink: 0;
+    flex-shrink: 0;
+    background: transparent;
+    border: 1px solid var(--green-dim);
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 7px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+  }
+
+  .download-btn:hover {
+    background: var(--green-soft);
+    border-color: var(--green);
   }
 
   .result-value {
@@ -252,6 +279,10 @@
     border-top: 1px solid var(--border);
   }
 
+  .print-header {
+    display: none;
+  }
+
   @media (max-width: 520px) {
     .grid-inputs {
       grid-template-columns: 1fr;
@@ -262,6 +293,100 @@
     .result-value {
       font-size: 26px;
     }
+  }
+
+  /* ---------- Tampilan cetak / Unduh PDF ---------- */
+  @media print {
+    html, body {
+      background: #ffffff;
+      color: #16241c;
+      padding: 0;
+    }
+
+    .wrap {
+      max-width: 100%;
+    }
+
+    header.page-header,
+    nav.tabs,
+    .download-btn {
+      display: none !important;
+    }
+
+    .print-header {
+      display: block;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #16803c;
+    }
+
+    .print-header .brand {
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f5132;
+    }
+
+    .print-header .module-name {
+      font-size: 13px;
+      color: #3a5c49;
+      margin-top: 2px;
+    }
+
+    .print-header .timestamp {
+      font-size: 11px;
+      color: #6b8578;
+      margin-top: 6px;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #cfe0d6;
+      box-shadow: none;
+      break-inside: avoid;
+    }
+
+    .card h2,
+    .result-value,
+    .breakdown-row .v {
+      color: #16241c;
+    }
+
+    .result-value {
+      color: #0f7a3d;
+    }
+
+    .card .card-sub,
+    .breakdown-row .k,
+    .note {
+      color: #4f6b5c;
+    }
+
+    .field .input-group {
+      background: #f5f9f6;
+      border: 1px solid #cfe0d6;
+    }
+
+    .note {
+      background: #f5f9f6;
+      border: 1px solid #e1ece6;
+    }
+
+    footer.disclaimer {
+      color: #4f6b5c;
+      border-top: 1px solid #cfe0d6;
+    }
+
+    .print-footer {
+      display: block !important;
+      margin-top: 10px;
+      font-size: 10.5px;
+      color: #8098a0;
+      text-align: center;
+    }
+  }
+
+  .print-footer {
+    display: none;
   }
 </style>
 </head>
@@ -281,6 +406,7 @@
       sebenarnya dapat berbeda tergantung kondisi pasar dan pribadi. Untuk
       keputusan keuangan, disarankan berkonsultasi dengan perencana keuangan
       atau agen berlisensi.
+      <div class="print-footer">Dicetak dari Kalkulator Perencanaan Keuangan — Mulia Putri Agency</div>
     </footer>
   </div>
 
@@ -314,6 +440,14 @@
 
   function yearsBetween(a, b) {
     return Math.max(0, b - a);
+  }
+
+  function formatPrintTimestamp() {
+    var d = new Date();
+    var pad = function (n) { return String(n).padStart(2, "0"); };
+    var hari = pad(d.getDate()) + "/" + pad(d.getMonth() + 1) + "/" + d.getFullYear();
+    var jam = pad(d.getHours()) + ":" + pad(d.getMinutes());
+    return hari + " " + jam;
   }
 
   var MODULES = [
@@ -476,6 +610,11 @@
     section.className = "module" + (idx === 0 ? " active" : "");
     section.id = "module-" + mod.id;
     section.innerHTML =
+      '<div class="print-header">' +
+      '<div class="brand">Kalkulator Perencanaan Keuangan — Mulia Putri Agency</div>' +
+      '<div class="module-name">' + mod.cardTitle + "</div>" +
+      '<div class="timestamp" data-print-timestamp></div>' +
+      "</div>" +
       '<div class="card">' +
       "<h2>" + mod.cardTitle + "</h2>" +
       '<p class="card-sub">' + mod.cardSub + "</p>" +
@@ -484,7 +623,10 @@
       "</div>" +
       "</div>" +
       '<div class="card result-card">' +
+      '<div class="result-top">' +
       '<p class="result-label">' + mod.resultLabel + "</p>" +
+      '<button type="button" class="download-btn" data-download="' + mod.id + '">📄 Unduh PDF</button>' +
+      "</div>" +
       '<div class="result-value" id="result-' + mod.id + '">Rp0</div>' +
       '<div class="breakdown" id="breakdown-' + mod.id + '"></div>' +
       '<div class="note" id="note-' + mod.id + '"></div>' +
@@ -500,6 +642,20 @@
       sec.classList.toggle("active", sec.id === "module-" + id);
     });
   }
+
+  // Tombol "Unduh PDF" -> pakai fitur cetak bawaan browser (window.print),
+  // dengan CSS @media print yang sudah dirapikan supaya hasil "Save as PDF"
+  // rapi dan cuma menampilkan modul yang sedang aktif. Ini sengaja tidak
+  // memakai library PDF eksternal, supaya file ini tetap satu file mandiri
+  // tanpa dependensi luar.
+  document.querySelectorAll("[data-download]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll("[data-print-timestamp]").forEach(function (el) {
+        el.textContent = "Dicetak pada " + formatPrintTimestamp();
+      });
+      window.print();
+    });
+  });
 
   function attachMoneyInput(field) {
     var el = document.getElementById(field.id);

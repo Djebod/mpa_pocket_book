@@ -13,10 +13,11 @@ laporan aktivitas — lengkap dengan export ke Excel.
   isi pencarian/filter untuk menjelajah katalog. Tiap produk berisi
   Nama, **Kategori** (dropdown tetap, cuma "Unit Link" / "Non Unit
   Link"), **Sub Kategori** (bebas isi, ada saran ketik dari sub kategori
-  yang sudah ada supaya tidak dobel — beda spasi/huruf besar-kecil tetap
-  dianggap sama), **1 kolom Deskripsi**, dan **banyak lampiran PDF/foto**
-  (konsep sama seperti halaman Promo & Kontes). Filter Kategori + Sub
-  Kategori dan pencarian tersedia.
+  yang sudah ada supaya tidak dobel), lalu 6 field konten: **Materi
+  Training**, **Tabel Premi**, **Resume**, **Tabel Medical** (masing-
+  masing upload 1 file PDF/foto), **File Ketsus** (link Google Drive),
+  dan **Video** (link YouTube, otomatis disesuaikan ke format embed).
+  Filter Kategori + Sub Kategori dan pencarian tersedia.
 - **Rekomendasi Produk** — wizard tap-pilih untuk agen: jawab 2-4
   pertanyaan tentang kebutuhan nasabah (proteksi kesehatan, sakit
   kritis, jiwa berjangka, warisan, dana pendidikan, dana pensiun,
@@ -40,9 +41,11 @@ laporan aktivitas — lengkap dengan export ke Excel.
   sebagai kartu yang bisa diklik.
 - **Kalkulator Finansial** — kalkulator perencanaan keuangan 4 modul
   (Asuransi Jiwa, Sakit Kritis, Dana Pensiun, Dana Pendidikan), hitung
-  otomatis real-time saat mengetik. File kalkulatornya sendiri
-  (`public/kalkulator-finansial.html`, satu file mandiri tanpa
-  dependensi luar) ditampilkan lewat halaman ini apa adanya.
+  otomatis real-time saat mengetik, dengan tombol **"Unduh PDF"** di
+  tiap modul (pakai fitur cetak bawaan browser, tanpa library eksternal).
+  File kalkulatornya sendiri (`public/kalkulator-finansial.html`, satu
+  file mandiri tanpa dependensi luar) ditampilkan lewat halaman ini apa
+  adanya.
 - Menu di sidebar (member maupun Admin) **terurut alfabetis A-Z**.
 - **Aktivitas Member (sistem poin)**: 2 kategori aktivitas —
   **Calon Nasabah** (field **Nama Nasabah** + **Nomor Telepon**, lalu

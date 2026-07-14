@@ -2,20 +2,30 @@
 
 import { useEffect, useMemo, useState } from "react";
 import * as store from "@/lib/store";
-import MultiFileInput from "@/components/MultiFileInput";
+import SingleFileInput from "@/components/SingleFileInput";
 
 // Kategori adalah field "kunci" — sengaja dibatasi cuma 2 pilihan supaya
 // filter Katalog Produk tetap konsisten (tidak ada variasi penulisan).
 const CATEGORY_OPTIONS = ["Unit Link", "Non Unit Link"];
 
-const emptyForm = { name: "", category: CATEGORY_OPTIONS[0], subCategory: "", description: "", files: [] };
+const emptyForm = {
+  name: "",
+  category: CATEGORY_OPTIONS[0],
+  subCategory: "",
+  materiTraining: null,
+  tabelPremi: null,
+  resume: null,
+  tabelMedical: null,
+  fileKetsusUrl: "",
+  videoUrl: "",
+};
 
 /**
  * Mencocokkan Sub Kategori yang baru diketik dengan daftar Sub Kategori
  * yang sudah ada (dibandingkan tanpa peduli spasi di ujung & huruf
  * besar/kecil) — supaya tidak ada entri dobel yang cuma beda spasi/huruf
- * kapital (mis. "Asuransi Jiwa" vs "asuransi jiwa "), tapi Sub Kategori
- * yang benar-benar baru tetap bisa ditambahkan bebas.
+ * kapital, tapi Sub Kategori yang benar-benar baru tetap bisa ditambahkan
+ * bebas.
  */
 function normalizeSubCategory(value, existingList) {
   const trimmed = value.trim();
@@ -36,11 +46,8 @@ export default function AdminProductsPage() {
 
   useEffect(refresh, []);
 
-  // Daftar Sub Kategori yang sudah pernah dipakai, sudah di-dedup
-  // (spasi & huruf besar/kecil diabaikan saat membandingkan), dipakai
-  // sebagai saran ketik (datalist) sekaligus acuan anti-duplikat.
   const existingSubCategories = useMemo(() => {
-    const seen = new Map(); // key: lowercase trimmed, value: penulisan asli pertama kali muncul
+    const seen = new Map();
     products.forEach((p) => {
       const raw = (p.subCategory || "").trim();
       if (!raw) return;
@@ -81,8 +88,12 @@ export default function AdminProductsPage() {
       name: product.name,
       category: CATEGORY_OPTIONS.includes(product.category) ? product.category : CATEGORY_OPTIONS[0],
       subCategory: product.subCategory || "",
-      description: product.description || "",
-      files: product.files || [],
+      materiTraining: product.materiTraining || null,
+      tabelPremi: product.tabelPremi || null,
+      resume: product.resume || null,
+      tabelMedical: product.tabelMedical || null,
+      fileKetsusUrl: product.fileKetsusUrl || "",
+      videoUrl: product.videoUrl || "",
     });
     setEditingId(product.id);
     setError("");
@@ -98,12 +109,16 @@ export default function AdminProductsPage() {
   const editingProductHasUnknownCategory =
     editingId && !CATEGORY_OPTIONS.includes(products.find((p) => p.id === editingId)?.category);
 
+  function countAttachments(p) {
+    return [p.materiTraining, p.tabelPremi, p.resume, p.tabelMedical].filter(Boolean).length;
+  }
+
   return (
     <div>
       <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-1">Kelola Produk</h1>
       <p className="text-sm text-ink/60 mb-8">
-        Isi nama, kategori, sub kategori, deskripsi produk, dan lampirkan file (PDF/JPG) — bisa lebih dari satu
-        ("Attach File 1, 2, dst").
+        Isi nama, kategori, sub kategori, lalu lengkapi Materi Training, Tabel Premi, Resume, Tabel Medical
+        (upload PDF/foto), File Ketsus (link Google Drive), dan Video (link YouTube).
       </p>
 
       <form onSubmit={handleSubmit} className="bg-card border border-ink/10 rounded-lg shadow-stamp px-4 sm:px-6 py-5 sm:py-6 mb-10 perforated">
@@ -116,7 +131,7 @@ export default function AdminProductsPage() {
           </p>
         )}
 
-        <div className="grid sm:grid-cols-2 gap-5 mb-5">
+        <div className="grid sm:grid-cols-2 gap-5 mb-6">
           <div>
             <label className="block text-sm font-semibold text-ink mb-1.5">Nama Produk</label>
             <input
@@ -161,22 +176,54 @@ export default function AdminProductsPage() {
           </div>
         </div>
 
-        <div className="mb-5">
-          <label className="block text-sm font-semibold text-ink mb-1.5">Deskripsi</label>
-          <textarea
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-            rows={6}
-            placeholder="Deskripsi produk, ilustrasi, cara menjual, dsb — bebas ditulis dalam satu kolom ini."
-            className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
+        <div className="grid sm:grid-cols-2 gap-6 mb-6">
+          <SingleFileInput
+            label="Materi Training"
+            value={form.materiTraining}
+            onChange={(v) => setForm({ ...form, materiTraining: v })}
           />
-          <p className="text-xs text-ink/45 mt-1">
-            Link (http/https) di dalam teks ini otomatis jadi bisa diklik di halaman member.
-          </p>
+          <SingleFileInput
+            label="Tabel Premi"
+            value={form.tabelPremi}
+            onChange={(v) => setForm({ ...form, tabelPremi: v })}
+          />
+          <SingleFileInput label="Resume" value={form.resume} onChange={(v) => setForm({ ...form, resume: v })} />
+          <SingleFileInput
+            label="Tabel Medical"
+            value={form.tabelMedical}
+            onChange={(v) => setForm({ ...form, tabelMedical: v })}
+          />
         </div>
 
-        <div className="mb-6">
-          <MultiFileInput value={form.files} onChange={(files) => setForm({ ...form, files })} label="Lampiran (PDF / Foto) — Attach File 1, 2, dst" />
+        <div className="grid sm:grid-cols-2 gap-5 mb-6">
+          <div>
+            <label className="block text-sm font-semibold text-ink mb-1.5">
+              File Ketsus <span className="font-normal text-ink/45">(link Google Drive)</span>
+            </label>
+            <input
+              value={form.fileKetsusUrl}
+              onChange={(e) => setForm({ ...form, fileKetsusUrl: e.target.value })}
+              placeholder="https://drive.google.com/..."
+              className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
+            />
+            <p className="text-xs text-ink/45 mt-1">
+              Copy-paste link Google Drive — saat diklik member akan diarahkan ke link ini.
+            </p>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-ink mb-1.5">
+              Video <span className="font-normal text-ink/45">(link YouTube)</span>
+            </label>
+            <input
+              value={form.videoUrl}
+              onChange={(e) => setForm({ ...form, videoUrl: e.target.value })}
+              placeholder="https://www.youtube.com/watch?v=xxxxxxxx"
+              className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
+            />
+            <p className="text-xs text-ink/45 mt-1">
+              Boleh paste link YouTube apa saja (watch, youtu.be, shorts) — otomatis disesuaikan.
+            </p>
+          </div>
         </div>
 
         {error && <p className="text-sm text-rust mb-4">{error}</p>}
@@ -206,8 +253,11 @@ export default function AdminProductsPage() {
                 {p.subCategory ? ` · ${p.subCategory}` : ""}
               </p>
               <p className="font-display text-lg text-ink mb-1">{p.name}</p>
-              <p className="text-sm text-charcoal/60 line-clamp-1">{p.description}</p>
-              <p className="text-xs text-ink/45 mt-1">{(p.files || []).length} file terlampir</p>
+              <p className="text-xs text-ink/45">
+                {countAttachments(p)} dari 4 dokumen terlampir
+                {p.fileKetsusUrl ? " · File Ketsus ✓" : ""}
+                {p.videoUrl ? " · Video ✓" : ""}
+              </p>
             </div>
             <div className="flex gap-3 shrink-0 pt-1">
               <button onClick={() => handleEdit(p)} className="text-xs font-semibold text-ink/60 hover:text-brass">

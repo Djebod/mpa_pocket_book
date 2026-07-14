@@ -40,7 +40,7 @@ export default function ProductsPage() {
         return false;
       if (search.trim()) {
         const q = search.trim().toLowerCase();
-        const haystack = `${p.name} ${p.category} ${p.subCategory || ""} ${p.description || ""}`.toLowerCase();
+        const haystack = `${p.name} ${p.category} ${p.subCategory || ""}`.toLowerCase();
         if (!haystack.includes(q)) return false;
       }
       return true;
@@ -180,7 +180,18 @@ export default function ProductsPage() {
                     {p.subCategory ? ` · ${p.subCategory}` : ""}
                   </p>
                   <h2 className="font-display text-xl text-ink mb-2 group-hover:italic">{p.name}</h2>
-                  <p className="text-sm text-charcoal/70 line-clamp-2">{p.description}</p>
+                  <p className="text-xs text-ink/45">
+                    {[
+                      p.materiTraining && "Materi Training",
+                      p.tabelPremi && "Tabel Premi",
+                      p.resume && "Resume",
+                      p.tabelMedical && "Tabel Medical",
+                      p.fileKetsusUrl && "File Ketsus",
+                      p.videoUrl && "Video",
+                    ]
+                      .filter(Boolean)
+                      .join(" · ") || "Belum ada dokumen dilengkapi"}
+                  </p>
                 </Link>
               ))}
             </div>

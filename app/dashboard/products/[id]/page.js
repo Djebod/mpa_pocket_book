@@ -4,12 +4,22 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import * as store from "@/lib/store";
-import { FileListDisplay } from "@/components/FileDisplay";
-import Linkified from "@/components/Linkified";
+import { toYouTubeEmbedUrl } from "@/lib/youtube";
+import { FileDisplay } from "@/components/FileDisplay";
+
+const TABS = [
+  { key: "materiTraining", label: "Materi Training", kind: "file" },
+  { key: "tabelPremi", label: "Tabel Premi", kind: "file" },
+  { key: "resume", label: "Resume", kind: "file" },
+  { key: "tabelMedical", label: "Tabel Medical", kind: "file" },
+  { key: "fileKetsusUrl", label: "File Ketsus", kind: "link" },
+  { key: "videoUrl", label: "Video", kind: "video" },
+];
 
 export default function ProductDetailPage() {
   const { id } = useParams();
   const [product, setProduct] = useState(undefined);
+  const [tab, setTab] = useState("materiTraining");
 
   useEffect(() => {
     setProduct(store.getProductById(id));
@@ -30,6 +40,8 @@ export default function ProductDetailPage() {
     );
   }
 
+  const activeTab = TABS.find((t) => t.key === tab);
+
   return (
     <div>
       <Link
@@ -45,13 +57,66 @@ export default function ProductDetailPage() {
       </p>
       <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-6">{product.name}</h1>
 
-      <div className="bg-card border border-ink/10 rounded-lg px-4 sm:px-6 py-5 sm:py-6 shadow-stamp perforated">
-        {product.description && (
-          <Linkified text={product.description} className="text-[15px] sm:text-sm leading-relaxed text-charcoal/85 mb-4" />
+      <div className="flex gap-1 border-b border-ink/15 mb-6 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+        {TABS.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setTab(t.key)}
+            className={`tab-notch whitespace-nowrap px-3.5 sm:px-4 py-3 sm:py-2.5 text-sm font-semibold transition-colors ${
+              tab === t.key
+                ? "bg-card text-ink border border-b-0 border-ink/15"
+                : "text-ink/50 hover:text-ink"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="bg-card border border-ink/10 rounded-lg rounded-tl-none px-4 sm:px-6 py-5 sm:py-6 shadow-stamp min-h-[220px]">
+        {activeTab.kind === "file" && (
+          <>
+            {product[activeTab.key] ? (
+              <FileDisplay file={product[activeTab.key]} />
+            ) : (
+              <p className="text-sm text-ink/50">Belum ada {activeTab.label.toLowerCase()} untuk produk ini.</p>
+            )}
+          </>
         )}
-        <FileListDisplay files={product.files || []} />
-        {!product.description && (!product.files || product.files.length === 0) && (
-          <p className="text-sm text-ink/50">Belum ada detail untuk produk ini.</p>
+
+        {activeTab.kind === "link" && (
+          <>
+            {product.fileKetsusUrl ? (
+              <a
+                href={product.fileKetsusUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-ink text-paper text-sm font-semibold px-4 py-2.5 rounded-md hover:bg-ink-light transition-colors"
+              >
+                🔗 Buka File Ketsus di Google Drive
+              </a>
+            ) : (
+              <p className="text-sm text-ink/50">Belum ada File Ketsus untuk produk ini.</p>
+            )}
+          </>
+        )}
+
+        {activeTab.kind === "video" && (
+          <>
+            {product.videoUrl ? (
+              <div className="aspect-video w-full rounded-md overflow-hidden bg-ink/10">
+                <iframe
+                  src={toYouTubeEmbedUrl(product.videoUrl)}
+                  title={`Video ${product.name}`}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            ) : (
+              <p className="text-sm text-ink/50">Belum ada video untuk produk ini.</p>
+            )}
+          </>
         )}
       </div>
     </div>
