@@ -39,6 +39,7 @@ export default function AdminProductsPage() {
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
 
   function refresh() {
     setProducts(store.getProducts());
@@ -56,6 +57,14 @@ export default function AdminProductsPage() {
     });
     return Array.from(seen.values()).sort();
   }, [products]);
+
+  const visibleProducts = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return products;
+    return products.filter((p) =>
+      `${p.name} ${p.category} ${p.subCategory || ""}`.toLowerCase().includes(q)
+    );
+  }, [products, search]);
 
   function resetForm() {
     setForm(emptyForm);
@@ -97,6 +106,9 @@ export default function AdminProductsPage() {
     });
     setEditingId(product.id);
     setError("");
+    setTimeout(() => {
+      document.getElementById("product-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
   }
 
   function handleDelete(id) {
@@ -121,7 +133,11 @@ export default function AdminProductsPage() {
         (upload PDF/foto), File Ketsus (link Google Drive), dan Video (link YouTube).
       </p>
 
-      <form onSubmit={handleSubmit} className="bg-card border border-ink/10 rounded-lg shadow-stamp px-4 sm:px-6 py-5 sm:py-6 mb-10 perforated">
+      <form
+        id="product-form"
+        onSubmit={handleSubmit}
+        className="bg-card border border-ink/10 rounded-lg shadow-stamp px-4 sm:px-6 py-5 sm:py-6 mb-10 perforated"
+      >
         <h2 className="font-display text-lg text-ink mb-4">{editingId ? "Ubah Produk" : "Tambah Produk Baru"}</h2>
 
         {editingProductHasUnknownCategory && (
@@ -243,9 +259,17 @@ export default function AdminProductsPage() {
         </div>
       </form>
 
-      <h2 className="font-display text-lg text-ink mb-3">Daftar Produk ({products.length})</h2>
+      <div className="flex items-center justify-between gap-4 flex-wrap mb-3">
+        <h2 className="font-display text-lg text-ink">Daftar Produk ({visibleProducts.length})</h2>
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Cari nama produk, kategori, atau sub kategori..."
+          className="w-full sm:w-72 rounded-md border border-ink/20 bg-paper px-3.5 py-2 text-sm focus:border-brass focus:outline-none"
+        />
+      </div>
       <div className="space-y-3">
-        {products.map((p) => (
+        {visibleProducts.map((p) => (
           <div key={p.id} className="flex items-start justify-between gap-4 bg-card border border-ink/10 rounded-lg px-5 py-4 shadow-stamp">
             <div className="min-w-0">
               <p className="font-mono text-[11px] uppercase tracking-wide text-brass mb-1">
@@ -269,9 +293,9 @@ export default function AdminProductsPage() {
             </div>
           </div>
         ))}
-        {products.length === 0 && (
+        {visibleProducts.length === 0 && (
           <div className="bg-card border border-dashed border-ink/20 rounded-lg px-5 py-8 text-center text-sm text-ink/50">
-            Belum ada produk.
+            {products.length === 0 ? "Belum ada produk." : "Tidak ada produk yang cocok dengan pencarian."}
           </div>
         )}
       </div>

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/app/providers";
 
-const MONITORING_TAB = { href: "/dashboard/monitoring", label: "Monitoring" };
+const MONITORING_TAB = { href: "/dashboard/monitoring", label: "Aktivitas" };
 
 const MEMBER_TABS = [
   { href: "/dashboard/kalkulator-finansial", label: "Kalkulator Finansial" },

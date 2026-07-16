@@ -32,9 +32,10 @@ laporan aktivitas — lengkap dengan export ke Excel.
 - **Recruit** — halaman tunggal (dikelola Admin): panduan proses recruit
   + lampiran materi (PDF/foto, bisa langsung dilihat & diunduh). Link di
   dalam teks deskripsi otomatis bisa diklik.
-- **Menu Monitoring** — di posisi #1 sidebar, mengelompokkan
-  **Ringkasan**, **Aktivitas**, **Tim Saya**, dan (khusus Admin)
-  **Ringkasan Aktivitas** sebagai kartu yang bisa diklik.
+- **Menu Aktivitas** (dulu "Monitoring") — di posisi #1 sidebar,
+  mengelompokkan **Catat Aktivitas**, **Ringkasan Aktivitas**, **Tim
+  Saya**, dan (khusus Admin) **Ringkasan Aktivitas Tim** sebagai kartu
+  yang bisa diklik.
 - **Menu Administratif** — sidebar admin diringkas jadi satu link
   ("Menu Administratif") yang membuka halaman index berisi daftar semua
   menu Kelola (Member, Produk, Promo & Kontes, Recruit, Tutorial)
