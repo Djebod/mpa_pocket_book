@@ -13,11 +13,13 @@ laporan aktivitas — lengkap dengan export ke Excel.
   isi pencarian/filter untuk menjelajah katalog. Tiap produk berisi
   Nama, **Kategori** (dropdown tetap, cuma "Unit Link" / "Non Unit
   Link"), **Sub Kategori** (bebas isi, ada saran ketik dari sub kategori
-  yang sudah ada supaya tidak dobel), lalu 6 field konten: **Materi
-  Training**, **Tabel Premi**, **Resume**, **Tabel Medical** (masing-
-  masing upload 1 file PDF/foto), **File Ketsus** (link Google Drive),
-  dan **Video** (link YouTube, otomatis disesuaikan ke format embed).
-  Filter Kategori + Sub Kategori dan pencarian tersedia.
+  yang sudah ada supaya tidak dobel), lalu field konten: **Materi
+  Training** (2 versi terpisah — **Manulife Pusat** dan **MPA**, masing-
+  masing upload 1 file PDF/foto), **Tabel Premi** dan **Tabel Medical**
+  (upload 1 file PDF/foto), **Resume** (upload **banyak file** PDF/foto),
+  **File Ketsus** (link Google Drive), dan **Video** (link YouTube,
+  otomatis disesuaikan ke format embed). Filter Kategori + Sub Kategori,
+  pencarian, dan search di Kelola Produk tersedia.
 - **Rekomendasi Produk** — wizard tap-pilih untuk agen: jawab 2-4
   pertanyaan tentang kebutuhan nasabah (proteksi kesehatan, sakit
   kritis, jiwa berjangka, warisan, dana pendidikan, dana pensiun,

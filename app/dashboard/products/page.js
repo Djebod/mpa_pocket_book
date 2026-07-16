@@ -182,9 +182,9 @@ export default function ProductsPage() {
                   <h2 className="font-display text-xl text-ink mb-2 group-hover:italic">{p.name}</h2>
                   <p className="text-xs text-ink/45">
                     {[
-                      p.materiTraining && "Materi Training",
+                      (p.materiTrainingManulife || p.materiTrainingMPA) && "Materi Training",
                       p.tabelPremi && "Tabel Premi",
-                      p.resume && "Resume",
+                      p.resume && p.resume.length > 0 && "Resume",
                       p.tabelMedical && "Tabel Medical",
                       p.fileKetsusUrl && "File Ketsus",
                       p.videoUrl && "Video",

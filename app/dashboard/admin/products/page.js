@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import * as store from "@/lib/store";
 import SingleFileInput from "@/components/SingleFileInput";
+import MultiFileInput from "@/components/MultiFileInput";
 
 // Kategori adalah field "kunci" — sengaja dibatasi cuma 2 pilihan supaya
 // filter Katalog Produk tetap konsisten (tidak ada variasi penulisan).
@@ -12,9 +13,10 @@ const emptyForm = {
   name: "",
   category: CATEGORY_OPTIONS[0],
   subCategory: "",
-  materiTraining: null,
+  materiTrainingManulife: null,
+  materiTrainingMPA: null,
   tabelPremi: null,
-  resume: null,
+  resume: [],
   tabelMedical: null,
   fileKetsusUrl: "",
   videoUrl: "",
@@ -97,9 +99,10 @@ export default function AdminProductsPage() {
       name: product.name,
       category: CATEGORY_OPTIONS.includes(product.category) ? product.category : CATEGORY_OPTIONS[0],
       subCategory: product.subCategory || "",
-      materiTraining: product.materiTraining || null,
+      materiTrainingManulife: product.materiTrainingManulife || null,
+      materiTrainingMPA: product.materiTrainingMPA || null,
       tabelPremi: product.tabelPremi || null,
-      resume: product.resume || null,
+      resume: product.resume || [],
       tabelMedical: product.tabelMedical || null,
       fileKetsusUrl: product.fileKetsusUrl || "",
       videoUrl: product.videoUrl || "",
@@ -122,15 +125,22 @@ export default function AdminProductsPage() {
     editingId && !CATEGORY_OPTIONS.includes(products.find((p) => p.id === editingId)?.category);
 
   function countAttachments(p) {
-    return [p.materiTraining, p.tabelPremi, p.resume, p.tabelMedical].filter(Boolean).length;
+    return [
+      p.materiTrainingManulife,
+      p.materiTrainingMPA,
+      p.tabelPremi,
+      p.tabelMedical,
+      ...(p.resume || []),
+    ].filter(Boolean).length;
   }
 
   return (
     <div>
       <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-1">Kelola Produk</h1>
       <p className="text-sm text-ink/60 mb-8">
-        Isi nama, kategori, sub kategori, lalu lengkapi Materi Training, Tabel Premi, Resume, Tabel Medical
-        (upload PDF/foto), File Ketsus (link Google Drive), dan Video (link YouTube).
+        Isi nama, kategori, sub kategori, lalu lengkapi Materi Training (Manulife Pusat & MPA), Tabel Premi,
+        Resume (bisa lebih dari satu file), Tabel Medical, File Ketsus (link Google Drive), dan Video (link
+        YouTube).
       </p>
 
       <form
@@ -192,22 +202,38 @@ export default function AdminProductsPage() {
           </div>
         </div>
 
+        <p className="text-xs font-semibold text-ink/50 uppercase tracking-wide mb-2">Materi Training</p>
         <div className="grid sm:grid-cols-2 gap-6 mb-6">
           <SingleFileInput
-            label="Materi Training"
-            value={form.materiTraining}
-            onChange={(v) => setForm({ ...form, materiTraining: v })}
+            label="Versi Manulife Pusat"
+            value={form.materiTrainingManulife}
+            onChange={(v) => setForm({ ...form, materiTrainingManulife: v })}
           />
+          <SingleFileInput
+            label="Versi MPA"
+            value={form.materiTrainingMPA}
+            onChange={(v) => setForm({ ...form, materiTrainingMPA: v })}
+          />
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-6 mb-6">
           <SingleFileInput
             label="Tabel Premi"
             value={form.tabelPremi}
             onChange={(v) => setForm({ ...form, tabelPremi: v })}
           />
-          <SingleFileInput label="Resume" value={form.resume} onChange={(v) => setForm({ ...form, resume: v })} />
           <SingleFileInput
             label="Tabel Medical"
             value={form.tabelMedical}
             onChange={(v) => setForm({ ...form, tabelMedical: v })}
+          />
+        </div>
+
+        <div className="mb-6">
+          <MultiFileInput
+            label="Resume — bisa lebih dari satu file"
+            value={form.resume}
+            onChange={(v) => setForm({ ...form, resume: v })}
           />
         </div>
 
@@ -278,7 +304,7 @@ export default function AdminProductsPage() {
               </p>
               <p className="font-display text-lg text-ink mb-1">{p.name}</p>
               <p className="text-xs text-ink/45">
-                {countAttachments(p)} dari 4 dokumen terlampir
+                {countAttachments(p)} dokumen terlampir
                 {p.fileKetsusUrl ? " · File Ketsus ✓" : ""}
                 {p.videoUrl ? " · Video ✓" : ""}
               </p>

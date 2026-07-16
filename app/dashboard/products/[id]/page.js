@@ -5,12 +5,12 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import * as store from "@/lib/store";
 import { toYouTubeEmbedUrl } from "@/lib/youtube";
-import { FileDisplay } from "@/components/FileDisplay";
+import { FileDisplay, FileListDisplay } from "@/components/FileDisplay";
 
 const TABS = [
-  { key: "materiTraining", label: "Materi Training", kind: "file" },
+  { key: "materiTraining", label: "Materi Training", kind: "materiTraining" },
   { key: "tabelPremi", label: "Tabel Premi", kind: "file" },
-  { key: "resume", label: "Resume", kind: "file" },
+  { key: "resume", label: "Resume", kind: "fileList" },
   { key: "tabelMedical", label: "Tabel Medical", kind: "file" },
   { key: "fileKetsusUrl", label: "File Ketsus", kind: "link" },
   { key: "videoUrl", label: "Video", kind: "video" },
@@ -74,6 +74,27 @@ export default function ProductDetailPage() {
       </div>
 
       <div className="bg-card border border-ink/10 rounded-lg rounded-tl-none px-4 sm:px-6 py-5 sm:py-6 shadow-stamp min-h-[220px]">
+        {activeTab.kind === "materiTraining" && (
+          <div className="space-y-8">
+            <div>
+              <p className="text-xs font-semibold text-ink/50 uppercase tracking-wide mb-2">Versi Manulife Pusat</p>
+              {product.materiTrainingManulife ? (
+                <FileDisplay file={product.materiTrainingManulife} />
+              ) : (
+                <p className="text-sm text-ink/50">Belum ada materi training versi Manulife Pusat.</p>
+              )}
+            </div>
+            <div className="pt-6 border-t border-ink/10">
+              <p className="text-xs font-semibold text-ink/50 uppercase tracking-wide mb-2">Versi MPA</p>
+              {product.materiTrainingMPA ? (
+                <FileDisplay file={product.materiTrainingMPA} />
+              ) : (
+                <p className="text-sm text-ink/50">Belum ada materi training versi MPA.</p>
+              )}
+            </div>
+          </div>
+        )}
+
         {activeTab.kind === "file" && (
           <>
             {product[activeTab.key] ? (
@@ -83,6 +104,8 @@ export default function ProductDetailPage() {
             )}
           </>
         )}
+
+        {activeTab.kind === "fileList" && <FileListDisplay files={product.resume || []} />}
 
         {activeTab.kind === "link" && (
           <>
