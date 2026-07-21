@@ -8,11 +8,12 @@ import { useAuth } from "@/app/providers";
 const MONITORING_TAB = { href: "/dashboard/monitoring", label: "Aktivitas" };
 
 const MEMBER_TABS = [
+  { href: "/dashboard/analisa-kebutuhan", label: "Analisa Kebutuhan Asuransi" },
   { href: "/dashboard/kalkulator-finansial", label: "Kalkulator Finansial" },
+  { href: "/dashboard/rekomendasi", label: "Rekomendasi Produk" },
   { href: "/dashboard/products", label: "Produk" },
   { href: "/dashboard/promo", label: "Promo & Kontes" },
   { href: "/dashboard/recruit", label: "Recruit" },
-  { href: "/dashboard/rekomendasi", label: "Rekomendasi Produk" },
   { href: "/dashboard/tutorials", label: "Tutorial Digital" },
 ];
 
