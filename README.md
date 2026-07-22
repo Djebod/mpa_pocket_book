@@ -41,8 +41,10 @@ laporan aktivitas — lengkap dengan export ke Excel.
 - **Promo & Kontes** — daftar promo (dikelola Admin): Type Promo +
   **Kategori Promo** (radio button "Agen"/"Nasabah") + banyak lampiran
   PDF/foto per promo. Member bisa filter Semua/Agen/Nasabah.
-- **After Sales & Claim** — halaman tunggal (dikelola Admin): banyak
-  lampiran PDF/foto.
+- **After Sales & Claim** — daftar data (dikelola Admin): tiap entri
+  wajib pilih **Kategori** (radio button "After Sales" / "Claim") +
+  banyak lampiran PDF/foto. Tampilan member terpisah jadi 2 tab sesuai
+  kategori.
 - **Tutorial Digital** — daftar tutorial (dikelola Admin): judul + link
   Google Drive, klik untuk membuka. Ada pencarian + urut A-Z.
 - **Recruit** — halaman tunggal (dikelola Admin): panduan proses recruit

@@ -3,11 +3,11 @@ import { readSheet, writeSheet, isSheetsConfigured } from "@/lib/google/sheetsCl
 
 export async function GET() {
   if (!isSheetsConfigured()) {
-    return NextResponse.json({ configured: false, afterSalesClaim: null });
+    return NextResponse.json({ configured: false, afterSalesClaim: [] });
   }
   try {
-    const rows = await readSheet("AfterSalesClaim");
-    return NextResponse.json({ configured: true, afterSalesClaim: rows[0] || null });
+    const afterSalesClaim = await readSheet("AfterSalesClaim");
+    return NextResponse.json({ configured: true, afterSalesClaim });
   } catch (err) {
     return NextResponse.json({ configured: true, error: String(err.message || err) }, { status: 500 });
   }
@@ -19,7 +19,7 @@ export async function POST(request) {
   }
   try {
     const { afterSalesClaim } = await request.json();
-    await writeSheet("AfterSalesClaim", afterSalesClaim ? [afterSalesClaim] : []);
+    await writeSheet("AfterSalesClaim", afterSalesClaim || []);
     return NextResponse.json({ ok: true });
   } catch (err) {
     return NextResponse.json({ ok: false, error: String(err.message || err) }, { status: 500 });
