@@ -16,6 +16,7 @@ const MEMBER_TABS = [
   { href: "/dashboard/products", label: "Produk" },
   { href: "/dashboard/promo", label: "Promo & Kontes" },
   { href: "/dashboard/recruit", label: "Recruit" },
+  { href: "/dashboard/after-sales-claim", label: "After Sales & Claim" },
   { href: "/dashboard/tutorials", label: "Tutorial Digital" },
 ];
 

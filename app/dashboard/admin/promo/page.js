@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import * as store from "@/lib/store";
 import MultiFileInput from "@/components/MultiFileInput";
 
-const emptyForm = { typePromo: "", files: [] };
+const PROMO_CATEGORY_OPTIONS = ["Agen", "Nasabah"];
+
+const emptyForm = { typePromo: "", category: PROMO_CATEGORY_OPTIONS[0], files: [] };
 
 export default function AdminPromoPage() {
   const [list, setList] = useState([]);
@@ -41,7 +43,7 @@ export default function AdminPromoPage() {
   }
 
   function handleEdit(p) {
-    setForm({ typePromo: p.typePromo, files: p.files || [] });
+    setForm({ typePromo: p.typePromo, category: p.category || PROMO_CATEGORY_OPTIONS[0], files: p.files || [] });
     setEditingId(p.id);
     setError("");
   }
@@ -73,6 +75,25 @@ export default function AdminPromoPage() {
           />
         </div>
 
+        <div className="mb-5">
+          <label className="block text-sm font-semibold text-ink mb-1.5">Kategori Promo</label>
+          <div className="flex gap-5">
+            {PROMO_CATEGORY_OPTIONS.map((opt) => (
+              <label key={opt} className="flex items-center gap-2 text-sm text-charcoal cursor-pointer">
+                <input
+                  type="radio"
+                  name="promoCategory"
+                  value={opt}
+                  checked={form.category === opt}
+                  onChange={() => setForm({ ...form, category: opt })}
+                  className="accent-brass w-4 h-4"
+                />
+                {opt}
+              </label>
+            ))}
+          </div>
+        </div>
+
         <div className="mb-6">
           <MultiFileInput value={form.files} onChange={(files) => setForm({ ...form, files })} label="Lampiran (PDF / Foto) — Attach File 1, 2, dst" />
         </div>
@@ -99,7 +120,14 @@ export default function AdminPromoPage() {
         {list.map((p) => (
           <div key={p.id} className="flex items-start justify-between gap-4 bg-card border border-ink/10 rounded-lg px-5 py-4 shadow-stamp">
             <div className="min-w-0">
-              <p className="font-display text-lg text-ink">{p.typePromo}</p>
+              <div className="flex items-center gap-2 mb-1">
+                <p className="font-display text-lg text-ink">{p.typePromo}</p>
+                {p.category && (
+                  <span className="font-mono text-[10px] uppercase tracking-wide text-brass bg-brass/10 px-2 py-0.5 rounded-full">
+                    {p.category}
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-ink/50">{(p.files || []).length} file terlampir</p>
             </div>
             <div className="flex gap-3 shrink-0 pt-1">

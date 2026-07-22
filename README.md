@@ -26,11 +26,11 @@ laporan aktivitas — lengkap dengan export ke Excel.
   Link"), **Sub Kategori** (bebas isi, ada saran ketik dari sub kategori
   yang sudah ada supaya tidak dobel), lalu field konten: **Materi
   Training** (2 versi terpisah — **Manulife Pusat** dan **MPA**, masing-
-  masing upload 1 file PDF/foto), **Tabel Premi** dan **Tabel Medical**
-  (upload 1 file PDF/foto), **Resume** (upload **banyak file** PDF/foto),
-  **File Ketsus** (link Google Drive), dan **Video** (link YouTube,
-  otomatis disesuaikan ke format embed). Filter Kategori + Sub Kategori,
-  pencarian, dan search di Kelola Produk tersedia.
+  masing upload 1 file PDF/foto), **Tabel Premi** (upload 1 file
+  PDF/foto), **Resume** dan **Tabel Medical** (upload **banyak file**
+  PDF/foto), **File Ketsus** (link Google Drive), dan **Video** (link
+  YouTube, otomatis disesuaikan ke format embed). Filter Kategori + Sub
+  Kategori, pencarian, dan search di Kelola Produk tersedia.
 - **Rekomendasi Produk** — wizard tap-pilih untuk agen: jawab 2-4
   pertanyaan tentang kebutuhan nasabah (proteksi kesehatan, sakit
   kritis, jiwa berjangka, warisan, dana pendidikan, dana pensiun,
@@ -38,8 +38,11 @@ laporan aktivitas — lengkap dengan export ke Excel.
   keputusan + link ke produk serupa di Katalog Produk (kalau ada). Data
   produk & alur pertanyaan ada di `lib/productWizard.js` (terpisah dari
   halaman render).
-- **Promo & Kontes** — daftar promo (dikelola Admin): Type Promo + banyak
-  lampiran PDF/foto per promo.
+- **Promo & Kontes** — daftar promo (dikelola Admin): Type Promo +
+  **Kategori Promo** (radio button "Agen"/"Nasabah") + banyak lampiran
+  PDF/foto per promo. Member bisa filter Semua/Agen/Nasabah.
+- **After Sales & Claim** — halaman tunggal (dikelola Admin): banyak
+  lampiran PDF/foto.
 - **Tutorial Digital** — daftar tutorial (dikelola Admin): judul + link
   Google Drive, klik untuk membuka. Ada pencarian + urut A-Z.
 - **Recruit** — halaman tunggal (dikelola Admin): panduan proses recruit
@@ -69,13 +72,13 @@ laporan aktivitas — lengkap dengan export ke Excel.
 - **Urutan menu** — "Kalkulator Aktivitas" muncul tepat di bawah
   "Aktivitas"; "Analisa Kebutuhan Asuransi" di bawahnya; "Rekomendasi
   Produk" muncul tepat di bawah "Kalkulator Finansial"; "Komisi &
-  Kompensasi" tepat di bawah "Rekomendasi Produk"; sisanya tetap
-  terurut alfabetis A-Z.
+  Kompensasi" tepat di bawah "Rekomendasi Produk"; "After Sales & Claim"
+  tepat di atas "Tutorial Digital"; sisanya tetap terurut alfabetis A-Z.
 - **Menu Administratif** — sidebar admin diringkas jadi satu link
   ("Menu Administratif") yang membuka halaman index berisi daftar semua
-  menu Kelola (Analisa Kebutuhan Asuransi, Komisi & Kompensasi, Member,
-  Produk, Promo & Kontes, Recruit, Tutorial) sebagai kartu yang bisa
-  diklik.
+  menu Kelola (After Sales & Claim, Analisa Kebutuhan Asuransi, Komisi &
+  Kompensasi, Member, Produk, Promo & Kontes, Recruit, Tutorial) sebagai
+  kartu yang bisa diklik.
 - Menu di sidebar (member maupun Admin) pada dasarnya **terurut
   alfabetis A-Z**, dengan beberapa pengecualian posisi manual (lihat
   poin "Urutan menu" di atas).
@@ -216,9 +219,9 @@ request.
 ### 2. Siapkan Google Sheet
 
 1. Buat spreadsheet baru di [Google Sheets](https://sheets.google.com).
-2. Buat 8 tab (sheet) dengan nama **persis**: `Members`, `Products`,
+2. Buat 9 tab (sheet) dengan nama **persis**: `Members`, `Products`,
    `Activities`, `Promo`, `Tutorials`, `Recruit`, `AnalisaKebutuhan`,
-   `KomisiKompensasi`.
+   `KomisiKompensasi`, `AfterSalesClaim`.
 3. Baris pertama tiap tab tidak perlu diisi manual — akan terisi otomatis
    header-nya saat pertama kali data disimpan lewat aplikasi (lihat
    `SHEET_HEADERS` di `lib/google/sheetsClient.js` untuk daftar kolomnya).
@@ -358,13 +361,12 @@ ingin saya bangunkan itu di sesi berikutnya.
 ### ⚠️ Migrasi: File Lama Perlu Diupload Ulang
 
 Perbaikan "tanpa tombol Pop-out" ini **hanya berlaku untuk file yang
-diupload setelah update ini**. File yang sudah ada sebelumnya (seperti
-"MPA - Materi Training ProActive Plus" di contoh Anda) masih memakai
-link viewer Google yang lama, dan masih akan menampilkan tombol
-Pop-out sampai file itu diunggah ulang. Untuk memperbaikinya: buka
-halaman Kelola yang sesuai (mis. Kelola Produk) → **Ubah** produk itu →
-**Ganti File** pada field yang bersangkutan → upload ulang file yang
-sama → **Simpan**.
+diupload setelah update ini**. File yang sudah ada sebelumnya masih
+memakai link viewer Google yang lama, dan masih akan menampilkan
+tombol Pop-out sampai file itu diunggah ulang. Untuk memperbaikinya:
+buka halaman Kelola yang sesuai (mis. Kelola Produk) → **Ubah** produk
+itu → **Ganti File** pada field yang bersangkutan → upload ulang file
+yang sama → **Simpan**.
 
 ## Update Selanjutnya
 

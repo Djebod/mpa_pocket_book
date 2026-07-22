@@ -11,7 +11,7 @@ const TABS = [
   { key: "materiTraining", label: "Materi Training", kind: "materiTraining" },
   { key: "tabelPremi", label: "Tabel Premi", kind: "file" },
   { key: "resume", label: "Resume", kind: "fileList" },
-  { key: "tabelMedical", label: "Tabel Medical", kind: "file" },
+  { key: "tabelMedical", label: "Tabel Medical", kind: "fileList" },
   { key: "fileKetsusUrl", label: "File Ketsus", kind: "link" },
   { key: "videoUrl", label: "Video", kind: "video" },
 ];
@@ -105,7 +105,7 @@ export default function ProductDetailPage() {
           </>
         )}
 
-        {activeTab.kind === "fileList" && <FileListDisplay files={product.resume || []} />}
+        {activeTab.kind === "fileList" && <FileListDisplay files={product[activeTab.key] || []} />}
 
         {activeTab.kind === "link" && (
           <>

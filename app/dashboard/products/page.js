@@ -185,7 +185,7 @@ export default function ProductsPage() {
                       (p.materiTrainingManulife || p.materiTrainingMPA) && "Materi Training",
                       p.tabelPremi && "Tabel Premi",
                       p.resume && p.resume.length > 0 && "Resume",
-                      p.tabelMedical && "Tabel Medical",
+                      p.tabelMedical && p.tabelMedical.length > 0 && "Tabel Medical",
                       p.fileKetsusUrl && "File Ketsus",
                       p.videoUrl && "Video",
                     ]

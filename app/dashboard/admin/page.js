@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 const ADMIN_SECTIONS = [
+  { href: "/dashboard/admin/after-sales-claim", label: "Kelola After Sales & Claim", desc: "Kelola lampiran (PDF/foto) After Sales & Claim." },
   { href: "/dashboard/admin/analisa-kebutuhan", label: "Kelola Analisa Kebutuhan Asuransi", desc: "Kelola deskripsi, materi, flier, dan video analisa kebutuhan asuransi." },
   { href: "/dashboard/admin/komisi-kompensasi", label: "Kelola Komisi & Kompensasi", desc: "Kelola deskripsi dan lampiran (PDF/foto) skema komisi & kompensasi." },
   { href: "/dashboard/admin/members", label: "Kelola Member", desc: "Tambah, ubah, hapus akun member & atur Direct Leader." },

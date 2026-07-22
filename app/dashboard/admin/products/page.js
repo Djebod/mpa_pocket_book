@@ -17,7 +17,7 @@ const emptyForm = {
   materiTrainingMPA: null,
   tabelPremi: null,
   resume: [],
-  tabelMedical: null,
+  tabelMedical: [],
   fileKetsusUrl: "",
   videoUrl: "",
 };
@@ -103,7 +103,7 @@ export default function AdminProductsPage() {
       materiTrainingMPA: product.materiTrainingMPA || null,
       tabelPremi: product.tabelPremi || null,
       resume: product.resume || [],
-      tabelMedical: product.tabelMedical || null,
+      tabelMedical: product.tabelMedical || [],
       fileKetsusUrl: product.fileKetsusUrl || "",
       videoUrl: product.videoUrl || "",
     });
@@ -129,8 +129,8 @@ export default function AdminProductsPage() {
       p.materiTrainingManulife,
       p.materiTrainingMPA,
       p.tabelPremi,
-      p.tabelMedical,
       ...(p.resume || []),
+      ...(p.tabelMedical || []),
     ].filter(Boolean).length;
   }
 
@@ -216,16 +216,11 @@ export default function AdminProductsPage() {
           />
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-6 mb-6">
+        <div className="mb-6">
           <SingleFileInput
             label="Tabel Premi"
             value={form.tabelPremi}
             onChange={(v) => setForm({ ...form, tabelPremi: v })}
-          />
-          <SingleFileInput
-            label="Tabel Medical"
-            value={form.tabelMedical}
-            onChange={(v) => setForm({ ...form, tabelMedical: v })}
           />
         </div>
 
@@ -234,6 +229,14 @@ export default function AdminProductsPage() {
             label="Resume — bisa lebih dari satu file"
             value={form.resume}
             onChange={(v) => setForm({ ...form, resume: v })}
+          />
+        </div>
+
+        <div className="mb-6">
+          <MultiFileInput
+            label="Tabel Medical — bisa lebih dari satu file"
+            value={form.tabelMedical}
+            onChange={(v) => setForm({ ...form, tabelMedical: v })}
           />
         </div>
 
