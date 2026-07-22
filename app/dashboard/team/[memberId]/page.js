@@ -114,8 +114,13 @@ export default function TeamMemberDetailPage() {
                       {act.contactPhone && <span className="text-ink/45 font-normal"> · {act.contactPhone}</span>}
                     </p>
                   )}
-                  {act.policyNumber && (
-                    <p className="text-sm text-ink/70 font-medium">Nomor Polis: {act.policyNumber}</p>
+                  {act.productSold && (
+                    <p className="text-sm text-ink/70 font-medium">
+                      Produk: {act.productSold}
+                      {act.premiumNominal
+                        ? ` · Premi: Rp${Number(act.premiumNominal).toLocaleString("id-ID")}/th`
+                        : ""}
+                    </p>
                   )}
                   {act.note && <p className="text-sm text-charcoal/80">{act.note}</p>}
                 </div>

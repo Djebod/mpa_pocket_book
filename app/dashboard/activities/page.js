@@ -8,72 +8,118 @@ import Stamp from "@/components/Stamp";
 import ValidationBadge from "@/components/ValidationBadge";
 
 const today = () => new Date().toISOString().slice(0, 10);
+const NEW_CONTACT_VALUE = "__new__";
 
 export default function ActivitiesPage() {
   const { session } = useAuth();
   const [activities, setActivities] = useState([]);
   const [summary, setSummary] = useState({ validPoints: 0, unconfirmedPoints: 0 });
-  const [selected, setSelected] = useState(null); // { categoryKey, typeKey } | null
-  const [date, setDate] = useState(today());
-  const [contactName, setContactName] = useState("");
-  const [contactPhone, setContactPhone] = useState("");
-  const [photo, setPhoto] = useState(null);
-  const [policyNumber, setPolicyNumber] = useState("");
+  const [contacts, setContacts] = useState([]);
+
+  const [jalur, setJalur] = useState(null); // "nasabah" | "agen" | null
+  const [typeKey, setTypeKey] = useState("");
+  const [contactSelect, setContactSelect] = useState(""); // id kontak, atau NEW_CONTACT_VALUE
+  const [newContactName, setNewContactName] = useState("");
+  const [newContactPhone, setNewContactPhone] = useState("");
+  const [newContactCategory, setNewContactCategory] = useState("");
   const [note, setNote] = useState("");
+  const [photo, setPhoto] = useState(null);
+  const [productSold, setProductSold] = useState("");
+  const [premiumNominal, setPremiumNominal] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [justStamped, setJustStamped] = useState(false);
 
   const categories = store.getActivityCategories();
+  const contactCategoryOptions = store.getContactCategories();
 
   function refresh() {
     if (!session) return;
     setActivities(store.getActivitiesByMember(session.memberId));
     setSummary(store.getMemberPointsSummary(session.memberId));
+    setContacts(store.getContactsByMember(session.memberId));
   }
 
   useEffect(refresh, [session]);
 
+  const activeCategory = jalur ? categories.find((c) => c.key === jalur) : null;
+  const activeTypeConfig = activeCategory && typeKey ? store.getActivityTypeConfig(jalur, typeKey) : null;
+
+  const filteredContacts = activeCategory
+    ? contacts.filter((c) => activeCategory.contactCategories.includes(c.category))
+    : [];
+
+  const selectedContact = contacts.find((c) => c.id === contactSelect) || null;
+
   function resetForm() {
-    setSelected(null);
-    setDate(today());
-    setContactName("");
-    setContactPhone("");
-    setPhoto(null);
-    setPolicyNumber("");
+    setJalur(null);
+    setTypeKey("");
+    setContactSelect("");
+    setNewContactName("");
+    setNewContactPhone("");
+    setNewContactCategory("");
     setNote("");
+    setPhoto(null);
+    setProductSold("");
+    setPremiumNominal("");
     setEditingId(null);
     setError("");
   }
 
-  function startLog(categoryKey, typeKey) {
-    setSelected({ categoryKey, typeKey });
-    setDate(today());
-    setContactName("");
-    setContactPhone("");
-    setPhoto(null);
-    setPolicyNumber("");
+  function chooseJalur(key) {
+    setJalur(key);
+    setTypeKey("");
+    setContactSelect("");
+    setNewContactName("");
+    setNewContactPhone("");
+    setNewContactCategory("");
     setNote("");
+    setPhoto(null);
+    setProductSold("");
+    setPremiumNominal("");
     setEditingId(null);
     setError("");
-    setTimeout(() => {
-      document.getElementById("activity-form")?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 50);
+  }
+
+  function handleSaveNewContact() {
+    setError("");
+    if (!newContactName.trim() || !newContactPhone.trim() || !newContactCategory) {
+      setError("Nama, Nomor Telepon, dan Kategori kontak baru wajib diisi.");
+      return;
+    }
+    try {
+      const created = store.addContact({
+        memberId: session.memberId,
+        name: newContactName.trim(),
+        phone: newContactPhone.trim(),
+        category: newContactCategory,
+      });
+      setContacts(store.getContactsByMember(session.memberId));
+      setContactSelect(created.id);
+      setNewContactName("");
+      setNewContactPhone("");
+      setNewContactCategory("");
+    } catch (err) {
+      setError(err.message || "Kontak gagal disimpan.");
+    }
   }
 
   function startEdit(act) {
-    setSelected({ categoryKey: act.category, typeKey: act.type });
-    setDate(act.date || today());
-    setContactName(act.contactName || "");
-    setContactPhone(act.contactPhone || "");
-    setPhoto(act.photo || null);
-    setPolicyNumber(act.policyNumber || "");
+    setJalur(act.category);
+    setTypeKey(act.type);
+    setContactSelect(act.contactId || "");
+    setNewContactName("");
+    setNewContactPhone("");
+    setNewContactCategory("");
     setNote(act.note || "");
+    setPhoto(act.photo || null);
+    setProductSold(act.productSold || "");
+    setPremiumNominal(act.premiumNominal ? String(act.premiumNominal) : "");
     setEditingId(act.id);
     setError("");
     setTimeout(() => {
-      document.getElementById("activity-form")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      document.getElementById("activity-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 50);
   }
 
@@ -101,25 +147,32 @@ export default function ActivitiesPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
-    if (!selected) return;
 
-    const config = store.getActivityTypeConfig(selected.categoryKey, selected.typeKey);
-    if (!config) {
-      setError("Jenis aktivitas tidak ditemukan.");
+    if (!activeTypeConfig) {
+      setError("Pilih Type Activity terlebih dahulu.");
       return;
     }
-
-    if (!contactName.trim()) {
-      setError(`${selectedCategory?.contactLabel || "Nama"} wajib diisi.`);
+    if (!selectedContact) {
+      setError("Pilih Nama dari Database, atau tambahkan kontak baru terlebih dahulu.");
       return;
     }
-    if (config.proofType === "photo" && !photo) {
-      setError("Foto bukti wajib dilampirkan.");
+    if (!note.trim()) {
+      setError(`${activeTypeConfig.noteLabel} wajib diisi.`);
       return;
     }
-    if (config.proofType === "policy" && !policyNumber.trim()) {
-      setError("Nomor polis wajib diisi.");
+    if (!photo) {
+      setError(`${activeTypeConfig.photoLabel} wajib dilampirkan.`);
       return;
+    }
+    if (activeTypeConfig.hasSaleFields) {
+      if (!productSold.trim()) {
+        setError("Produk yang dijual wajib diisi.");
+        return;
+      }
+      if (!premiumNominal || Number(premiumNominal) <= 0) {
+        setError("Nominal Premi/Tahun wajib diisi (angka saja).");
+        return;
+      }
     }
 
     setSubmitting(true);
@@ -127,15 +180,17 @@ export default function ActivitiesPage() {
 
     try {
       const payload = {
-        category: selected.categoryKey,
-        type: selected.typeKey,
-        points: config.points,
-        date,
-        contactName: contactName.trim(),
-        contactPhone: contactPhone.trim(),
-        photo: photoValue || "",
-        policyNumber: policyNumber.trim(),
+        category: jalur,
+        type: typeKey,
+        points: activeTypeConfig.points,
+        date: today(),
+        contactId: selectedContact.id,
+        contactName: selectedContact.name,
+        contactPhone: selectedContact.phone,
         note: note.trim(),
+        photo: photoValue || "",
+        productSold: activeTypeConfig.hasSaleFields ? productSold.trim() : "",
+        premiumNominal: activeTypeConfig.hasSaleFields ? Number(premiumNominal) : "",
       };
 
       if (editingId) {
@@ -159,9 +214,6 @@ export default function ActivitiesPage() {
     setSubmitting(false);
   }
 
-  const selectedConfig = selected ? store.getActivityTypeConfig(selected.categoryKey, selected.typeKey) : null;
-  const selectedCategory = selected ? categories.find((c) => c.key === selected.categoryKey) : null;
-
   return (
     <div>
       <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-1">Aktivitas</h1>
@@ -182,36 +234,24 @@ export default function ActivitiesPage() {
         </div>
       </div>
 
-      {/* 2 kategori */}
-      <div className="grid sm:grid-cols-2 gap-4 mb-8">
-        {categories.map((cat) => (
-          <div key={cat.key} className="bg-card border border-ink/10 rounded-lg shadow-stamp overflow-hidden">
-            <div className="px-5 py-4 border-b border-ink/10 bg-paper-dark/30">
-              <h2 className="font-display text-lg text-ink">{cat.label}</h2>
-              <p className="text-xs text-ink/50">{cat.sublabel}</p>
-            </div>
-            <div className="divide-y divide-ink/5">
-              {cat.types.map((t) => (
-                <div key={t.key} className="flex items-center justify-between gap-3 px-5 py-3.5">
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-charcoal">{t.label}</p>
-                    <p className="text-xs text-ink/45">{t.points} poin · {t.proofLabel}</p>
-                  </div>
-                  <button
-                    onClick={() => startLog(cat.key, t.key)}
-                    className="shrink-0 text-xs font-semibold bg-brass text-ink px-3.5 py-2 rounded-md hover:bg-brass-light transition-colors"
-                  >
-                    Catat
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* Langkah 1: pilih jalur */}
+      {!jalur && (
+        <div className="grid sm:grid-cols-2 gap-4 mb-8">
+          {categories.map((cat) => (
+            <button
+              key={cat.key}
+              onClick={() => chooseJalur(cat.key)}
+              className="text-left bg-card border border-ink/10 rounded-lg px-5 py-5 shadow-stamp hover:border-brass transition-colors"
+            >
+              <span className="font-display text-xl text-ink block">{cat.label}</span>
+              <span className="text-xs text-ink/50">{cat.sublabel}</span>
+            </button>
+          ))}
+        </div>
+      )}
 
-      {/* Form pencatatan */}
-      {selected && selectedConfig && (
+      {/* Langkah 2: form terpadu */}
+      {jalur && (
         <form
           id="activity-form"
           onSubmit={handleSubmit}
@@ -222,71 +262,184 @@ export default function ActivitiesPage() {
               {editingId ? "Tersimpan ✓" : "Tercatat ✓"}
             </div>
           )}
-          <div className="flex items-center gap-2 flex-wrap mb-4">
-            <Stamp type={selectedConfig.label} category={selected.categoryKey} />
-            <span className="font-mono text-xs text-ink/50">{selectedCategory?.label}</span>
-            <span className="font-mono text-xs text-brass font-semibold">{selectedConfig.points} poin</span>
+
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <span className="font-display text-lg text-ink">{activeCategory.label}</span>
+              <span className="text-xs text-ink/50 block">{activeCategory.sublabel}</span>
+            </div>
+            <button
+              type="button"
+              onClick={resetForm}
+              className="text-xs font-semibold text-ink/50 hover:text-brass underline underline-offset-2"
+            >
+              Ganti Jalur
+            </button>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-5 mb-5">
-            <div>
-              <label className="block text-sm font-semibold text-ink mb-1.5">Tanggal</label>
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
-              />
+          {/* Type Activity: radio wajib */}
+          <div className="mb-5">
+            <label className="block text-sm font-semibold text-ink mb-2">
+              Type Activity <span className="text-rust">*</span>
+            </label>
+            <div className="flex flex-wrap gap-4">
+              {activeCategory.types.map((t) => (
+                <label key={t.key} className="flex items-center gap-2 text-sm text-charcoal cursor-pointer">
+                  <input
+                    type="radio"
+                    name="activityType"
+                    value={t.key}
+                    checked={typeKey === t.key}
+                    onChange={() => setTypeKey(t.key)}
+                    className="accent-brass w-4 h-4"
+                  />
+                  {t.label} <span className="text-xs text-ink/40">({t.points} poin)</span>
+                </label>
+              ))}
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-ink mb-1.5">
-                {selectedCategory?.contactLabel || "Nama"}
-              </label>
-              <input
-                value={contactName}
-                onChange={(e) => setContactName(e.target.value)}
-                placeholder={selected.categoryKey === "agen" ? "Contoh: Budi Santoso" : "Contoh: Bapak Andi Wijaya"}
-                className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
-              />
+          </div>
+
+          {/* Tanggal — tetap, tidak bisa diubah */}
+          <div className="mb-5">
+            <label className="block text-sm font-semibold text-ink mb-1.5">Tanggal</label>
+            <div className="rounded-md border border-ink/15 bg-paper-dark/40 px-3.5 py-2.5 text-sm text-ink/60 font-mono">
+              {today()} <span className="text-ink/40">(otomatis hari ini, tidak bisa diubah)</span>
             </div>
-            <div>
+          </div>
+
+          {/* Nama dari Database */}
+          <div className="mb-2">
+            <label className="block text-sm font-semibold text-ink mb-1.5">
+              Nama (Database Calon Nasabah / Calon Agen) <span className="text-rust">*</span>
+            </label>
+            <select
+              value={contactSelect}
+              onChange={(e) => setContactSelect(e.target.value)}
+              className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
+            >
+              <option value="">— Pilih nama —</option>
+              {filteredContacts.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name} ({c.category})
+                </option>
+              ))}
+              <option value={NEW_CONTACT_VALUE}>➕ Tambah Kontak Baru…</option>
+            </select>
+          </div>
+
+          {contactSelect === NEW_CONTACT_VALUE && (
+            <div className="mb-5 bg-paper-dark/40 border border-ink/10 rounded-md px-4 py-4">
+              <p className="text-xs font-semibold text-ink/50 uppercase tracking-wide mb-3">Tambah Kontak Baru</p>
+              <div className="grid sm:grid-cols-2 gap-4 mb-3">
+                <div>
+                  <label className="block text-xs font-semibold text-ink mb-1">Nama</label>
+                  <input
+                    value={newContactName}
+                    onChange={(e) => setNewContactName(e.target.value)}
+                    placeholder="Contoh: Syam Shugi"
+                    className="w-full rounded-md border border-ink/20 bg-paper px-3 py-2 text-sm focus:border-brass focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-ink mb-1">Nomor Telepon</label>
+                  <input
+                    value={newContactPhone}
+                    onChange={(e) => setNewContactPhone(e.target.value)}
+                    placeholder="Contoh: 0812-3456-7890"
+                    className="w-full rounded-md border border-ink/20 bg-paper px-3 py-2 text-sm focus:border-brass focus:outline-none"
+                  />
+                </div>
+              </div>
+              <div className="mb-3">
+                <label className="block text-xs font-semibold text-ink mb-1.5">Kategori</label>
+                <div className="flex flex-wrap gap-4">
+                  {contactCategoryOptions.map((opt) => (
+                    <label key={opt} className="flex items-center gap-2 text-sm text-charcoal cursor-pointer">
+                      <input
+                        type="radio"
+                        name="newContactCategory"
+                        value={opt}
+                        checked={newContactCategory === opt}
+                        onChange={() => setNewContactCategory(opt)}
+                        className="accent-brass w-4 h-4"
+                      />
+                      {opt}
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleSaveNewContact}
+                className="text-xs font-semibold bg-ink text-paper px-4 py-2 rounded-md hover:bg-ink-light transition-colors"
+              >
+                Simpan Kontak
+              </button>
+              <p className="text-xs text-ink/40 mt-2">Tanggal kontak ini tercatat otomatis: {today()}</p>
+            </div>
+          )}
+
+          {/* Nomor Telepon — otomatis dari kontak terpilih */}
+          {selectedContact && (
+            <div className="mb-5">
               <label className="block text-sm font-semibold text-ink mb-1.5">Nomor Telepon</label>
-              <input
-                value={contactPhone}
-                onChange={(e) => setContactPhone(e.target.value)}
-                placeholder="Contoh: 0812-3456-7890"
-                className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
-              />
+              <div className="rounded-md border border-ink/15 bg-paper-dark/40 px-3.5 py-2.5 text-sm text-ink/70 font-mono">
+                {selectedContact.phone}
+              </div>
             </div>
-            {selectedConfig.proofType === "policy" && (
-              <div>
-                <label className="block text-sm font-semibold text-ink mb-1.5">Nomor Polis</label>
-                <input
-                  value={policyNumber}
-                  onChange={(e) => setPolicyNumber(e.target.value)}
-                  placeholder="Contoh: 0123456789"
+          )}
+
+          {activeTypeConfig && (
+            <>
+              {/* Field khusus Closing */}
+              {activeTypeConfig.hasSaleFields && (
+                <div className="grid sm:grid-cols-2 gap-5 mb-5">
+                  <div>
+                    <label className="block text-sm font-semibold text-ink mb-1.5">
+                      Produk yang Dijual <span className="text-rust">*</span>
+                    </label>
+                    <input
+                      value={productSold}
+                      onChange={(e) => setProductSold(e.target.value)}
+                      placeholder="Contoh: Mulia Sehat Keluarga"
+                      className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-ink mb-1.5">
+                      Nominal Premi / Tahun <span className="text-rust">*</span>
+                    </label>
+                    <input
+                      value={premiumNominal}
+                      onChange={(e) => setPremiumNominal(e.target.value.replace(/\D/g, ""))}
+                      inputMode="numeric"
+                      placeholder="Contoh: 5000000"
+                      className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
+                    />
+                    <p className="text-xs text-ink/45 mt-1">Angka saja, tanpa titik/koma.</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Catatan / Hasil Pertemuan (atau Level Agen untuk Recruit) */}
+              <div className="mb-5">
+                <label className="block text-sm font-semibold text-ink mb-1.5">
+                  {activeTypeConfig.noteLabel} <span className="text-rust">*</span>
+                </label>
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  rows={3}
                   className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
                 />
               </div>
-            )}
-          </div>
 
-          <div className="mb-5">
-            <label className="block text-sm font-semibold text-ink mb-1.5">Catatan (opsional)</label>
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              rows={2}
-              className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
-            />
-          </div>
-
-          <div className="mb-5">
-            <PhotoInput value={photo} onChange={setPhoto} required={selectedConfig.proofType === "photo"} />
-            {selectedConfig.proofType === "policy" && (
-              <p className="text-xs text-ink/45 mt-1.5">Foto di atas opsional untuk jenis aktivitas ini.</p>
-            )}
-          </div>
+              {/* Foto bukti — selalu wajib */}
+              <div className="mb-5">
+                <PhotoInput value={photo} onChange={setPhoto} label={activeTypeConfig.photoLabel} required />
+              </div>
+            </>
+          )}
 
           {error && (
             <p className="text-sm text-rust mb-4" role="alert">
@@ -343,8 +496,13 @@ export default function ActivitiesPage() {
                       {act.contactPhone && <span className="text-ink/45 font-normal"> · {act.contactPhone}</span>}
                     </p>
                   )}
-                  {act.policyNumber && (
-                    <p className="text-sm text-ink/70 font-medium">Nomor Polis: {act.policyNumber}</p>
+                  {act.productSold && (
+                    <p className="text-sm text-ink/70">
+                      Produk: {act.productSold}
+                      {act.premiumNominal
+                        ? ` · Premi: Rp${Number(act.premiumNominal).toLocaleString("id-ID")}/th`
+                        : ""}
+                    </p>
                   )}
                   {act.note && <p className="text-sm text-charcoal/80">{act.note}</p>}
                 </div>

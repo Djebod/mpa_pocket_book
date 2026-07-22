@@ -158,13 +158,13 @@ export default function AdminActivitiesPage() {
           </select>
         </div>
         <div>
-          <label className="block text-xs font-semibold text-ink/60 mb-1.5">Kategori</label>
+          <label className="block text-xs font-semibold text-ink/60 mb-1.5">Jalur</label>
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
             className="w-full rounded-md border border-ink/20 bg-paper px-3 py-2 text-sm focus:border-brass focus:outline-none"
           >
-            <option value="all">Semua Kategori</option>
+            <option value="all">Semua Jalur</option>
             {categories.map((c) => (
               <option key={c.key} value={c.key}>
                 {c.label}
@@ -230,7 +230,7 @@ export default function AdminActivitiesPage() {
                 Member{sortIndicator("member")}
               </th>
               <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("category")}>
-                Kategori{sortIndicator("category")}
+                Jalur{sortIndicator("category")}
               </th>
               <th className="px-4 py-3 cursor-pointer hover:text-ink" onClick={() => handleSort("type")}>
                 Aktivitas{sortIndicator("type")}
@@ -268,14 +268,19 @@ export default function AdminActivitiesPage() {
                 </td>
                 <td className="px-4 py-3 font-mono text-xs font-semibold text-brass">{a.points}</td>
                 <td className="px-4 py-3 text-charcoal/70">
-                  {a.policyNumber && <p className="text-xs mb-1">Polis: {a.policyNumber}</p>}
+                  {a.productSold && (
+                    <p className="text-xs mb-1">
+                      {a.productSold}
+                      {a.premiumNominal ? ` · Rp${Number(a.premiumNominal).toLocaleString("id-ID")}/th` : ""}
+                    </p>
+                  )}
                   {a.photo ? (
                     <button onClick={() => setPreview(a.photo)}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={a.photo} alt="" className="w-10 h-10 rounded object-cover hover:opacity-80" />
                     </button>
                   ) : (
-                    !a.policyNumber && "—"
+                    !a.productSold && "—"
                   )}
                 </td>
                 <td className="px-4 py-3">

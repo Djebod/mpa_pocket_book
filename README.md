@@ -84,18 +84,33 @@ laporan aktivitas — lengkap dengan export ke Excel.
 - Menu di sidebar (member maupun Admin) pada dasarnya **terurut
   alfabetis A-Z**, dengan beberapa pengecualian posisi manual (lihat
   poin "Urutan menu" di atas).
-- **Aktivitas Member (sistem poin)**: 2 kategori aktivitas —
-  **Calon Nasabah** (field **Nama Nasabah** + **Nomor Telepon**, lalu
-  Fact Finding 3 poin, Presentation 5 poin, Closing 10 poin) dan
-  **Calon Agen** (field **Nama Calon Agen** + **Nomor Telepon**, lalu
-  Fact Finding 3 poin, Presentation 5 poin, Recruit 10 poin),
-  masing-masing dengan bukti sendiri (foto, atau nomor polis untuk
-  Closing). Poin baru terhitung sebagai **Valid Point** setelah Admin
-  menekan tombol **"Valid"** — sebelum itu poin tampil sebagai
-  **Unconfirmed Point**. Kedua angka ini tampil di sisi member
-  (Ringkasan & Aktivitas) maupun Admin (Ringkasan Aktivitas & detail per
-  member). Aktivitas bisa **diedit di hari yang sama** (edit otomatis
-  membatalkan validasi, perlu divalidasi ulang).
+- **Database Calon Nasabah / Calon Agen**: tiap member punya database
+  kontak sendiri (Nama, Nomor Telepon, Kategori — Calon Agen / Calon
+  Nasabah / Calon Agen & Nasabah — tanggal tercatat otomatis). Kontak
+  ditambahkan langsung dari form Catat Aktivitas (opsi "➕ Tambah Kontak
+  Baru").
+- **Aktivitas Member (sistem poin, alur terpadu)**: form Catat Aktivitas
+  sekarang satu alur — pilih **Jalur Penjualan** atau **Jalur
+  Rekrutmen** dulu, baru form menyesuaikan:
+  - **Jalur Penjualan**: pilih nama dari database (kategori Calon
+    Nasabah / Calon Agen & Nasabah) → **Type Activity** (radio wajib):
+    Fact Finding (3 poin), Presentation (5 poin), atau Closing (10
+    poin, ada field tambahan **Produk yang Dijual** + **Nominal
+    Premi/Tahun** — angka saja).
+  - **Jalur Rekrutmen**: pilih nama dari database (kategori Calon Agen
+    / Calon Agen & Nasabah) → Type Activity: Fact Finding, Presentation,
+    atau Recruit (10 poin, field catatan berubah jadi **"Level Agen
+    yang Direkrut"**, foto wajib berlabel **"Bukti Transfer AAJI"**).
+  - Nomor Telepon otomatis terisi begitu nama dipilih. **Tanggal
+    terkunci ke hari ini** (tidak bisa back-date). Field **"Hasil
+    Pertemuan"** (atau label khusus di atas) **wajib diisi**, foto
+    bukti **selalu wajib** di semua jenis aktivitas.
+  - Poin baru terhitung sebagai **Valid Point** setelah Admin menekan
+    tombol **"Valid"** — sebelum itu poin tampil sebagai **Unconfirmed
+    Point**. Kedua angka ini tampil di sisi member (Ringkasan &
+    Aktivitas) maupun Admin (Ringkasan Aktivitas & detail per member).
+    Aktivitas bisa **diedit di hari yang sama** (edit otomatis
+    membatalkan validasi, perlu divalidasi ulang).
 - **Direct Leader**: tiap member bisa diberi satu Direct Leader (member
   lain). Direct Leader bisa melihat riwayat aktivitas anak buahnya lewat
   halaman **Tim Saya** — member lain (bukan diri sendiri, bukan Direct
@@ -221,9 +236,9 @@ request.
 ### 2. Siapkan Google Sheet
 
 1. Buat spreadsheet baru di [Google Sheets](https://sheets.google.com).
-2. Buat 9 tab (sheet) dengan nama **persis**: `Members`, `Products`,
+2. Buat 10 tab (sheet) dengan nama **persis**: `Members`, `Products`,
    `Activities`, `Promo`, `Tutorials`, `Recruit`, `AnalisaKebutuhan`,
-   `KomisiKompensasi`, `AfterSalesClaim`.
+   `KomisiKompensasi`, `AfterSalesClaim`, `Contacts`.
 3. Baris pertama tiap tab tidak perlu diisi manual — akan terisi otomatis
    header-nya saat pertama kali data disimpan lewat aplikasi (lihat
    `SHEET_HEADERS` di `lib/google/sheetsClient.js` untuk daftar kolomnya).

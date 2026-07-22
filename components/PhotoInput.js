@@ -44,7 +44,7 @@ function compressImage(file) {
   });
 }
 
-export default function PhotoInput({ value, onChange, required = true }) {
+export default function PhotoInput({ value, onChange, required = true, label = "Foto Bukti Aktivitas" }) {
   const inputRef = useRef(null);
   const [processing, setProcessing] = useState(false);
 
@@ -69,7 +69,7 @@ export default function PhotoInput({ value, onChange, required = true }) {
   return (
     <div>
       <label className="block font-body text-sm font-semibold text-ink mb-2">
-        Foto Bukti Aktivitas {required && <span className="text-rust">*</span>}
+        {label} {required && <span className="text-rust">*</span>}
       </label>
       <div className="flex items-start gap-4">
         <button
