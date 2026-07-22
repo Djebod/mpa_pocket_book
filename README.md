@@ -13,8 +13,12 @@ laporan aktivitas — lengkap dengan export ke Excel.
   **tidak punya tombol download**, klik kanan dan seleksi teks pada
   area viewer dinonaktifkan (kecuali di halaman **Kalkulator
   Finansial**, yang tetap punya tombol "Unduh PDF" khusus untuk hasil
-  kalkulasinya sendiri). Lihat catatan penting soal batas kemampuan
-  proteksi ini di bagian bawah README.
+  kalkulasinya sendiri). File baru yang diupload dilayani lewat proxy
+  milik aplikasi sendiri (`/api/drive-file/[fileId]`) — bukan lagi lewat
+  halaman viewer Google — supaya URL Drive asli tidak pernah terkirim
+  ke browser dan tombol "Pop-out" bawaan Google tidak muncul. Lihat
+  catatan penting soal batas kemampuan proteksi ini di bagian bawah
+  README.
 - **Katalog Produk** — tampilan default menampilkan **Piramida Asuransi**
   (gambar ringkasan kebutuhan nasabah); klik "Lihat Semua Produk" atau
   isi pencarian/filter untuk menjelajah katalog. Tiap produk berisi
@@ -325,30 +329,42 @@ penyimpanan normal.
 
 Halaman dengan lampiran PDF/foto (Produk, Promo, Recruit, Analisa
 Kebutuhan Asuransi, Komisi & Kompensasi, dst) **tidak punya tombol
-download**, dan klik kanan/seleksi teks pada area viewer dinonaktifkan.
-Ini menaikkan friksi untuk pengguna biasa yang iseng mau
-menyimpan/copy — **tapi ini bukan proteksi keamanan yang benar-benar
-kedap**, karena dua batasan mendasar:
+download**, klik kanan/seleksi teks pada area viewer dinonaktifkan, dan
+**file baru** dilayani lewat proxy sendiri (`/api/drive-file/[fileId]`)
+alih-alih lewat halaman viewer Google — jadi tombol "Pop-out" yang
+mengarah ke sumber asli file di Drive juga tidak muncul lagi.
 
-1. **Konten PDF ditampilkan lewat iframe Google Docs Viewer**, yang
-   berasal dari domain Google (bukan domain kita) — kita tidak bisa
-   mengontrol interaksi *di dalam* iframe itu (mis. tombol/menu bawaan
-   Google Docs Viewer sendiri, kalau Google menampilkannya).
-2. **Aplikasi ini belum punya sistem login/session sisi server** —
-   login yang ada sekarang murni dicek di browser (client-side).
-   Karena itu, siapa pun yang cukup paham teknis bisa membuka **Network
-   tab** di DevTools browser dan melihat URL asli file yang sedang
-   dimuat, lalu membukanya langsung tanpa login — proteksi front-end
-   (sembunyikan tombol, blok klik kanan) tidak bisa mencegah ini.
+Ini menaikkan friksi secara signifikan untuk pengguna biasa yang iseng
+mau menyimpan/copy — **tapi tetap bukan proteksi keamanan yang
+benar-benar kedap**, karena satu batasan mendasar yang tersisa:
+
+**Aplikasi ini belum punya sistem login/session sisi server** — login
+yang ada sekarang murni dicek di browser (client-side). Karena itu,
+proxy `/api/drive-file/[fileId]` kita sendiri saat ini masih bisa
+diakses langsung oleh siapa pun yang tahu URL-nya (misalnya dengan
+membuka **Network tab** di DevTools browser lalu menyalin URL-nya),
+**tanpa perlu login ke Pocket Book sama sekali** — karena route API
+ini belum memeriksa siapa yang memintanya.
 
 **Supaya dokumen benar-benar "exclusive hanya bisa dilihat sebagai
-member"** (URL file tidak bisa diakses sama sekali tanpa login,
-termasuk lewat DevTools), dibutuhkan perubahan arsitektur yang lebih
-besar: sistem login berbasis session/cookie di server (bukan cuma di
-browser), ditambah endpoint API yang memeriksa session itu sebelum
-mengalirkan isi file dari Google Drive ke pengguna. Ini proyek
-tersendiri yang cukup besar — beri tahu saya kalau Anda ingin saya
-bangunkan itu di sesi berikutnya.
+member"** (proxy-nya sendiri menolak permintaan dari siapa pun yang
+belum login), dibutuhkan perubahan arsitektur yang lebih besar: sistem
+login berbasis session/cookie di server (bukan cuma di browser seperti
+sekarang), ditambah pengecekan session itu di dalam
+`app/api/drive-file/[fileId]/route.js` sebelum mengalirkan isi filenya.
+Ini proyek tersendiri yang cukup besar — beri tahu saya kalau Anda
+ingin saya bangunkan itu di sesi berikutnya.
+
+### ⚠️ Migrasi: File Lama Perlu Diupload Ulang
+
+Perbaikan "tanpa tombol Pop-out" ini **hanya berlaku untuk file yang
+diupload setelah update ini**. File yang sudah ada sebelumnya (seperti
+"MPA - Materi Training ProActive Plus" di contoh Anda) masih memakai
+link viewer Google yang lama, dan masih akan menampilkan tombol
+Pop-out sampai file itu diunggah ulang. Untuk memperbaikinya: buka
+halaman Kelola yang sesuai (mis. Kelola Produk) → **Ubah** produk itu →
+**Ganti File** pada field yang bersangkutan → upload ulang file yang
+sama → **Simpan**.
 
 ## Update Selanjutnya
 

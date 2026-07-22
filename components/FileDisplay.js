@@ -7,20 +7,23 @@ function blockContextMenu(e) {
 }
 
 /**
- * Menampilkan satu file: gambar tampil langsung, PDF tampil via Google
- * Docs Viewer. TIDAK ada tombol download (disengaja — dokumen ini hanya
- * dimaksudkan untuk dilihat di dalam Pocket Book), klik kanan dan seleksi
+ * Menampilkan satu file: gambar tampil langsung, PDF tampil lewat proxy
+ * milik aplikasi sendiri (`/api/drive-file/[fileId]`, lihat
+ * `lib/google/driveClient.js`) — file baru yang diupload TIDAK lagi
+ * ditampilkan lewat halaman viewer Google, jadi tombol "Pop-out" bawaan
+ * Google Docs Viewer (yang mengarah ke sumber asli di Drive) tidak
+ * muncul sama sekali. TIDAK ada tombol download, klik kanan dan seleksi
  * teks pada area viewer juga dinonaktifkan.
  *
- * Catatan jujur: ini mengurangi kemudahan orang iseng menyimpan/copy
- * file lewat UI kita, TAPI bukan proteksi yang tidak bisa ditembus.
- * Konten di dalam iframe Google Docs Viewer berasal dari domain Google
- * (cross-origin) sehingga kita tidak bisa mengontrol interaksi di
- * dalamnya (mis. tombol download bawaan Google Docs Viewer, kalau ada,
- * tetap di luar kendali kita), dan siapa pun yang memeriksa Network tab
- * di browser tetap bisa melihat URL file aslinya. Proteksi berbasis
- * front-end seperti ini menaikkan sedikit "friksi" untuk pengguna
- * awam/tidak sengaja, bukan proteksi keamanan yang benar-benar kedap.
+ * Catatan jujur: ini jauh lebih baik dari sekadar sembunyikan tombol di
+ * CSS (karena URL Drive aslinya tidak lagi pernah dikirim ke browser
+ * sama sekali), TAPI tetap bukan proteksi yang benar-benar kedap:
+ * aplikasi ini belum punya sistem login berbasis session di server, jadi
+ * URL proxy kita sendiri (`/api/drive-file/...`) masih bisa diakses
+ * langsung tanpa login kalau seseorang menyalin URL-nya dari Network
+ * tab browser. Proteksi tingkat ini menghilangkan cara paling mudah
+ * (klik kanan, tombol download, tombol Pop-out Google) untuk pengguna
+ * awam, bukan proteksi keamanan tingkat server.
  */
 export function FileDisplay({ file }) {
   const [fullscreen, setFullscreen] = useState(false);
@@ -29,7 +32,14 @@ export function FileDisplay({ file }) {
   const isImage = file.mimeType?.startsWith("image/");
 
   if (isPdf) {
-    const embedSrc = file.previewUrl || file.url;
+    const rawSrc = file.previewUrl || file.url;
+    // Untuk PDF yang dilayani langsung (proxy kita sendiri atau data URL
+    // lokal — bukan halaman viewer Google), minta browser sembunyikan
+    // toolbar viewer PDF bawaannya sendiri juga (didukung Chrome/Edge,
+    // sebagian besar juga oleh Firefox — di browser lain fragment ini
+    // aman diabaikan begitu saja).
+    const isOwnProxyOrLocal = !rawSrc.startsWith("https://docs.google.com");
+    const embedSrc = isOwnProxyOrLocal ? `${rawSrc}#toolbar=0&navpanes=0` : rawSrc;
     return (
       <div className="mt-4">
         <div className="flex items-center justify-between gap-3 mb-2">
