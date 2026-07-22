@@ -1,19 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function blockContextMenu(e) {
   e.preventDefault();
-}
-
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    if (typeof navigator !== "undefined") {
-      setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
-    }
-  }, []);
-  return isMobile;
 }
 
 /**
@@ -25,28 +15,27 @@ function useIsMobile() {
  * muncul sama sekali. TIDAK ada tombol download, klik kanan dan seleksi
  * teks pada area viewer juga dinonaktifkan.
  *
- * Catatan khusus HP: viewer PDF bawaan Safari/Chrome di iOS & Android
- * TIDAK bisa diandalkan untuk menampilkan PDF banyak halaman di dalam
- * iframe (sering cuma tampil 1 halaman/terpotong, sulit di-scroll) —
- * ini keterbatasan browser mobile itu sendiri, bukan sesuatu yang bisa
- * diperbaiki lewat CSS. Solusinya: di HP, PDF dibuka di tab baru
- * (viewer native browser di situ bekerja penuh dengan semua halaman),
- * bukan di-embed di dalam iframe halaman. Di desktop, preview inline di
- * dalam kotak tetap dipakai seperti biasa.
+ * Catatan soal HP: viewer PDF di dalam iframe kadang tidak sempurna di
+ * sebagian browser mobile (semua browser di iOS — termasuk Chrome —
+ * wajib pakai mesin WebKit dari Apple, jadi punya batasan yang sama
+ * seperti Safari). Preview inline tetap ditampilkan seperti biasa di
+ * semua device, TAPI selalu disediakan juga tombol "⤢ Buka PDF Layar
+ * Penuh" yang membuka file di tab baru — di situ viewer PDF bawaan
+ * browser bekerja penuh (semua halaman, bisa di-scroll/zoom normal),
+ * jadi selalu ada jalan pasti kalau preview inline-nya kurang optimal.
  *
- * Catatan jujur: ini jauh lebih baik dari sekadar sembunyikan tombol di
- * CSS (karena URL Drive aslinya tidak lagi pernah dikirim ke browser
- * sama sekali), TAPI tetap bukan proteksi yang benar-benar kedap:
- * aplikasi ini belum punya sistem login berbasis session di server, jadi
- * URL proxy kita sendiri (`/api/drive-file/...`) masih bisa diakses
- * langsung tanpa login kalau seseorang menyalin URL-nya dari Network
- * tab browser. Proteksi tingkat ini menghilangkan cara paling mudah
- * (klik kanan, tombol download, tombol Pop-out Google) untuk pengguna
- * awam, bukan proteksi keamanan tingkat server.
+ * Catatan jujur soal proteksi: ini jauh lebih baik dari sekadar
+ * sembunyikan tombol di CSS (karena URL Drive aslinya tidak lagi pernah
+ * dikirim ke browser sama sekali), TAPI tetap bukan proteksi yang
+ * benar-benar kedap: aplikasi ini belum punya sistem login berbasis
+ * session di server, jadi URL proxy kita sendiri (`/api/drive-file/...`)
+ * masih bisa diakses langsung tanpa login kalau seseorang menyalin
+ * URL-nya dari Network tab browser. Proteksi tingkat ini menghilangkan
+ * cara paling mudah (klik kanan, tombol download, tombol Pop-out
+ * Google) untuk pengguna awam, bukan proteksi keamanan tingkat server.
  */
 export function FileDisplay({ file }) {
   const [fullscreen, setFullscreen] = useState(false);
-  const isMobile = useIsMobile();
   if (!file) return null;
   const isPdf = file.mimeType === "application/pdf";
   const isImage = file.mimeType?.startsWith("image/");
@@ -60,44 +49,32 @@ export function FileDisplay({ file }) {
     // aman diabaikan begitu saja).
     const isOwnProxyOrLocal = !rawSrc.startsWith("https://docs.google.com");
     const embedSrc = isOwnProxyOrLocal ? `${rawSrc}#toolbar=0&navpanes=0` : rawSrc;
-
-    if (isMobile) {
-      return (
-        <div className="mt-4">
-          <div
-            onContextMenu={blockContextMenu}
-            className="w-full rounded-md border border-ink/10 bg-paper-dark/30 shadow-stamp px-5 py-8 flex flex-col items-center text-center select-none"
-          >
-            <span className="text-4xl mb-3">📄</span>
-            <p className="text-sm font-semibold text-ink mb-1 break-all">{file.name || "Lampiran PDF"}</p>
-            <p className="text-xs text-ink/45 mb-4">
-              Dokumen ini hanya bisa dilihat di dalam Pocket Book. Ketuk tombol di bawah untuk membacanya —
-              semua halaman akan tampil penuh di tab baru.
-            </p>
-            <a
-              href={embedSrc}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-ink text-paper text-sm font-semibold px-5 py-2.5 rounded-md hover:bg-ink-light transition-colors"
-            >
-              ⤢ Buka PDF Layar Penuh
-            </a>
-          </div>
-        </div>
-      );
-    }
+    // Link "buka tab baru" pakai URL polos (tanpa fragment toolbar=0)
+    // supaya viewer PDF native browser di tab baru tampil dengan
+    // toolbar/kontrol lengkapnya sendiri.
+    const openSrc = rawSrc;
 
     return (
       <div className="mt-4">
-        <div className="flex items-center justify-between gap-3 mb-2">
+        <div className="flex items-center justify-between gap-2 flex-wrap mb-2">
           <p className="text-xs text-ink/45">Dokumen ini hanya bisa dilihat di dalam Pocket Book.</p>
-          <button
-            type="button"
-            onClick={() => setFullscreen(true)}
-            className="shrink-0 text-xs font-semibold text-ink/60 hover:text-brass border border-ink/20 rounded-md px-3 py-1.5"
-          >
-            ⤢ Perbesar
-          </button>
+          <div className="flex gap-2 shrink-0">
+            <a
+              href={openSrc}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-semibold text-ink/60 hover:text-brass border border-ink/20 rounded-md px-3 py-1.5"
+            >
+              ⤢ Buka PDF Layar Penuh
+            </a>
+            <button
+              type="button"
+              onClick={() => setFullscreen(true)}
+              className="text-xs font-semibold text-ink/60 hover:text-brass border border-ink/20 rounded-md px-3 py-1.5"
+            >
+              ⤢ Perbesar
+            </button>
+          </div>
         </div>
         <div
           onContextMenu={blockContextMenu}
@@ -110,14 +87,24 @@ export function FileDisplay({ file }) {
           <div className="fixed inset-0 z-50 bg-ink/90 flex flex-col">
             <div className="flex items-center justify-between px-4 py-3 bg-ink text-paper shrink-0">
               <p className="text-sm font-semibold truncate pr-3">{file.name || "Lampiran PDF"}</p>
-              <button
-                type="button"
-                onClick={() => setFullscreen(false)}
-                aria-label="Tutup"
-                className="shrink-0 w-9 h-9 flex items-center justify-center rounded-md hover:bg-ink-light text-2xl leading-none"
-              >
-                ×
-              </button>
+              <div className="flex items-center gap-3 shrink-0">
+                <a
+                  href={openSrc}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-semibold text-paper/80 hover:text-paper underline underline-offset-2"
+                >
+                  ⤢ Buka di Tab Baru
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setFullscreen(false)}
+                  aria-label="Tutup"
+                  className="w-9 h-9 flex items-center justify-center rounded-md hover:bg-ink-light text-2xl leading-none"
+                >
+                  ×
+                </button>
+              </div>
             </div>
             <div className="flex-1 bg-paper-dark/30 select-none" onContextMenu={blockContextMenu}>
               <iframe src={embedSrc} title={file.name || "Lampiran PDF"} className="w-full h-full" />

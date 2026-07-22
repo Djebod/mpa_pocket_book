@@ -16,14 +16,14 @@ laporan aktivitas — lengkap dengan export ke Excel.
   kalkulasinya sendiri). File baru yang diupload dilayani lewat proxy
   milik aplikasi sendiri (`/api/drive-file/[fileId]`) — bukan lagi lewat
   halaman viewer Google — supaya URL Drive asli tidak pernah terkirim
-  ke browser dan tombol "Pop-out" bawaan Google tidak muncul. **Di HP**
-  (iOS/Android), PDF dibuka lewat tombol "Buka PDF Layar Penuh" di tab
-  baru (bukan di-embed di iframe) — viewer PDF bawaan browser HP tidak
-  bisa diandalkan menampilkan PDF banyak halaman di dalam iframe (sering
-  cuma tampil 1 halaman/terpotong), jadi ini jalan paling stabil untuk
-  memastikan semua halaman dokumen tetap bisa dibaca penuh di HP. Lihat
-  catatan penting soal batas kemampuan proteksi ini di bagian bawah
-  README.
+  ke browser dan tombol "Pop-out" bawaan Google tidak muncul. Preview
+  inline tetap tampil di semua device, dan selalu ada tombol **"⤢ Buka
+  PDF Layar Penuh"** (buka di tab baru) sebagai opsi tambahan — berguna
+  di browser mobile (semua browser di iOS, termasuk Chrome, wajib pakai
+  mesin WebKit dari Apple sehingga preview PDF di dalam iframe kadang
+  tidak sempurna; membuka di tab baru memakai viewer PDF native browser
+  yang bekerja penuh). Lihat catatan penting soal batas kemampuan
+  proteksi ini di bagian bawah README.
 - **Katalog Produk** — tampilan default menampilkan **Piramida Asuransi**
   (gambar ringkasan kebutuhan nasabah); klik "Lihat Semua Produk" atau
   isi pencarian/filter untuk menjelajah katalog. Tiap produk berisi
