@@ -25,7 +25,7 @@ laporan aktivitas — lengkap dengan export ke Excel.
   Nama, **Kategori** (dropdown tetap, cuma "Unit Link" / "Non Unit
   Link"), **Sub Kategori** (bebas isi, ada saran ketik dari sub kategori
   yang sudah ada supaya tidak dobel), lalu field konten: **Materi
-  Training** (2 versi terpisah — **Manulife Pusat** dan **MPA**, masing-
+  Training** (2 versi terpisah — **MPA** dan **Manulife Pusat**, masing-
   masing upload 1 file PDF/foto), **Tabel Premi** (upload 1 file
   PDF/foto), **Resume** dan **Tabel Medical** (upload **banyak file**
   PDF/foto), **File Ketsus** (link Google Drive), dan **Video** (link
@@ -62,7 +62,14 @@ laporan aktivitas — lengkap dengan export ke Excel.
   tahunan/bulanan ke jumlah aktivitas harian (Prospek → Janji Temu →
   Presentasi → Closing) berbasis rasio sales cycle LIMRA (bisa
   disesuaikan). Menampilkan funnel visual + tabel ritme aktivitas per
-  bulan/minggu/hari.
+  bulan/minggu/hari. Di bagian bawah ada **Perbandingan Ritme vs
+  Aktivitas Valid**: pilih **Tanggal Mulai** (Tanggal Akhir otomatis
+  akhir tahun dari tahun itu), sistem membandingkan target yang
+  diprorata sampai hari ini dengan data aktual (Prospek = jumlah
+  database Calon Nasabah/Agen yang diinput pada rentang itu; Janji
+  Temu/Presentasi/Closing = jumlah aktivitas **valid** Jalur Penjualan
+  sesuai jenisnya), lengkap dengan grafik milestone dan kesimpulan
+  otomatis. Ada tombol **"Unduh PDF"**.
 - **Kalkulator Finansial** — halaman React native (bukan iframe) dengan
   4 modul (Asuransi Jiwa, Sakit Kritis, Dana Pensiun, Dana Pendidikan),
   hitung otomatis real-time saat mengetik, dengan tombol **"Unduh

@@ -77,19 +77,19 @@ export default function ProductDetailPage() {
         {activeTab.kind === "materiTraining" && (
           <div className="space-y-8">
             <div>
-              <p className="text-xs font-semibold text-ink/50 uppercase tracking-wide mb-2">Versi Manulife Pusat</p>
-              {product.materiTrainingManulife ? (
-                <FileDisplay file={product.materiTrainingManulife} />
-              ) : (
-                <p className="text-sm text-ink/50">Belum ada materi training versi Manulife Pusat.</p>
-              )}
-            </div>
-            <div className="pt-6 border-t border-ink/10">
               <p className="text-xs font-semibold text-ink/50 uppercase tracking-wide mb-2">Versi MPA</p>
               {product.materiTrainingMPA ? (
                 <FileDisplay file={product.materiTrainingMPA} />
               ) : (
                 <p className="text-sm text-ink/50">Belum ada materi training versi MPA.</p>
+              )}
+            </div>
+            <div className="pt-6 border-t border-ink/10">
+              <p className="text-xs font-semibold text-ink/50 uppercase tracking-wide mb-2">Versi Manulife Pusat</p>
+              {product.materiTrainingManulife ? (
+                <FileDisplay file={product.materiTrainingManulife} />
+              ) : (
+                <p className="text-sm text-ink/50">Belum ada materi training versi Manulife Pusat.</p>
               )}
             </div>
           </div>

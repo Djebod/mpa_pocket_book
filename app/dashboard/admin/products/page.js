@@ -205,14 +205,14 @@ export default function AdminProductsPage() {
         <p className="text-xs font-semibold text-ink/50 uppercase tracking-wide mb-2">Materi Training</p>
         <div className="grid sm:grid-cols-2 gap-6 mb-6">
           <SingleFileInput
-            label="Versi Manulife Pusat"
-            value={form.materiTrainingManulife}
-            onChange={(v) => setForm({ ...form, materiTrainingManulife: v })}
-          />
-          <SingleFileInput
             label="Versi MPA"
             value={form.materiTrainingMPA}
             onChange={(v) => setForm({ ...form, materiTrainingMPA: v })}
+          />
+          <SingleFileInput
+            label="Versi Manulife Pusat"
+            value={form.materiTrainingManulife}
+            onChange={(v) => setForm({ ...form, materiTrainingManulife: v })}
           />
         </div>
 
