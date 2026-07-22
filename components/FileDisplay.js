@@ -2,7 +2,26 @@
 
 import { useState } from "react";
 
-/** Menampilkan satu file: gambar tampil langsung, PDF tampil via Google Docs Viewer + tombol download. */
+function blockContextMenu(e) {
+  e.preventDefault();
+}
+
+/**
+ * Menampilkan satu file: gambar tampil langsung, PDF tampil via Google
+ * Docs Viewer. TIDAK ada tombol download (disengaja — dokumen ini hanya
+ * dimaksudkan untuk dilihat di dalam Pocket Book), klik kanan dan seleksi
+ * teks pada area viewer juga dinonaktifkan.
+ *
+ * Catatan jujur: ini mengurangi kemudahan orang iseng menyimpan/copy
+ * file lewat UI kita, TAPI bukan proteksi yang tidak bisa ditembus.
+ * Konten di dalam iframe Google Docs Viewer berasal dari domain Google
+ * (cross-origin) sehingga kita tidak bisa mengontrol interaksi di
+ * dalamnya (mis. tombol download bawaan Google Docs Viewer, kalau ada,
+ * tetap di luar kendali kita), dan siapa pun yang memeriksa Network tab
+ * di browser tetap bisa melihat URL file aslinya. Proteksi berbasis
+ * front-end seperti ini menaikkan sedikit "friksi" untuk pengguna
+ * awam/tidak sengaja, bukan proteksi keamanan yang benar-benar kedap.
+ */
 export function FileDisplay({ file }) {
   const [fullscreen, setFullscreen] = useState(false);
   if (!file) return null;
@@ -14,9 +33,7 @@ export function FileDisplay({ file }) {
     return (
       <div className="mt-4">
         <div className="flex items-center justify-between gap-3 mb-2">
-          <p className="text-xs text-ink/45">
-            Kalau PDF tidak tampil, gunakan tombol download di bawah.
-          </p>
+          <p className="text-xs text-ink/45">Dokumen ini hanya bisa dilihat di dalam Pocket Book.</p>
           <button
             type="button"
             onClick={() => setFullscreen(true)}
@@ -25,18 +42,12 @@ export function FileDisplay({ file }) {
             ⤢ Perbesar
           </button>
         </div>
-        <div className="w-full h-[70vh] min-h-[420px] max-h-[820px] rounded-md overflow-hidden border border-ink/10 bg-paper-dark/30 shadow-stamp">
-          <iframe src={embedSrc} title={file.name || "Lampiran PDF"} className="w-full h-full" />
-        </div>
-        <a
-          href={file.downloadUrl || file.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          download={file.name || undefined}
-          className="mt-3 inline-flex items-center gap-2 bg-ink text-paper text-sm font-semibold px-4 py-2.5 rounded-md hover:bg-ink-light transition-colors"
+        <div
+          onContextMenu={blockContextMenu}
+          className="w-full h-[70vh] min-h-[420px] max-h-[820px] rounded-md overflow-hidden border border-ink/10 bg-paper-dark/30 shadow-stamp select-none"
         >
-          📄 Download PDF{file.name ? ` — ${file.name}` : ""}
-        </a>
+          <iframe src={embedSrc} title={file.name || "Lampiran PDF"} className="w-full h-full pointer-events-auto" />
+        </div>
 
         {fullscreen && (
           <div className="fixed inset-0 z-50 bg-ink/90 flex flex-col">
@@ -51,7 +62,7 @@ export function FileDisplay({ file }) {
                 ×
               </button>
             </div>
-            <div className="flex-1 bg-paper-dark/30">
+            <div className="flex-1 bg-paper-dark/30 select-none" onContextMenu={blockContextMenu}>
               <iframe src={embedSrc} title={file.name || "Lampiran PDF"} className="w-full h-full" />
             </div>
           </div>
@@ -63,21 +74,33 @@ export function FileDisplay({ file }) {
   if (isImage) {
     return (
       <>
-        <button type="button" onClick={() => setFullscreen(true)} className="block mt-4 w-full text-left">
+        <button
+          type="button"
+          onClick={() => setFullscreen(true)}
+          onContextMenu={blockContextMenu}
+          className="block mt-4 w-full text-left select-none"
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={file.url}
             alt={file.name || "Lampiran"}
-            className="max-w-full h-auto rounded-md border border-ink/10 shadow-stamp hover:opacity-90 transition-opacity"
+            draggable={false}
+            className="max-w-full h-auto rounded-md border border-ink/10 shadow-stamp hover:opacity-90 transition-opacity select-none"
           />
         </button>
         {fullscreen && (
           <div
             className="fixed inset-0 z-50 bg-ink/90 flex items-center justify-center p-4"
             onClick={() => setFullscreen(false)}
+            onContextMenu={blockContextMenu}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={file.url} alt={file.name || "Lampiran"} className="max-w-full max-h-full rounded-lg" />
+            <img
+              src={file.url}
+              alt={file.name || "Lampiran"}
+              draggable={false}
+              className="max-w-full max-h-full rounded-lg select-none"
+            />
           </div>
         )}
       </>

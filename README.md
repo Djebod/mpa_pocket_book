@@ -8,6 +8,13 @@ laporan aktivitas — lengkap dengan export ke Excel.
 ## Fitur
 
 - **Login** email & password, password tersimpan ter-enkripsi (hashed).
+- **Dokumen (PDF/foto) yang diupload Admin bersifat lihat-saja** — semua
+  halaman yang menampilkan lampiran (Produk, Promo, Recruit, dst)
+  **tidak punya tombol download**, klik kanan dan seleksi teks pada
+  area viewer dinonaktifkan (kecuali di halaman **Kalkulator
+  Finansial**, yang tetap punya tombol "Unduh PDF" khusus untuk hasil
+  kalkulasinya sendiri). Lihat catatan penting soal batas kemampuan
+  proteksi ini di bagian bawah README.
 - **Katalog Produk** — tampilan default menampilkan **Piramida Asuransi**
   (gambar ringkasan kebutuhan nasabah); klik "Lihat Semua Produk" atau
   isi pencarian/filter untuk menjelajah katalog. Tiap produk berisi
@@ -313,6 +320,35 @@ penyimpanan normal.
   base64 raksasa) ke kolom `photoUrl`. Kalau belum dikonfigurasi / gagal,
   otomatis fallback ke penyimpanan lokal browser sementara — tidak ada
   fitur yang rusak, cuma foto belum ikut ter-backup ke Drive.
+
+## Catatan Penting: Batas Kemampuan Proteksi Dokumen
+
+Halaman dengan lampiran PDF/foto (Produk, Promo, Recruit, Analisa
+Kebutuhan Asuransi, Komisi & Kompensasi, dst) **tidak punya tombol
+download**, dan klik kanan/seleksi teks pada area viewer dinonaktifkan.
+Ini menaikkan friksi untuk pengguna biasa yang iseng mau
+menyimpan/copy — **tapi ini bukan proteksi keamanan yang benar-benar
+kedap**, karena dua batasan mendasar:
+
+1. **Konten PDF ditampilkan lewat iframe Google Docs Viewer**, yang
+   berasal dari domain Google (bukan domain kita) — kita tidak bisa
+   mengontrol interaksi *di dalam* iframe itu (mis. tombol/menu bawaan
+   Google Docs Viewer sendiri, kalau Google menampilkannya).
+2. **Aplikasi ini belum punya sistem login/session sisi server** —
+   login yang ada sekarang murni dicek di browser (client-side).
+   Karena itu, siapa pun yang cukup paham teknis bisa membuka **Network
+   tab** di DevTools browser dan melihat URL asli file yang sedang
+   dimuat, lalu membukanya langsung tanpa login — proteksi front-end
+   (sembunyikan tombol, blok klik kanan) tidak bisa mencegah ini.
+
+**Supaya dokumen benar-benar "exclusive hanya bisa dilihat sebagai
+member"** (URL file tidak bisa diakses sama sekali tanpa login,
+termasuk lewat DevTools), dibutuhkan perubahan arsitektur yang lebih
+besar: sistem login berbasis session/cookie di server (bukan cuma di
+browser), ditambah endpoint API yang memeriksa session itu sebelum
+mengalirkan isi file dari Google Drive ke pengguna. Ini proyek
+tersendiri yang cukup besar — beri tahu saya kalau Anda ingin saya
+bangunkan itu di sesi berikutnya.
 
 ## Update Selanjutnya
 
