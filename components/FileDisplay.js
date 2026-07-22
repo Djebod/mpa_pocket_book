@@ -1,9 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function blockContextMenu(e) {
   e.preventDefault();
+}
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    if (typeof navigator !== "undefined") {
+      setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    }
+  }, []);
+  return isMobile;
 }
 
 /**
@@ -14,6 +24,15 @@ function blockContextMenu(e) {
  * Google Docs Viewer (yang mengarah ke sumber asli di Drive) tidak
  * muncul sama sekali. TIDAK ada tombol download, klik kanan dan seleksi
  * teks pada area viewer juga dinonaktifkan.
+ *
+ * Catatan khusus HP: viewer PDF bawaan Safari/Chrome di iOS & Android
+ * TIDAK bisa diandalkan untuk menampilkan PDF banyak halaman di dalam
+ * iframe (sering cuma tampil 1 halaman/terpotong, sulit di-scroll) —
+ * ini keterbatasan browser mobile itu sendiri, bukan sesuatu yang bisa
+ * diperbaiki lewat CSS. Solusinya: di HP, PDF dibuka di tab baru
+ * (viewer native browser di situ bekerja penuh dengan semua halaman),
+ * bukan di-embed di dalam iframe halaman. Di desktop, preview inline di
+ * dalam kotak tetap dipakai seperti biasa.
  *
  * Catatan jujur: ini jauh lebih baik dari sekadar sembunyikan tombol di
  * CSS (karena URL Drive aslinya tidak lagi pernah dikirim ke browser
@@ -27,6 +46,7 @@ function blockContextMenu(e) {
  */
 export function FileDisplay({ file }) {
   const [fullscreen, setFullscreen] = useState(false);
+  const isMobile = useIsMobile();
   if (!file) return null;
   const isPdf = file.mimeType === "application/pdf";
   const isImage = file.mimeType?.startsWith("image/");
@@ -40,6 +60,33 @@ export function FileDisplay({ file }) {
     // aman diabaikan begitu saja).
     const isOwnProxyOrLocal = !rawSrc.startsWith("https://docs.google.com");
     const embedSrc = isOwnProxyOrLocal ? `${rawSrc}#toolbar=0&navpanes=0` : rawSrc;
+
+    if (isMobile) {
+      return (
+        <div className="mt-4">
+          <div
+            onContextMenu={blockContextMenu}
+            className="w-full rounded-md border border-ink/10 bg-paper-dark/30 shadow-stamp px-5 py-8 flex flex-col items-center text-center select-none"
+          >
+            <span className="text-4xl mb-3">📄</span>
+            <p className="text-sm font-semibold text-ink mb-1 break-all">{file.name || "Lampiran PDF"}</p>
+            <p className="text-xs text-ink/45 mb-4">
+              Dokumen ini hanya bisa dilihat di dalam Pocket Book. Ketuk tombol di bawah untuk membacanya —
+              semua halaman akan tampil penuh di tab baru.
+            </p>
+            <a
+              href={embedSrc}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-ink text-paper text-sm font-semibold px-5 py-2.5 rounded-md hover:bg-ink-light transition-colors"
+            >
+              ⤢ Buka PDF Layar Penuh
+            </a>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="mt-4">
         <div className="flex items-center justify-between gap-3 mb-2">
