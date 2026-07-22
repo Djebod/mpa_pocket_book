@@ -4,6 +4,7 @@ import Link from "next/link";
 
 const ADMIN_SECTIONS = [
   { href: "/dashboard/admin/analisa-kebutuhan", label: "Kelola Analisa Kebutuhan Asuransi", desc: "Kelola deskripsi, materi, flier, dan video analisa kebutuhan asuransi." },
+  { href: "/dashboard/admin/komisi-kompensasi", label: "Kelola Komisi & Kompensasi", desc: "Kelola deskripsi dan lampiran (PDF/foto) skema komisi & kompensasi." },
   { href: "/dashboard/admin/members", label: "Kelola Member", desc: "Tambah, ubah, hapus akun member & atur Direct Leader." },
   { href: "/dashboard/admin/products", label: "Kelola Produk", desc: "Kelola katalog produk: nama, kategori, deskripsi, lampiran." },
   { href: "/dashboard/admin/promo", label: "Kelola Promo & Kontes", desc: "Kelola daftar promo & kontes beserta lampirannya." },

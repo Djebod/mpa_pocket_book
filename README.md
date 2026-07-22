@@ -42,23 +42,32 @@ laporan aktivitas — lengkap dengan export ke Excel.
   deskripsi (teks panjang, link otomatis bisa diklik), lampiran Materi
   & Flier (masing-masing upload 1 file PDF/foto), dan Video (link
   YouTube).
-- **Urutan menu** — "Analisa Kebutuhan Asuransi" muncul tepat di bawah
-  "Aktivitas"; "Rekomendasi Produk" muncul tepat di bawah "Kalkulator
-  Finansial"; sisanya tetap terurut alfabetis A-Z.
+- **Kalkulator Aktivitas** — hitung mundur dari target premi (APE)
+  tahunan/bulanan ke jumlah aktivitas harian (Prospek → Janji Temu →
+  Presentasi → Closing) berbasis rasio sales cycle LIMRA (bisa
+  disesuaikan). Menampilkan funnel visual + tabel ritme aktivitas per
+  bulan/minggu/hari.
+- **Kalkulator Finansial** — halaman React native (bukan iframe) dengan
+  4 modul (Asuransi Jiwa, Sakit Kritis, Dana Pensiun, Dana Pendidikan),
+  hitung otomatis real-time saat mengetik, dengan tombol **"Unduh
+  PDF"** per modul (pakai fitur cetak bawaan browser — saat cetak,
+  sidebar/header aplikasi ikut disembunyikan otomatis supaya hasil PDF
+  cuma berisi kartu kalkulatornya).
+- **Komisi & Kompensasi** — halaman tunggal (dikelola Admin): deskripsi
+  + banyak lampiran PDF/foto.
+- **Urutan menu** — "Kalkulator Aktivitas" muncul tepat di bawah
+  "Aktivitas"; "Analisa Kebutuhan Asuransi" di bawahnya; "Rekomendasi
+  Produk" muncul tepat di bawah "Kalkulator Finansial"; "Komisi &
+  Kompensasi" tepat di bawah "Rekomendasi Produk"; sisanya tetap
+  terurut alfabetis A-Z.
 - **Menu Administratif** — sidebar admin diringkas jadi satu link
   ("Menu Administratif") yang membuka halaman index berisi daftar semua
-  menu Kelola (Analisa Kebutuhan Asuransi, Member, Produk, Promo &
-  Kontes, Recruit, Tutorial) sebagai kartu yang bisa diklik.
-- **Kalkulator Finansial** — kalkulator perencanaan keuangan 4 modul
-  (Asuransi Jiwa, Sakit Kritis, Dana Pensiun, Dana Pendidikan), hitung
-  otomatis real-time saat mengetik, dengan tombol **"Unduh PDF"** di
-  tiap modul (pakai fitur cetak bawaan browser, tanpa library eksternal).
-  File kalkulatornya sendiri (`public/kalkulator-finansial.html`, satu
-  file mandiri tanpa dependensi luar) ditampilkan lewat halaman ini apa
-  adanya.
+  menu Kelola (Analisa Kebutuhan Asuransi, Komisi & Kompensasi, Member,
+  Produk, Promo & Kontes, Recruit, Tutorial) sebagai kartu yang bisa
+  diklik.
 - Menu di sidebar (member maupun Admin) pada dasarnya **terurut
-  alfabetis A-Z**, dengan 2 pengecualian posisi manual (lihat poin di
-  atas: Analisa Kebutuhan Asuransi & Rekomendasi Produk).
+  alfabetis A-Z**, dengan beberapa pengecualian posisi manual (lihat
+  poin "Urutan menu" di atas).
 - **Aktivitas Member (sistem poin)**: 2 kategori aktivitas —
   **Calon Nasabah** (field **Nama Nasabah** + **Nomor Telepon**, lalu
   Fact Finding 3 poin, Presentation 5 poin, Closing 10 poin) dan
@@ -196,8 +205,9 @@ request.
 ### 2. Siapkan Google Sheet
 
 1. Buat spreadsheet baru di [Google Sheets](https://sheets.google.com).
-2. Buat 7 tab (sheet) dengan nama **persis**: `Members`, `Products`,
-   `Activities`, `Promo`, `Tutorials`, `Recruit`, `AnalisaKebutuhan`.
+2. Buat 8 tab (sheet) dengan nama **persis**: `Members`, `Products`,
+   `Activities`, `Promo`, `Tutorials`, `Recruit`, `AnalisaKebutuhan`,
+   `KomisiKompensasi`.
 3. Baris pertama tiap tab tidak perlu diisi manual — akan terisi otomatis
    header-nya saat pertama kali data disimpan lewat aplikasi (lihat
    `SHEET_HEADERS` di `lib/google/sheetsClient.js` untuk daftar kolomnya).
