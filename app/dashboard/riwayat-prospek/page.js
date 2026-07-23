@@ -14,10 +14,12 @@ export default function RiwayatProspekPage() {
   const [selectedContactId, setSelectedContactId] = useState(null);
 
   const categories = store.getActivityCategories();
+  const isAdmin = session?.role === "admin";
 
   useEffect(() => {
     if (!session) return;
-    setActivities(store.getActivitiesByMember(session.memberId));
+    setActivities(isAdmin ? store.getActivities() : store.getActivitiesByMember(session.memberId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
   function typeLabel(a) {
@@ -74,7 +76,9 @@ export default function RiwayatProspekPage() {
         </button>
       </div>
       <p className="text-sm text-ink/60 mb-6 no-print">
-        Riwayat aktivitas Anda per calon prospek. Klik nama untuk melihat detail kunjungan.
+        {isAdmin
+          ? "Riwayat aktivitas seluruh member per calon prospek. Klik nama untuk melihat detail kunjungan."
+          : "Riwayat aktivitas Anda per calon prospek. Klik nama untuk melihat detail kunjungan."}
       </p>
 
       {!detailView && (
@@ -91,6 +95,7 @@ export default function RiwayatProspekPage() {
               <thead>
                 <tr className="text-left border-b border-ink/10 text-ink/50 text-xs uppercase tracking-wide select-none">
                   <th className="px-4 py-3">Tanggal</th>
+                  {isAdmin && <th className="px-4 py-3">Member</th>}
                   <th className="px-4 py-3">Jalur</th>
                   <th className="px-4 py-3">Aktivitas</th>
                   <th className="px-4 py-3">Kontak</th>
@@ -102,6 +107,7 @@ export default function RiwayatProspekPage() {
                 {sorted.map((a) => (
                   <tr key={a.id} className="border-b border-ink/5 last:border-0 align-top">
                     <td className="px-4 py-3 font-mono text-xs text-charcoal/70 whitespace-nowrap">{a.date}</td>
+                    {isAdmin && <td className="px-4 py-3 text-charcoal text-xs">{a.memberName}</td>}
                     <td className="px-4 py-3">
                       <span className="text-xs text-ink/60">
                         {categories.find((c) => c.key === a.category)?.label || a.category}
@@ -146,7 +152,7 @@ export default function RiwayatProspekPage() {
                 ))}
                 {sorted.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-ink/40">
+                    <td colSpan={isAdmin ? 7 : 6} className="px-4 py-8 text-center text-ink/40">
                       Belum ada aktivitas tercatat.
                     </td>
                   </tr>
@@ -171,7 +177,10 @@ export default function RiwayatProspekPage() {
               {contactInfo?.category || "Prospek"}
             </p>
             <h2 className="font-display text-2xl text-ink mb-1">{displayName}</h2>
-            {contactInfo?.profession && <p className="text-sm text-ink/60 mb-4">{contactInfo.profession}</p>}
+            {contactInfo?.profession && <p className="text-sm text-ink/60 mb-1">{contactInfo.profession}</p>}
+            {isAdmin && latest?.memberName && (
+              <p className="text-xs text-ink/45 mb-3">Dicatat oleh: {latest.memberName}</p>
+            )}
 
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div className="bg-paper-dark/40 rounded-md px-4 py-3">

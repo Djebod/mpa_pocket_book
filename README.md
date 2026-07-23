@@ -46,12 +46,11 @@ laporan aktivitas — lengkap dengan export ke Excel.
   halaman render).
 - **Promo & Kontes** — daftar promo (dikelola Admin): Type Promo +
   **Kategori Promo** (radio button "Agen"/"Nasabah") + banyak lampiran
-  PDF/foto per promo. Member bisa filter Semua/Agen/Nasabah, dan cari
-  berdasarkan nama promo.
+  PDF/foto per promo. Member bisa filter Semua/Agen/Nasabah.
 - **After Sales & Claim** — daftar data (dikelola Admin): tiap entri
   wajib pilih **Kategori** (radio button "After Sales" / "Claim") +
   banyak lampiran PDF/foto. Tampilan member terpisah jadi 2 tab sesuai
-  kategori, dengan pencarian berdasarkan nama file lampiran.
+  kategori.
 - **Tutorial Digital** — daftar tutorial (dikelola Admin): judul + link
   Google Drive, klik untuk membuka. Ada pencarian + urut A-Z.
 - **Recruit** — halaman tunggal (dikelola Admin): panduan proses recruit
@@ -74,9 +73,11 @@ laporan aktivitas — lengkap dengan export ke Excel.
   juga dikelompokkan per kategori + abjad, plus kolom nama member
   pemiliknya.
 - **Riwayat Calon Prospek** — tabel riwayat aktivitas (mirip Ringkasan
-  Aktivitas Tim tapi tanpa kolom Member & Poin). Klik nama kontak untuk
-  lihat detail: total kunjungan/aktivitas dan aktivitas terbaru untuk
-  prospek itu. Ada pencarian dan tombol **"Unduh PDF"**.
+  Aktivitas Tim tapi tanpa kolom Poin). Member cuma lihat aktivitas
+  miliknya sendiri; **Admin melihat aktivitas dari semua member
+  sekaligus** (ada kolom Member tambahan khusus untuk Admin). Klik nama
+  kontak untuk lihat detail: total kunjungan/aktivitas dan aktivitas
+  terbaru untuk prospek itu. Ada pencarian dan tombol **"Unduh PDF"**.
 - **Analisa Kebutuhan Asuransi** — halaman tunggal (dikelola Admin):
   deskripsi (teks panjang, link otomatis bisa diklik), lampiran Materi
   & Flier (masing-masing upload 1 file PDF/foto), dan Video (link
