@@ -397,6 +397,24 @@ buka halaman Kelola yang sesuai (mis. Kelola Produk) → **Ubah** produk
 itu → **Ganti File** pada field yang bersangkutan → upload ulang file
 yang sama → **Simpan**.
 
+## Catatan Perbaikan: Data "Hilang" Setelah Simpan (Race Condition)
+
+Sempat ada bug: kalau halaman di-refresh **tepat setelah** menekan
+Simpan (di halaman mana pun yang menyimpan ke Google Sheets — Komisi &
+Kompensasi, After Sales & Claim, Promo, dst), data yang baru saja
+disimpan bisa "hilang" lagi. Penyebabnya: pengiriman data ke Google
+Sheets berjalan di latar belakang (tidak instan), dan kalau halaman
+di-refresh sebelum pengiriman itu selesai, sinkronisasi awal
+(`syncAllFromSheets` di `app/providers.js`) menarik data **lama** dari
+Sheets dan menimpa data baru di penyimpanan lokal.
+
+**Sudah diperbaiki** di `lib/store.js`: semua pengiriman ke Sheets yang
+sedang berjalan sekarang dilacak (`pendingSheetPushes`), dan
+`syncAllFromSheets()` menunggu semuanya selesai dulu sebelum menarik
+data — jadi tidak ada lagi celah waktu yang bisa membuat data baru
+tertimpa data lama. Perbaikan ini berlaku otomatis untuk **semua**
+jenis konten (bukan cuma Komisi & Kompensasi / After Sales & Claim).
+
 ## Update Selanjutnya
 
 ```bash
