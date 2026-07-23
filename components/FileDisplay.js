@@ -159,6 +159,16 @@ export function FileDisplay({ file }) {
  * dipakai di halaman Komisi & Kompensasi dan Promo yang bisa punya
  * beberapa Attach File sekaligus.
  */
+/** Memendekkan nama file supaya muat di tab (mis. "Materi-Training-Lengkap-2026.pdf" -> "Materi-Trai…2026.pdf"), tetap menyisakan ekstensinya. */
+function shortenFileName(name, maxLen = 20) {
+  if (!name || name.length <= maxLen) return name;
+  const dotIndex = name.lastIndexOf(".");
+  const ext = dotIndex > -1 ? name.slice(dotIndex) : "";
+  const base = dotIndex > -1 ? name.slice(0, dotIndex) : name;
+  const keep = Math.max(4, maxLen - ext.length - 1);
+  return `${base.slice(0, keep)}…${ext}`;
+}
+
 export function FileListDisplay({ files = [] }) {
   const [active, setActive] = useState(0);
 
@@ -174,11 +184,12 @@ export function FileListDisplay({ files = [] }) {
             <button
               key={i}
               onClick={() => setActive(i)}
+              title={f.name || `File ${i + 1}`}
               className={`text-xs font-semibold px-3 py-2 rounded-md border transition-colors ${
                 active === i ? "bg-ink text-paper border-ink" : "text-ink/60 border-ink/20 hover:border-brass"
               }`}
             >
-              File {i + 1}
+              {f.name ? shortenFileName(f.name) : `File ${i + 1}`}
             </button>
           ))}
         </div>
