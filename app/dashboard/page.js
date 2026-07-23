@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/app/providers";
 import * as store from "@/lib/store";
 import Stamp from "@/components/Stamp";
@@ -10,22 +9,32 @@ import ValidationBadge from "@/components/ValidationBadge";
 export default function MemberDashboardPage() {
   const { session } = useAuth();
   const [summary, setSummary] = useState({ validPoints: 0, unconfirmedPoints: 0 });
-  const [recent, setRecent] = useState([]);
-  const [total, setTotal] = useState(0);
+  const [activities, setActivities] = useState([]);
+  const [preview, setPreview] = useState(null);
+
+  const categories = store.getActivityCategories();
 
   useEffect(() => {
     if (!session) return;
     setSummary(store.getMemberPointsSummary(session.memberId));
-    const activities = store.getActivitiesByMember(session.memberId);
-    setTotal(activities.length);
-    setRecent(activities.slice(0, 5));
+    setActivities(store.getActivitiesByMember(session.memberId));
   }, [session]);
+
+  const sorted = useMemo(
+    () => [...activities].sort((a, b) => (b.date || "").localeCompare(a.date || "")),
+    [activities]
+  );
+
+  function typeLabel(a) {
+    const config = store.getActivityTypeConfig(a.category, a.type);
+    return config?.label || a.type;
+  }
 
   return (
     <div>
       <div className="flex items-baseline justify-between mb-1">
         <h1 className="font-display italic text-2xl sm:text-3xl text-ink">Halo, {session?.name?.split(" ")[0]}</h1>
-        <span className="font-mono text-xs text-ink/50">{total} aktivitas tercatat</span>
+        <span className="font-mono text-xs text-ink/50">{activities.length} aktivitas tercatat</span>
       </div>
       <p className="text-sm text-ink/60 mb-8">Ringkasan aktivitas Anda di Mulia Putri Agency.</p>
 
@@ -40,43 +49,78 @@ export default function MemberDashboardPage() {
         </div>
       </div>
 
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="font-display text-lg text-ink">Aktivitas Terbaru</h2>
-        <Link href="/dashboard/activities" className="text-xs font-semibold text-brass underline underline-offset-2">
-          Lihat semua &amp; catat aktivitas baru
-        </Link>
-      </div>
+      <h2 className="font-display text-lg text-ink mb-3">Detail Aktivitas</h2>
 
-      {recent.length === 0 ? (
+      {sorted.length === 0 ? (
         <div className="bg-card border border-dashed border-ink/20 rounded-lg px-5 py-8 text-center text-sm text-ink/50">
           Belum ada aktivitas tercatat. Mulai catat aktivitas pertama Anda.
         </div>
       ) : (
-        <ul className="space-y-3">
-          {recent.map((act) => {
-            const config = store.getActivityTypeConfig(act.category, act.type);
-            return (
-              <li
-                key={act.id}
-                className="flex items-center gap-4 bg-card border border-ink/10 rounded-lg px-4 py-3 shadow-stamp"
-              >
-                {act.photo && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={act.photo} alt="" className="w-12 h-12 rounded object-cover shrink-0" />
-                )}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Stamp type={config?.label || act.type} category={act.category} small />
-                    <span className="font-mono text-[11px] text-brass font-semibold">{act.points} poin</span>
-                    <ValidationBadge validated={act.validated} small />
-                    <span className="font-mono text-[11px] text-ink/45">{act.date}</span>
-                  </div>
-                  {act.note && <p className="text-sm text-charcoal/80 mt-1 truncate">{act.note}</p>}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+        <div className="overflow-x-auto bg-card border border-ink/10 rounded-lg shadow-stamp">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left border-b border-ink/10 text-ink/50 text-xs uppercase tracking-wide select-none">
+                <th className="px-4 py-3">Tanggal</th>
+                <th className="px-4 py-3">Jalur</th>
+                <th className="px-4 py-3">Aktivitas</th>
+                <th className="px-4 py-3">Kontak</th>
+                <th className="px-4 py-3">Poin</th>
+                <th className="px-4 py-3">Bukti</th>
+                <th className="px-4 py-3">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sorted.map((a) => (
+                <tr key={a.id} className="border-b border-ink/5 last:border-0 align-top">
+                  <td className="px-4 py-3 font-mono text-xs text-charcoal/70 whitespace-nowrap">{a.date}</td>
+                  <td className="px-4 py-3">
+                    <span className="text-xs text-ink/60">
+                      {categories.find((c) => c.key === a.category)?.label || a.category}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <Stamp type={typeLabel(a)} category={a.category} small />
+                  </td>
+                  <td className="px-4 py-3 text-charcoal/70">
+                    {a.contactName && <p className="text-xs">{a.contactName}</p>}
+                    {a.contactProfession && <p className="text-xs text-ink/45">{a.contactProfession}</p>}
+                    {!a.contactName && !a.contactProfession && "—"}
+                  </td>
+                  <td className="px-4 py-3 font-mono text-xs font-semibold text-brass">{a.points}</td>
+                  <td className="px-4 py-3 text-charcoal/70">
+                    {a.productSold && (
+                      <p className="text-xs mb-1">
+                        {a.productSold}
+                        {a.premiumNominal ? ` · Rp${Number(a.premiumNominal).toLocaleString("id-ID")}/th` : ""}
+                      </p>
+                    )}
+                    {a.photo ? (
+                      <button onClick={() => setPreview(a.photo)}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={a.photo} alt="" className="w-10 h-10 rounded object-cover hover:opacity-80" />
+                      </button>
+                    ) : (
+                      !a.productSold && "—"
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <ValidationBadge validated={a.validated} small />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {preview && (
+        <div
+          className="fixed inset-0 bg-ink/80 flex items-center justify-center p-6 z-50"
+          onClick={() => setPreview(null)}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={preview} alt="Foto aktivitas" className="max-w-full max-h-full rounded-lg shadow-2xl" />
+        </div>
       )}
     </div>
   );

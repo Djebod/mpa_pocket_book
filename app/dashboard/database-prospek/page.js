@@ -23,13 +23,28 @@ export default function DatabaseProspekPage() {
 
   useEffect(refresh, [session]);
 
-  const visible = useMemo(() => {
+  const grouped = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return contacts;
-    return contacts.filter(
-      (c) => (c.name || "").toLowerCase().includes(q) || (c.profession || "").toLowerCase().includes(q)
-    );
-  }, [contacts, search]);
+    const filtered = q
+      ? contacts.filter(
+          (c) => (c.name || "").toLowerCase().includes(q) || (c.profession || "").toLowerCase().includes(q)
+        )
+      : contacts;
+
+    const map = {};
+    categoryOptions.forEach((cat) => (map[cat] = []));
+    filtered.forEach((c) => {
+      if (!map[c.category]) map[c.category] = [];
+      map[c.category].push(c);
+    });
+    Object.keys(map).forEach((cat) => {
+      map[cat].sort((a, b) => (a.name || "").localeCompare(b.name || "", "id", { sensitivity: "base" }));
+    });
+    return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contacts, search, categoryOptions]);
+
+  const totalVisible = Object.values(grouped).reduce((sum, list) => sum + list.length, 0);
 
   function resetForm() {
     setForm(emptyForm);
@@ -65,13 +80,6 @@ export default function DatabaseProspekPage() {
     setTimeout(() => {
       document.getElementById("prospek-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 50);
-  }
-
-  function handleDelete(id) {
-    if (!confirm("Hapus data prospek ini? Riwayat aktivitas yang sudah tercatat sebelumnya tidak akan terhapus.")) return;
-    store.deleteContact(id);
-    refresh();
-    if (editingId === id) resetForm();
   }
 
   return (
@@ -146,8 +154,8 @@ export default function DatabaseProspekPage() {
         </div>
       </form>
 
-      <div className="flex items-center justify-between gap-4 flex-wrap mb-3">
-        <h2 className="font-display text-lg text-ink">Daftar Prospek ({visible.length})</h2>
+      <div className="flex items-center justify-between gap-4 flex-wrap mb-5">
+        <h2 className="font-display text-lg text-ink">Daftar Prospek ({totalVisible})</h2>
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -156,31 +164,33 @@ export default function DatabaseProspekPage() {
         />
       </div>
 
-      <div className="space-y-3">
-        {visible.map((c) => (
-          <div key={c.id} className="flex items-start justify-between gap-4 bg-card border border-ink/10 rounded-lg px-5 py-4 shadow-stamp">
-            <div className="min-w-0">
-              <p className="font-mono text-[10px] uppercase tracking-wide text-brass mb-1">{c.category}</p>
-              <p className="font-display text-lg text-ink">{c.name}</p>
-              <p className="text-sm text-ink/60">{c.profession}</p>
-              <p className="text-xs text-ink/40 mt-1">Tercatat: {(c.createdAt || "").slice(0, 10)}</p>
+      {categoryOptions.map((cat) => (
+        <div key={cat} className="mb-8">
+          <h3 className="font-display text-base text-ink mb-3">
+            {cat} ({(grouped[cat] || []).length})
+          </h3>
+          {(grouped[cat] || []).length === 0 ? (
+            <div className="bg-card border border-dashed border-ink/20 rounded-lg px-5 py-5 text-center text-sm text-ink/50">
+              Belum ada data untuk kategori ini.
             </div>
-            <div className="flex gap-3 shrink-0 pt-1">
-              <button onClick={() => handleEdit(c)} className="text-xs font-semibold text-ink/60 hover:text-brass">
-                Ubah
-              </button>
-              <button onClick={() => handleDelete(c.id)} className="text-xs font-semibold text-rust/70 hover:text-rust">
-                Hapus
-              </button>
+          ) : (
+            <div className="space-y-3">
+              {(grouped[cat] || []).map((c) => (
+                <div key={c.id} className="flex items-start justify-between gap-4 bg-card border border-ink/10 rounded-lg px-5 py-4 shadow-stamp">
+                  <div className="min-w-0">
+                    <p className="font-display text-lg text-ink">{c.name}</p>
+                    <p className="text-sm text-ink/60">{c.profession}</p>
+                    <p className="text-xs text-ink/40 mt-1">Tercatat: {(c.createdAt || "").slice(0, 10)}</p>
+                  </div>
+                  <button onClick={() => handleEdit(c)} className="text-xs font-semibold text-ink/60 hover:text-brass shrink-0 pt-1">
+                    Ubah
+                  </button>
+                </div>
+              ))}
             </div>
-          </div>
-        ))}
-        {visible.length === 0 && (
-          <div className="bg-card border border-dashed border-ink/20 rounded-lg px-5 py-8 text-center text-sm text-ink/50">
-            {contacts.length === 0 ? "Belum ada data prospek." : "Tidak ada data yang cocok dengan pencarian."}
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

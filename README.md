@@ -60,11 +60,19 @@ laporan aktivitas — lengkap dengan export ke Excel.
 - **Menu Aktivitas** (dulu "Monitoring") — di posisi #1 sidebar,
   mengelompokkan **Catat Aktivitas**, **Ringkasan Aktivitas**, **Tim
   Saya**, dan (khusus Admin) **Ringkasan Aktivitas Tim** sebagai kartu
-  yang bisa diklik.
+  yang bisa diklik. **Ringkasan Aktivitas** (member) menampilkan tabel
+  detail lengkap (Tanggal, Jalur, Aktivitas, Kontak, Poin, Bukti,
+  Status) — mirip tabel Ringkasan Aktivitas Tim milik Admin, cuma tanpa
+  kolom Member.
 - **Database Calon Prospek** — member kelola database Calon Nasabah /
-  Calon Agen / Calon Agen & Nasabah milik sendiri: tambah, ubah, hapus.
-  Isian: **Nama**, **Profesi** (bukan lagi Nomor Telepon), **Kategori**,
-  tanggal tercatat otomatis. Ada pencarian.
+  Calon Agen / Calon Agen & Nasabah milik sendiri: tambah & ubah
+  (member **tidak bisa menghapus** data). Isian: **Nama**, **Profesi**
+  (bukan lagi Nomor Telepon), **Kategori**, tanggal tercatat otomatis.
+  Daftar dikelompokkan per kategori dan terurut abjad, ada pencarian.
+  **Admin** punya halaman terpisah (di Menu Administratif) untuk
+  melihat database ini dari **semua member sekaligus** (read-only),
+  juga dikelompokkan per kategori + abjad, plus kolom nama member
+  pemiliknya.
 - **Riwayat Calon Prospek** — tabel riwayat aktivitas (mirip Ringkasan
   Aktivitas Tim tapi tanpa kolom Member & Poin). Klik nama kontak untuk
   lihat detail: total kunjungan/aktivitas dan aktivitas terbaru untuk
@@ -102,8 +110,9 @@ laporan aktivitas — lengkap dengan export ke Excel.
   Kompensasi" tepat di bawah "Rekomendasi Produk"; "After Sales & Claim"
   tepat di atas "Tutorial Digital"; sisanya tetap terurut alfabetis A-Z.
 - **Menu Administratif** — sidebar admin diringkas jadi satu link
-  ("Menu Administratif") yang membuka halaman index berisi daftar semua
-  menu Kelola (After Sales & Claim, Analisa Kebutuhan Asuransi, Komisi &
+  ("Menu Administratif") yang membuka halaman index berisi **Database
+  Calon Prospek** (lihat semua member) dan daftar semua menu Kelola
+  (After Sales & Claim, Analisa Kebutuhan Asuransi, Komisi &
   Kompensasi, Member, Produk, Promo & Kontes, Recruit, Tutorial) sebagai
   kartu yang bisa diklik.
 - Menu di sidebar (member maupun Admin) pada dasarnya **terurut
