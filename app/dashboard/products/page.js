@@ -6,7 +6,6 @@ import * as store from "@/lib/store";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
-  const [category, setCategory] = useState("all");
   const [subCategory, setSubCategory] = useState("all");
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
@@ -16,26 +15,19 @@ export default function ProductsPage() {
     setProducts(store.getProducts());
   }, []);
 
-  const categories = useMemo(
-    () => Array.from(new Set(products.map((p) => p.category).filter(Boolean))).sort(),
-    [products]
-  );
-
   const subCategories = useMemo(() => {
-    const relevant = category === "all" ? products : products.filter((p) => p.category === category);
     const seen = new Map(); // key: versi lowercase+trim, value: penulisan asli yang tampil
-    relevant.forEach((p) => {
+    products.forEach((p) => {
       const raw = (p.subCategory || "").trim();
       if (!raw) return;
       const key = raw.toLowerCase();
       if (!seen.has(key)) seen.set(key, raw);
     });
     return Array.from(seen.values()).sort();
-  }, [products, category]);
+  }, [products]);
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
-      if (category !== "all" && p.category !== category) return false;
       if (subCategory !== "all" && (p.subCategory || "").trim().toLowerCase() !== subCategory.trim().toLowerCase())
         return false;
       if (search.trim()) {
@@ -45,7 +37,7 @@ export default function ProductsPage() {
       }
       return true;
     });
-  }, [products, category, subCategory, search]);
+  }, [products, subCategory, search]);
 
   function handleSearchSubmit(e) {
     e.preventDefault();
@@ -53,15 +45,8 @@ export default function ProductsPage() {
     setBrowsing(true);
   }
 
-  function handleCategoryChange(value) {
-    setCategory(value);
-    setSubCategory("all");
-    setBrowsing(true);
-  }
-
   function backToPyramid() {
     setBrowsing(false);
-    setCategory("all");
     setSubCategory("all");
     setSearch("");
     setSearchInput("");
@@ -92,41 +77,24 @@ export default function ProductsPage() {
           </button>
         </form>
 
-        <div className="grid sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-semibold text-ink/60 mb-1.5">Kategori</label>
-            <select
-              value={category}
-              onChange={(e) => handleCategoryChange(e.target.value)}
-              className="w-full rounded-md border border-ink/20 bg-paper px-3 py-2 text-sm focus:border-brass focus:outline-none"
-            >
-              <option value="all">Semua Kategori</option>
-              {categories.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-ink/60 mb-1.5">Sub Kategori</label>
-            <select
-              value={subCategory}
-              onChange={(e) => {
-                setSubCategory(e.target.value);
-                setBrowsing(true);
-              }}
-              disabled={subCategories.length === 0}
-              className="w-full rounded-md border border-ink/20 bg-paper px-3 py-2 text-sm focus:border-brass focus:outline-none disabled:opacity-50"
-            >
-              <option value="all">Semua Sub Kategori</option>
-              {subCategories.map((sc) => (
-                <option key={sc} value={sc}>
-                  {sc}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div>
+          <label className="block text-xs font-semibold text-ink/60 mb-1.5">Sub Kategori</label>
+          <select
+            value={subCategory}
+            onChange={(e) => {
+              setSubCategory(e.target.value);
+              setBrowsing(true);
+            }}
+            disabled={subCategories.length === 0}
+            className="w-full sm:w-64 rounded-md border border-ink/20 bg-paper px-3 py-2 text-sm focus:border-brass focus:outline-none disabled:opacity-50"
+          >
+            <option value="all">Semua Sub Kategori</option>
+            {subCategories.map((sc) => (
+              <option key={sc} value={sc}>
+                {sc}
+              </option>
+            ))}
+          </select>
         </div>
 
         {!browsing ? (

@@ -263,8 +263,8 @@ export default function AdminActivitiesPage() {
                 </td>
                 <td className="px-4 py-3 text-charcoal/70">
                   {a.contactName && <p className="text-xs">{a.contactName}</p>}
-                  {a.contactPhone && <p className="text-xs text-ink/45 font-mono">{a.contactPhone}</p>}
-                  {!a.contactName && !a.contactPhone && "—"}
+                  {a.contactProfession && <p className="text-xs text-ink/45 font-mono">{a.contactProfession}</p>}
+                  {!a.contactName && !a.contactProfession && "—"}
                 </td>
                 <td className="px-4 py-3 font-mono text-xs font-semibold text-brass">{a.points}</td>
                 <td className="px-4 py-3 text-charcoal/70">

@@ -34,8 +34,9 @@ laporan aktivitas — lengkap dengan export ke Excel.
   masing upload 1 file PDF/foto), **Tabel Premi** (upload 1 file
   PDF/foto), **Resume** dan **Tabel Medical** (upload **banyak file**
   PDF/foto), **File Ketsus** (link Google Drive), dan **Video** (link
-  YouTube, otomatis disesuaikan ke format embed). Filter Kategori + Sub
-  Kategori, pencarian, dan search di Kelola Produk tersedia.
+  YouTube, otomatis disesuaikan ke format embed). Filter **Sub
+  Kategori** (filter Kategori sudah dihilangkan dari halaman katalog
+  member), pencarian, dan search di Kelola Produk tersedia.
 - **Rekomendasi Produk** — wizard tap-pilih untuk agen: jawab 2-4
   pertanyaan tentang kebutuhan nasabah (proteksi kesehatan, sakit
   kritis, jiwa berjangka, warisan, dana pendidikan, dana pensiun,
@@ -45,11 +46,12 @@ laporan aktivitas — lengkap dengan export ke Excel.
   halaman render).
 - **Promo & Kontes** — daftar promo (dikelola Admin): Type Promo +
   **Kategori Promo** (radio button "Agen"/"Nasabah") + banyak lampiran
-  PDF/foto per promo. Member bisa filter Semua/Agen/Nasabah.
+  PDF/foto per promo. Member bisa filter Semua/Agen/Nasabah, dan cari
+  berdasarkan nama promo.
 - **After Sales & Claim** — daftar data (dikelola Admin): tiap entri
   wajib pilih **Kategori** (radio button "After Sales" / "Claim") +
   banyak lampiran PDF/foto. Tampilan member terpisah jadi 2 tab sesuai
-  kategori.
+  kategori, dengan pencarian berdasarkan nama file lampiran.
 - **Tutorial Digital** — daftar tutorial (dikelola Admin): judul + link
   Google Drive, klik untuk membuka. Ada pencarian + urut A-Z.
 - **Recruit** — halaman tunggal (dikelola Admin): panduan proses recruit
@@ -59,6 +61,14 @@ laporan aktivitas — lengkap dengan export ke Excel.
   mengelompokkan **Catat Aktivitas**, **Ringkasan Aktivitas**, **Tim
   Saya**, dan (khusus Admin) **Ringkasan Aktivitas Tim** sebagai kartu
   yang bisa diklik.
+- **Database Calon Prospek** — member kelola database Calon Nasabah /
+  Calon Agen / Calon Agen & Nasabah milik sendiri: tambah, ubah, hapus.
+  Isian: **Nama**, **Profesi** (bukan lagi Nomor Telepon), **Kategori**,
+  tanggal tercatat otomatis. Ada pencarian.
+- **Riwayat Calon Prospek** — tabel riwayat aktivitas (mirip Ringkasan
+  Aktivitas Tim tapi tanpa kolom Member & Poin). Klik nama kontak untuk
+  lihat detail: total kunjungan/aktivitas dan aktivitas terbaru untuk
+  prospek itu. Ada pencarian dan tombol **"Unduh PDF"**.
 - **Analisa Kebutuhan Asuransi** — halaman tunggal (dikelola Admin):
   deskripsi (teks panjang, link otomatis bisa diklik), lampiran Materi
   & Flier (masing-masing upload 1 file PDF/foto), dan Video (link
@@ -66,8 +76,8 @@ laporan aktivitas — lengkap dengan export ke Excel.
 - **Kalkulator Aktivitas** — hitung mundur dari target premi (APE)
   tahunan/bulanan ke jumlah aktivitas harian (Prospek → Janji Temu →
   Presentasi → Closing) berbasis rasio sales cycle LIMRA (bisa
-  disesuaikan). Menampilkan funnel visual + tabel ritme aktivitas per
-  bulan/minggu/hari. Di bagian bawah ada **Perbandingan Ritme vs
+  disesuaikan). Menampilkan funnel visual + tabel target aktivitas per
+  bulan/minggu/hari. Di bagian bawah ada **Perbandingan Target vs
   Aktivitas Valid**: pilih **Tanggal Mulai** (Tanggal Akhir otomatis
   akhir tahun dari tahun itu), sistem membandingkan target yang
   diprorata sampai hari ini dengan data aktual (Prospek = jumlah
@@ -77,7 +87,10 @@ laporan aktivitas — lengkap dengan export ke Excel.
   otomatis. Ada tombol **"Unduh PDF"**.
 - **Kalkulator Finansial** — halaman React native (bukan iframe) dengan
   4 modul (Asuransi Jiwa, Sakit Kritis, Dana Pensiun, Dana Pendidikan),
-  hitung otomatis real-time saat mengetik, dengan tombol **"Unduh
+  hitung otomatis real-time saat mengetik, dengan **Data Nasabah**
+  (pilih dari Database Calon Prospek atau tambah baru — otomatis ikut
+  tersimpan ke database) yang tercantum saat hasilnya diunduh, dan
+  tombol **"Unduh
   PDF"** per modul (pakai fitur cetak bawaan browser — saat cetak,
   sidebar/header aplikasi ikut disembunyikan otomatis supaya hasil PDF
   cuma berisi kartu kalkulatornya).
@@ -397,23 +410,49 @@ buka halaman Kelola yang sesuai (mis. Kelola Produk) → **Ubah** produk
 itu → **Ganti File** pada field yang bersangkutan → upload ulang file
 yang sama → **Simpan**.
 
+## Catatan Migrasi: Kolom "Nomor Telepon" Jadi "Profesi"
+
+Field kontak di database Calon Nasabah/Calon Agen berubah dari **Nomor
+Telepon** menjadi **Profesi**. Kalau tab `Contacts` atau `Activities`
+di Sheet Anda sudah ada data dari sebelum perubahan ini, kolom lama
+(`phone` / `contactPhone`) tidak otomatis terisi ke kolom baru
+(`profession` / `contactProfession`) — data lama tetap ada tapi di
+kolom lama yang sudah tidak dipakai lagi. Tidak wajib dibersihkan,
+tapi kalau ingin rapi, kolom lama itu boleh dihapus manual dari Sheet.
+
 ## Catatan Perbaikan: Data "Hilang" Setelah Simpan (Race Condition)
 
 Sempat ada bug: kalau halaman di-refresh **tepat setelah** menekan
 Simpan (di halaman mana pun yang menyimpan ke Google Sheets — Komisi &
 Kompensasi, After Sales & Claim, Promo, dst), data yang baru saja
-disimpan bisa "hilang" lagi. Penyebabnya: pengiriman data ke Google
-Sheets berjalan di latar belakang (tidak instan), dan kalau halaman
-di-refresh sebelum pengiriman itu selesai, sinkronisasi awal
-(`syncAllFromSheets` di `app/providers.js`) menarik data **lama** dari
-Sheets dan menimpa data baru di penyimpanan lokal.
+disimpan bisa "hilang" lagi. Ada **dua penyebab berlapis**:
 
-**Sudah diperbaiki** di `lib/store.js`: semua pengiriman ke Sheets yang
-sedang berjalan sekarang dilacak (`pendingSheetPushes`), dan
-`syncAllFromSheets()` menunggu semuanya selesai dulu sebelum menarik
-data — jadi tidak ada lagi celah waktu yang bisa membuat data baru
-tertimpa data lama. Perbaikan ini berlaku otomatis untuk **semua**
-jenis konten (bukan cuma Komisi & Kompensasi / After Sales & Claim).
+1. Pengiriman data ke Google Sheets berjalan di latar belakang (tidak
+   instan), dan kalau halaman di-refresh sebelum pengiriman itu selesai,
+   sinkronisasi awal (`syncAllFromSheets` di `app/providers.js`) menarik
+   data **lama** dari Sheets dan menimpa data baru di penyimpanan lokal.
+   → **Diperbaiki**: semua pengiriman ke Sheets yang sedang berjalan
+   sekarang dilacak (`pendingSheetPushes` di `lib/store.js`), dan
+   `syncAllFromSheets()` menunggu semuanya selesai dulu sebelum menarik
+   data.
+2. **Hard refresh** (Ctrl/Cmd+Shift+R) membatalkan **semua** request
+   jaringan yang sedang berjalan dari halaman sebelumnya, termasuk
+   pengiriman ke Sheets yang belum selesai — jadi walaupun penyebab #1
+   sudah diperbaiki, kalau refresh terjadi **di tengah-tengah**
+   pengiriman (bukan cuma setelahnya), datanya memang belum sempat
+   "sampai" ke Sheets sama sekali. → **Diperbaiki** khusus di **Kelola
+   Komisi & Kompensasi** dan **Kelola After Sales & Claim**: tombol
+   Simpan sekarang menunggu (`await`) sampai pengiriman ke Sheets
+   benar-benar selesai sebelum dianggap tersimpan (tombol nonaktif +
+   teks "Menyimpan…" selama proses), dan muncul peringatan browser
+   kalau Anda coba tutup/refresh halaman **persis saat** masih dalam
+   proses menyimpan.
+
+Halaman lain (Promo, Recruit, Analisa Kebutuhan Asuransi, dst) sudah
+ikut terlindungi dari penyebab #1, tapi belum punya perlindungan
+tambahan seperti penyebab #2 di atas — kabari kalau Anda mengalami
+gejala serupa di halaman lain supaya bisa diperkuat juga dengan pola
+yang sama.
 
 ## Update Selanjutnya
 

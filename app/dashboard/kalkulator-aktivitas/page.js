@@ -27,7 +27,7 @@ export default function KalkulatorAktivitasPage() {
   const [rJanji, setRJanji] = useState(5);
   const [rPresentasi, setRPresentasi] = useState(3);
 
-  // Data nyata (untuk perbandingan Ritme vs Aktivitas Valid)
+  // Data nyata (untuk perbandingan Target vs Aktivitas Valid)
   const [contacts, setContacts] = useState([]);
   const [activities, setActivities] = useState([]);
   const [startDate, setStartDate] = useState(() => new Date().toISOString().slice(0, 10));
@@ -384,9 +384,9 @@ export default function KalkulatorAktivitasPage() {
           ))}
         </div>
 
-        {/* Ritme aktivitas */}
+        {/* Target aktivitas */}
         <h2 style={{ fontSize: 18, fontWeight: 800, margin: "28px 4px 12px" }}>
-          Ritme Aktivitas Agen
+          Target Aktivitas Agen
         </h2>
         <div
           style={{
@@ -472,10 +472,10 @@ export default function KalkulatorAktivitasPage() {
           <strong>{tampil(perWaktu(hasil.prospek).hari)} prospek baru per hari kerja</strong>.
         </div>
 
-        {/* Perbandingan Ritme vs Aktivitas Valid */}
+        {/* Perbandingan Target vs Aktivitas Valid */}
         <div className="no-print" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "36px 4px 12px" }}>
           <h2 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>
-            Perbandingan Ritme vs Aktivitas Valid
+            Perbandingan Target vs Aktivitas Valid
           </h2>
           <button
             onClick={handlePrintComparison}
@@ -557,7 +557,7 @@ export default function KalkulatorAktivitasPage() {
             }}
           >
             <div>Tahapan</div>
-            <div style={{ textAlign: "center" }}>Ritme Agen</div>
+            <div style={{ textAlign: "center" }}>Target Agen</div>
             <div style={{ textAlign: "center" }}>Valid</div>
             <div style={{ textAlign: "center" }}>Capaian</div>
           </div>
@@ -642,7 +642,7 @@ export default function KalkulatorAktivitasPage() {
           <div style={{ display: "flex", gap: 16, justifyContent: "center", marginTop: 8, fontSize: 12, color: "#5B7268" }}>
             <span>
               <span style={{ display: "inline-block", width: 10, height: 10, background: "#D7E5DD", borderRadius: 3, marginRight: 6 }} />
-              Ritme Agen (target)
+              Target Agen
             </span>
             <span>
               <span style={{ display: "inline-block", width: 10, height: 10, background: "#00A758", borderRadius: 3, marginRight: 6 }} />

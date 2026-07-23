@@ -7,7 +7,9 @@ import MultiFileInput from "@/components/MultiFileInput";
 export default function AdminKomisiKompensasiPage() {
   const [description, setDescription] = useState("");
   const [files, setFiles] = useState([]);
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const existing = store.getKomisiKompensasiInfo();
@@ -17,11 +19,33 @@ export default function AdminKomisiKompensasiPage() {
     }
   }, []);
 
-  function handleSubmit(e) {
+  // Peringatkan kalau ada yang coba refresh/tutup tab persis saat data
+  // masih dalam proses dikirim ke Google Sheets — supaya tidak ada
+  // pengiriman yang terputus di tengah jalan (penyebab utama data
+  // "hilang" setelah hard refresh).
+  useEffect(() => {
+    function handleBeforeUnload(e) {
+      if (saving) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [saving]);
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    store.saveKomisiKompensasiInfo({ description, files });
-    setSaved(true);
-    setTimeout(() => setSaved(false), 1600);
+    setError("");
+    setSaving(true);
+    try {
+      await store.saveKomisiKompensasiInfo({ description, files });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 1600);
+    } catch (err) {
+      setError(err.message || "Gagal menyimpan. Coba lagi.");
+    }
+    setSaving(false);
   }
 
   return (
@@ -66,12 +90,20 @@ export default function AdminKomisiKompensasiPage() {
           />
         </div>
 
+        {error && <p className="text-sm text-rust mb-4">{error}</p>}
+
         <button
           type="submit"
-          className="bg-brass text-ink font-semibold text-sm px-5 py-2.5 rounded-md hover:bg-brass-light transition-colors"
+          disabled={saving}
+          className="bg-brass text-ink font-semibold text-sm px-5 py-2.5 rounded-md hover:bg-brass-light transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          Simpan
+          {saving ? "Menyimpan…" : "Simpan"}
         </button>
+        {saving && (
+          <p className="text-xs text-ink/45 mt-2">
+            Jangan tutup atau refresh halaman ini dulu — sedang mengirim ke Google Sheets…
+          </p>
+        )}
       </form>
     </div>
   );

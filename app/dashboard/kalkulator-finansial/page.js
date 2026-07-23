@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "@/app/providers";
+import * as store from "@/lib/store";
 
 // ---------- Util format ----------
 const idFormatter = new Intl.NumberFormat("id-ID");
@@ -156,10 +158,56 @@ function buildDefaultValues() {
   return values;
 }
 
+const NEW_NASABAH_VALUE = "__new__";
+
 export default function KalkulatorFinansialPage() {
+  const { session } = useAuth();
   const [activeId, setActiveId] = useState(MODULES[0].id);
   const [values, setValues] = useState(buildDefaultValues);
   const [printLabel, setPrintLabel] = useState("");
+
+  const [contacts, setContacts] = useState([]);
+  const [nasabahSelect, setNasabahSelect] = useState("");
+  const [newNasabahName, setNewNasabahName] = useState("");
+  const [newNasabahProfession, setNewNasabahProfession] = useState("");
+  const [nasabahError, setNasabahError] = useState("");
+
+  useEffect(() => {
+    if (!session) return;
+    setContacts(store.getContactsByMember(session.memberId));
+  }, [session]);
+
+  // Nasabah relevan: kategori Calon Nasabah atau Calon Agen & Nasabah —
+  // sama seperti kontak yang muncul di Jalur Penjualan pada Catat Aktivitas.
+  const nasabahOptions = useMemo(() => {
+    const jalurPenjualan = store.getActivityCategories().find((c) => c.key === "nasabah");
+    const allowedCategories = jalurPenjualan?.contactCategories || [];
+    return contacts.filter((c) => allowedCategories.includes(c.category));
+  }, [contacts]);
+
+  const selectedNasabah = contacts.find((c) => c.id === nasabahSelect) || null;
+
+  function handleSaveNewNasabah() {
+    setNasabahError("");
+    if (!newNasabahName.trim() || !newNasabahProfession.trim()) {
+      setNasabahError("Nama dan Profesi wajib diisi.");
+      return;
+    }
+    try {
+      const created = store.addContact({
+        memberId: session.memberId,
+        name: newNasabahName.trim(),
+        profession: newNasabahProfession.trim(),
+        category: "Calon Nasabah",
+      });
+      setContacts(store.getContactsByMember(session.memberId));
+      setNasabahSelect(created.id);
+      setNewNasabahName("");
+      setNewNasabahProfession("");
+    } catch (err) {
+      setNasabahError(err.message || "Gagal menyimpan ke database nasabah.");
+    }
+  }
 
   const activeModule = MODULES.find((m) => m.id === activeId);
   const result = useMemo(() => activeModule.calculate(values), [activeModule, values]);
@@ -175,7 +223,8 @@ export default function KalkulatorFinansialPage() {
   }
 
   function handlePrint() {
-    setPrintLabel(`${activeModule.cardTitle} — Dicetak pada ${formatPrintTimestamp()}`);
+    const nasabahLine = selectedNasabah ? ` — Nasabah: ${selectedNasabah.name} (${selectedNasabah.profession})` : "";
+    setPrintLabel(`${activeModule.cardTitle}${nasabahLine} — Dicetak pada ${formatPrintTimestamp()}`);
     // Beri waktu satu frame supaya label print sempat ter-render sebelum dialog cetak muncul.
     requestAnimationFrame(() => window.print());
   }
@@ -218,6 +267,73 @@ export default function KalkulatorFinansialPage() {
       </div>
 
       <p className="print-only text-xs text-ink/60 mb-4 pb-3 border-b-2 border-ink/20">{printLabel}</p>
+
+      <div className="no-print bg-card border border-ink/10 rounded-lg px-4 sm:px-6 py-5 sm:py-6 shadow-stamp mb-6">
+        <h2 className="font-display text-lg text-ink mb-1">Data Nasabah</h2>
+        <p className="text-xs text-ink/50 mb-4">
+          Pilih dari Database Calon Prospek, atau tambahkan baru — otomatis ikut tersimpan ke database. Data ini
+          akan ikut tercantum saat hasil kalkulasi diunduh sebagai PDF.
+        </p>
+
+        <select
+          value={nasabahSelect}
+          onChange={(e) => setNasabahSelect(e.target.value)}
+          className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none mb-3"
+        >
+          <option value="">— Tidak pakai data nasabah —</option>
+          {nasabahOptions.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name} ({c.profession})
+            </option>
+          ))}
+          <option value={NEW_NASABAH_VALUE}>➕ Tambah Nasabah Baru…</option>
+        </select>
+
+        {nasabahSelect === NEW_NASABAH_VALUE && (
+          <div className="bg-paper-dark/40 border border-ink/10 rounded-md px-4 py-4">
+            <div className="grid sm:grid-cols-2 gap-4 mb-3">
+              <div>
+                <label className="block text-xs font-semibold text-ink mb-1">Nama</label>
+                <input
+                  value={newNasabahName}
+                  onChange={(e) => setNewNasabahName(e.target.value)}
+                  placeholder="Contoh: Syam Shugi"
+                  className="w-full rounded-md border border-ink/20 bg-paper px-3 py-2 text-sm focus:border-brass focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-ink mb-1">Profesi</label>
+                <input
+                  value={newNasabahProfession}
+                  onChange={(e) => setNewNasabahProfession(e.target.value)}
+                  placeholder="Contoh: Wiraswasta"
+                  className="w-full rounded-md border border-ink/20 bg-paper px-3 py-2 text-sm focus:border-brass focus:outline-none"
+                />
+              </div>
+            </div>
+            {nasabahError && <p className="text-xs text-rust mb-2">{nasabahError}</p>}
+            <button
+              type="button"
+              onClick={handleSaveNewNasabah}
+              className="text-xs font-semibold bg-ink text-paper px-4 py-2 rounded-md hover:bg-ink-light transition-colors"
+            >
+              Simpan ke Database Nasabah
+            </button>
+          </div>
+        )}
+
+        {selectedNasabah && (
+          <p className="text-xs text-sage font-semibold">
+            ✓ Data untuk: {selectedNasabah.name} ({selectedNasabah.profession})
+          </p>
+        )}
+      </div>
+
+      {selectedNasabah && (
+        <p className="print-only text-sm font-semibold text-ink mb-4">
+          Nasabah: {selectedNasabah.name} — {selectedNasabah.profession}
+        </p>
+      )}
 
       <div className="bg-card border border-ink/10 rounded-lg rounded-tl-none px-4 sm:px-6 py-5 sm:py-6 shadow-stamp mb-6">
         <h2 className="font-display text-lg text-ink mb-1">{activeModule.cardTitle}</h2>

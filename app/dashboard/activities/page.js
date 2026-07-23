@@ -20,7 +20,7 @@ export default function ActivitiesPage() {
   const [typeKey, setTypeKey] = useState("");
   const [contactSelect, setContactSelect] = useState(""); // id kontak, atau NEW_CONTACT_VALUE
   const [newContactName, setNewContactName] = useState("");
-  const [newContactPhone, setNewContactPhone] = useState("");
+  const [newContactProfession, setNewContactProfession] = useState("");
   const [newContactCategory, setNewContactCategory] = useState("");
   const [note, setNote] = useState("");
   const [photo, setPhoto] = useState(null);
@@ -57,7 +57,7 @@ export default function ActivitiesPage() {
     setTypeKey("");
     setContactSelect("");
     setNewContactName("");
-    setNewContactPhone("");
+    setNewContactProfession("");
     setNewContactCategory("");
     setNote("");
     setPhoto(null);
@@ -72,7 +72,7 @@ export default function ActivitiesPage() {
     setTypeKey("");
     setContactSelect("");
     setNewContactName("");
-    setNewContactPhone("");
+    setNewContactProfession("");
     setNewContactCategory("");
     setNote("");
     setPhoto(null);
@@ -84,21 +84,21 @@ export default function ActivitiesPage() {
 
   function handleSaveNewContact() {
     setError("");
-    if (!newContactName.trim() || !newContactPhone.trim() || !newContactCategory) {
-      setError("Nama, Nomor Telepon, dan Kategori kontak baru wajib diisi.");
+    if (!newContactName.trim() || !newContactProfession.trim() || !newContactCategory) {
+      setError("Nama, Profesi, dan Kategori kontak baru wajib diisi.");
       return;
     }
     try {
       const created = store.addContact({
         memberId: session.memberId,
         name: newContactName.trim(),
-        phone: newContactPhone.trim(),
+        profession: newContactProfession.trim(),
         category: newContactCategory,
       });
       setContacts(store.getContactsByMember(session.memberId));
       setContactSelect(created.id);
       setNewContactName("");
-      setNewContactPhone("");
+      setNewContactProfession("");
       setNewContactCategory("");
     } catch (err) {
       setError(err.message || "Kontak gagal disimpan.");
@@ -110,7 +110,7 @@ export default function ActivitiesPage() {
     setTypeKey(act.type);
     setContactSelect(act.contactId || "");
     setNewContactName("");
-    setNewContactPhone("");
+    setNewContactProfession("");
     setNewContactCategory("");
     setNote(act.note || "");
     setPhoto(act.photo || null);
@@ -186,7 +186,7 @@ export default function ActivitiesPage() {
         date: today(),
         contactId: selectedContact.id,
         contactName: selectedContact.name,
-        contactPhone: selectedContact.phone,
+        contactProfession: selectedContact.profession,
         note: note.trim(),
         photo: photoValue || "",
         productSold: activeTypeConfig.hasSaleFields ? productSold.trim() : "",
@@ -341,11 +341,11 @@ export default function ActivitiesPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-ink mb-1">Nomor Telepon</label>
+                  <label className="block text-xs font-semibold text-ink mb-1">Profesi</label>
                   <input
-                    value={newContactPhone}
-                    onChange={(e) => setNewContactPhone(e.target.value)}
-                    placeholder="Contoh: 0812-3456-7890"
+                    value={newContactProfession}
+                    onChange={(e) => setNewContactProfession(e.target.value)}
+                    placeholder="Contoh: Wiraswasta"
                     className="w-full rounded-md border border-ink/20 bg-paper px-3 py-2 text-sm focus:border-brass focus:outline-none"
                   />
                 </div>
@@ -379,12 +379,12 @@ export default function ActivitiesPage() {
             </div>
           )}
 
-          {/* Nomor Telepon — otomatis dari kontak terpilih */}
+          {/* Profesi — otomatis dari kontak terpilih */}
           {selectedContact && (
             <div className="mb-5">
-              <label className="block text-sm font-semibold text-ink mb-1.5">Nomor Telepon</label>
+              <label className="block text-sm font-semibold text-ink mb-1.5">Profesi</label>
               <div className="rounded-md border border-ink/15 bg-paper-dark/40 px-3.5 py-2.5 text-sm text-ink/70 font-mono">
-                {selectedContact.phone}
+                {selectedContact.profession}
               </div>
             </div>
           )}
@@ -490,10 +490,12 @@ export default function ActivitiesPage() {
                     <ValidationBadge validated={act.validated} small />
                     <span className="font-mono text-[11px] text-ink/45">{act.date}</span>
                   </div>
-                  {(act.contactName || act.contactPhone) && (
+                  {(act.contactName || act.contactProfession) && (
                     <p className="text-sm text-ink/70 font-medium">
                       {act.contactName || "—"}
-                      {act.contactPhone && <span className="text-ink/45 font-normal"> · {act.contactPhone}</span>}
+                      {act.contactProfession && (
+                        <span className="text-ink/45 font-normal"> · {act.contactProfession}</span>
+                      )}
                     </p>
                   )}
                   {act.productSold && (

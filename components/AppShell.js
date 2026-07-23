@@ -10,6 +10,8 @@ const MONITORING_TAB = { href: "/dashboard/monitoring", label: "Aktivitas" };
 const MEMBER_TABS = [
   { href: "/dashboard/kalkulator-aktivitas", label: "Kalkulator Aktivitas" },
   { href: "/dashboard/analisa-kebutuhan", label: "Analisa Kebutuhan Asuransi" },
+  { href: "/dashboard/database-prospek", label: "Database Calon Prospek" },
+  { href: "/dashboard/riwayat-prospek", label: "Riwayat Calon Prospek" },
   { href: "/dashboard/kalkulator-finansial", label: "Kalkulator Finansial" },
   { href: "/dashboard/rekomendasi", label: "Rekomendasi Produk" },
   { href: "/dashboard/komisi-kompensasi", label: "Komisi & Kompensasi" },

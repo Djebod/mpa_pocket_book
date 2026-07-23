@@ -13,6 +13,7 @@ export default function AdminAfterSalesClaimPage() {
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
 
   function refresh() {
     setList(store.getAfterSalesClaimList());
@@ -20,26 +21,47 @@ export default function AdminAfterSalesClaimPage() {
 
   useEffect(refresh, []);
 
+  // Peringatkan kalau ada yang coba refresh/tutup tab persis saat data
+  // masih dalam proses dikirim ke Google Sheets — supaya tidak ada
+  // pengiriman yang terputus di tengah jalan (penyebab utama data
+  // "hilang" setelah hard refresh).
+  useEffect(() => {
+    function handleBeforeUnload(e) {
+      if (saving) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [saving]);
+
   function resetForm() {
     setForm(emptyForm);
     setEditingId(null);
     setError("");
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     if (!form.category) {
       setError("Kategori wajib dipilih (After Sales atau Claim).");
       return;
     }
-    if (editingId) {
-      store.updateAfterSalesClaimEntry(editingId, form);
-    } else {
-      store.addAfterSalesClaimEntry(form);
+    setSaving(true);
+    try {
+      if (editingId) {
+        await store.updateAfterSalesClaimEntry(editingId, form);
+      } else {
+        await store.addAfterSalesClaimEntry(form);
+      }
+      refresh();
+      resetForm();
+    } catch (err) {
+      setError(err.message || "Gagal menyimpan. Coba lagi.");
     }
-    refresh();
-    resetForm();
+    setSaving(false);
   }
 
   function handleEdit(entry) {
@@ -48,11 +70,13 @@ export default function AdminAfterSalesClaimPage() {
     setError("");
   }
 
-  function handleDelete(id) {
+  async function handleDelete(id) {
     if (!confirm("Hapus data ini?")) return;
-    store.deleteAfterSalesClaimEntry(id);
+    setSaving(true);
+    await store.deleteAfterSalesClaimEntry(id);
     refresh();
     if (editingId === id) resetForm();
+    setSaving(false);
   }
 
   const grouped = useMemo(() => {
@@ -106,12 +130,13 @@ export default function AdminAfterSalesClaimPage() {
 
         {error && <p className="text-sm text-rust mb-4">{error}</p>}
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-center">
           <button
             type="submit"
-            className="bg-brass text-ink font-semibold text-sm px-5 py-2.5 rounded-md hover:bg-brass-light transition-colors"
+            disabled={saving}
+            className="bg-brass text-ink font-semibold text-sm px-5 py-2.5 rounded-md hover:bg-brass-light transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {editingId ? "Simpan Perubahan" : "Tambah Data"}
+            {saving ? "Menyimpan…" : editingId ? "Simpan Perubahan" : "Tambah Data"}
           </button>
           {editingId && (
             <button type="button" onClick={resetForm} className="text-sm font-semibold text-ink/60 hover:text-ink px-3">
@@ -119,6 +144,11 @@ export default function AdminAfterSalesClaimPage() {
             </button>
           )}
         </div>
+        {saving && (
+          <p className="text-xs text-ink/45 mt-2">
+            Jangan tutup atau refresh halaman ini dulu — sedang mengirim ke Google Sheets…
+          </p>
+        )}
       </form>
 
       {CATEGORY_OPTIONS.map((cat) => (

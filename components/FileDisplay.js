@@ -159,16 +159,6 @@ export function FileDisplay({ file }) {
  * dipakai di halaman Komisi & Kompensasi dan Promo yang bisa punya
  * beberapa Attach File sekaligus.
  */
-/** Memendekkan nama file supaya muat di tab (mis. "Materi-Training-Lengkap-2026.pdf" -> "Materi-Trai…2026.pdf"), tetap menyisakan ekstensinya. */
-function shortenFileName(name, maxLen = 20) {
-  if (!name || name.length <= maxLen) return name;
-  const dotIndex = name.lastIndexOf(".");
-  const ext = dotIndex > -1 ? name.slice(dotIndex) : "";
-  const base = dotIndex > -1 ? name.slice(0, dotIndex) : name;
-  const keep = Math.max(4, maxLen - ext.length - 1);
-  return `${base.slice(0, keep)}…${ext}`;
-}
-
 export function FileListDisplay({ files = [] }) {
   const [active, setActive] = useState(0);
 
@@ -176,25 +166,33 @@ export function FileListDisplay({ files = [] }) {
     return <p className="text-sm text-ink/50">Belum ada file dilampirkan.</p>;
   }
 
+  const sorted = [...files].sort((a, b) => {
+    const nameA = a.name || "";
+    const nameB = b.name || "";
+    if (!nameA && !nameB) return 0;
+    if (!nameA) return 1;
+    if (!nameB) return -1;
+    return nameA.localeCompare(nameB, "id", { numeric: true, sensitivity: "base" });
+  });
+
   return (
     <div>
-      {files.length > 1 && (
+      {sorted.length > 1 && (
         <div className="flex gap-1.5 flex-wrap mb-3">
-          {files.map((f, i) => (
+          {sorted.map((f, i) => (
             <button
               key={i}
               onClick={() => setActive(i)}
-              title={f.name || `File ${i + 1}`}
-              className={`text-xs font-semibold px-3 py-2 rounded-md border transition-colors ${
+              className={`text-xs font-semibold px-3 py-2 rounded-md border transition-colors break-all text-left ${
                 active === i ? "bg-ink text-paper border-ink" : "text-ink/60 border-ink/20 hover:border-brass"
               }`}
             >
-              {f.name ? shortenFileName(f.name) : `File ${i + 1}`}
+              {f.name || `File ${i + 1}`}
             </button>
           ))}
         </div>
       )}
-      <FileDisplay file={files[active]} />
+      <FileDisplay file={sorted[active]} />
     </div>
   );
 }

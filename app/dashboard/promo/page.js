@@ -10,20 +10,30 @@ export default function PromoPage() {
   const [list, setList] = useState([]);
   const [openId, setOpenId] = useState(null);
   const [filter, setFilter] = useState("Semua");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     setList(store.getPromoList());
   }, []);
 
   const visible = useMemo(() => {
-    if (filter === "Semua") return list;
-    return list.filter((p) => p.category === filter);
-  }, [list, filter]);
+    let result = filter === "Semua" ? list : list.filter((p) => p.category === filter);
+    const q = search.trim().toLowerCase();
+    if (q) result = result.filter((p) => (p.typePromo || "").toLowerCase().includes(q));
+    return result;
+  }, [list, filter, search]);
 
   return (
     <div>
       <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-1">Promo & Kontes</h1>
       <p className="text-sm text-ink/60 mb-6">Materi promo terbaru dari Mulia Putri Agency.</p>
+
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Cari nama promo..."
+        className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none mb-4"
+      />
 
       <div className="flex gap-2 mb-6">
         {FILTERS.map((f) => (
@@ -41,7 +51,7 @@ export default function PromoPage() {
 
       {visible.length === 0 ? (
         <div className="bg-card border border-dashed border-ink/20 rounded-lg px-5 py-8 text-center text-sm text-ink/50">
-          {list.length === 0 ? "Belum ada promo saat ini." : "Tidak ada promo untuk kategori ini."}
+          {list.length === 0 ? "Belum ada promo saat ini." : "Tidak ada promo yang cocok."}
         </div>
       ) : (
         <div className="space-y-3">
