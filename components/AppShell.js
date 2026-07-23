@@ -30,9 +30,12 @@ export default function AppShell({ children }) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const isAdmin = session?.role === "admin";
+  const memberTabsForAdmin = MEMBER_TABS.filter((t) => t.href !== "/dashboard/database-prospek");
+
   const tabs = [
     MONITORING_TAB,
-    ...(session?.role === "admin" ? [...MEMBER_TABS, ...ADMIN_TABS] : MEMBER_TABS),
+    ...(isAdmin ? [...memberTabsForAdmin, ...ADMIN_TABS] : MEMBER_TABS),
   ];
 
   function handleLogout() {

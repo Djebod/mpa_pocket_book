@@ -71,7 +71,10 @@ laporan aktivitas — lengkap dengan export ke Excel.
   **Admin** punya halaman terpisah (di Menu Administratif) untuk
   melihat database ini dari **semua member sekaligus** (read-only),
   juga dikelompokkan per kategori + abjad, plus kolom nama member
-  pemiliknya.
+  pemiliknya — otomatis tarik data terbaru dari Sheets tiap dibuka.
+  Menu "Database Calon Prospek" versi member (yang cuma menampilkan
+  data sendiri) **disembunyikan dari sidebar utama saat login sebagai
+  Admin**, supaya tidak dobel dengan versi Menu Administratif.
 - **Riwayat Calon Prospek** — tabel riwayat aktivitas (mirip Ringkasan
   Aktivitas Tim tapi tanpa kolom Poin). Member cuma lihat aktivitas
   miliknya sendiri; **Admin melihat aktivitas dari semua member
