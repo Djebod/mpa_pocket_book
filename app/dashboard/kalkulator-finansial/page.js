@@ -171,6 +171,7 @@ export default function KalkulatorFinansialPage() {
   const [newNasabahName, setNewNasabahName] = useState("");
   const [newNasabahProfession, setNewNasabahProfession] = useState("");
   const [nasabahError, setNasabahError] = useState("");
+  const [savingNasabah, setSavingNasabah] = useState(false);
 
   useEffect(() => {
     if (!session) return;
@@ -187,14 +188,15 @@ export default function KalkulatorFinansialPage() {
 
   const selectedNasabah = contacts.find((c) => c.id === nasabahSelect) || null;
 
-  function handleSaveNewNasabah() {
+  async function handleSaveNewNasabah() {
     setNasabahError("");
     if (!newNasabahName.trim() || !newNasabahProfession.trim()) {
       setNasabahError("Nama dan Profesi wajib diisi.");
       return;
     }
+    setSavingNasabah(true);
     try {
-      const created = store.addContact({
+      const created = await store.addContact({
         memberId: session.memberId,
         name: newNasabahName.trim(),
         profession: newNasabahProfession.trim(),
@@ -207,6 +209,7 @@ export default function KalkulatorFinansialPage() {
     } catch (err) {
       setNasabahError(err.message || "Gagal menyimpan ke database nasabah.");
     }
+    setSavingNasabah(false);
   }
 
   const activeModule = MODULES.find((m) => m.id === activeId);
@@ -315,9 +318,10 @@ export default function KalkulatorFinansialPage() {
             <button
               type="button"
               onClick={handleSaveNewNasabah}
-              className="text-xs font-semibold bg-ink text-paper px-4 py-2 rounded-md hover:bg-ink-light transition-colors"
+              disabled={savingNasabah}
+              className="text-xs font-semibold bg-ink text-paper px-4 py-2 rounded-md hover:bg-ink-light transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Simpan ke Database Nasabah
+              {savingNasabah ? "Menyimpan…" : "Simpan ke Database Nasabah"}
             </button>
           </div>
         )}

@@ -13,6 +13,7 @@ export default function DatabaseProspekPage() {
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const categoryOptions = store.getContactCategories();
 
@@ -22,6 +23,17 @@ export default function DatabaseProspekPage() {
   }
 
   useEffect(refresh, [session]);
+
+  useEffect(() => {
+    function handleBeforeUnload(e) {
+      if (saving) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [saving]);
 
   const grouped = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -52,25 +64,27 @@ export default function DatabaseProspekPage() {
     setError("");
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     if (!form.name.trim() || !form.profession.trim() || !form.category) {
       setError("Nama, Profesi, dan Kategori wajib diisi.");
       return;
     }
+    setSaving(true);
     try {
       const payload = { name: form.name.trim(), profession: form.profession.trim(), category: form.category };
       if (editingId) {
-        store.updateContact(editingId, payload);
+        await store.updateContact(editingId, payload);
       } else {
-        store.addContact({ memberId: session.memberId, ...payload });
+        await store.addContact({ memberId: session.memberId, ...payload });
       }
       refresh();
       resetForm();
     } catch (err) {
       setError(err.message || "Gagal menyimpan.");
     }
+    setSaving(false);
   }
 
   function handleEdit(c) {
@@ -142,9 +156,10 @@ export default function DatabaseProspekPage() {
         <div className="flex gap-3">
           <button
             type="submit"
-            className="bg-brass text-ink font-semibold text-sm px-5 py-2.5 rounded-md hover:bg-brass-light transition-colors"
+            disabled={saving}
+            className="bg-brass text-ink font-semibold text-sm px-5 py-2.5 rounded-md hover:bg-brass-light transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {editingId ? "Simpan Perubahan" : "Tambah Prospek"}
+            {saving ? "Menyimpan…" : editingId ? "Simpan Perubahan" : "Tambah Prospek"}
           </button>
           {editingId && (
             <button type="button" onClick={resetForm} className="text-sm font-semibold text-ink/60 hover:text-ink px-3">
@@ -152,6 +167,11 @@ export default function DatabaseProspekPage() {
             </button>
           )}
         </div>
+        {saving && (
+          <p className="text-xs text-ink/45 mt-2">
+            Jangan tutup atau refresh halaman ini dulu — sedang mengirim ke Google Sheets…
+          </p>
+        )}
       </form>
 
       <div className="flex items-center justify-between gap-4 flex-wrap mb-5">

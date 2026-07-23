@@ -7,12 +7,25 @@ export default function AdminDatabaseProspekPage() {
   const [contacts, setContacts] = useState([]);
   const [members, setMembers] = useState([]);
   const [search, setSearch] = useState("");
+  const [syncing, setSyncing] = useState(true);
 
   const categoryOptions = store.getContactCategories();
 
-  useEffect(() => {
+  async function loadFreshData() {
+    setSyncing(true);
+    // Halaman ini sengaja menarik ulang data langsung dari Google Sheets
+    // setiap kali dibuka (bukan cuma mengandalkan data yang sempat
+    // tersinkron di awal sesi browser Admin) — supaya Admin selalu
+    // melihat kontak terbaru yang diinput member mana pun, sekalipun
+    // member itu menambahkannya SETELAH sesi Admin dimulai.
+    await store.syncAllFromSheets();
     setContacts(store.getAllContactsForAdmin());
     setMembers(store.getMembers());
+    setSyncing(false);
+  }
+
+  useEffect(() => {
+    loadFreshData();
   }, []);
 
   function memberName(memberId) {
@@ -43,13 +56,25 @@ export default function AdminDatabaseProspekPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contacts, members, search, categoryOptions]);
 
+  const totalContacts = contacts.length;
+
   return (
     <div>
-      <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-1">Database Calon Prospek</h1>
+      <div className="flex items-start justify-between gap-4 flex-wrap mb-1">
+        <h1 className="font-display italic text-2xl sm:text-3xl text-ink">Database Calon Prospek</h1>
+        <button
+          onClick={loadFreshData}
+          disabled={syncing}
+          className="bg-ink text-paper text-xs font-semibold px-4 py-2.5 rounded-md hover:bg-ink-light transition-colors disabled:opacity-60 disabled:cursor-not-allowed shrink-0"
+        >
+          {syncing ? "Memuat…" : "🔄 Muat Ulang dari Sheets"}
+        </button>
+      </div>
       <p className="text-sm text-ink/60 mb-6">
-        Seluruh database Calon Nasabah / Calon Agen / Calon Agen & Nasabah dari semua member, dikelompokkan
-        berdasarkan kategori dan terurut abjad. Halaman ini hanya untuk melihat — pengelolaan (tambah/ubah) data
-        dilakukan oleh masing-masing member lewat halaman "Database Calon Prospek" mereka sendiri.
+        Seluruh database Calon Nasabah / Calon Agen / Calon Agen & Nasabah dari semua member ({totalContacts}{" "}
+        total), dikelompokkan berdasarkan kategori dan terurut abjad. Halaman ini hanya untuk melihat —
+        pengelolaan (tambah/ubah) data dilakukan oleh masing-masing member lewat halaman "Database Calon
+        Prospek" mereka sendiri.
       </p>
 
       <input
@@ -59,43 +84,47 @@ export default function AdminDatabaseProspekPage() {
         className="w-full sm:w-96 rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none mb-8"
       />
 
-      {categoryOptions.map((cat) => (
-        <div key={cat} className="mb-8">
-          <h2 className="font-display text-lg text-ink mb-3">
-            {cat} ({(grouped[cat] || []).length})
-          </h2>
-          {(grouped[cat] || []).length === 0 ? (
-            <div className="bg-card border border-dashed border-ink/20 rounded-lg px-5 py-6 text-center text-sm text-ink/50">
-              Belum ada data untuk kategori ini.
-            </div>
-          ) : (
-            <div className="overflow-x-auto bg-card border border-ink/10 rounded-lg shadow-stamp">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left border-b border-ink/10 text-ink/50 text-xs uppercase tracking-wide select-none">
-                    <th className="px-4 py-3">Nama</th>
-                    <th className="px-4 py-3">Profesi</th>
-                    <th className="px-4 py-3">Member</th>
-                    <th className="px-4 py-3">Tanggal Tercatat</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(grouped[cat] || []).map((c) => (
-                    <tr key={c.id} className="border-b border-ink/5 last:border-0">
-                      <td className="px-4 py-3 font-semibold text-charcoal">{c.name}</td>
-                      <td className="px-4 py-3 text-charcoal/70">{c.profession || "—"}</td>
-                      <td className="px-4 py-3 text-ink/60 text-xs">{memberName(c.memberId)}</td>
-                      <td className="px-4 py-3 font-mono text-xs text-ink/45 whitespace-nowrap">
-                        {(c.createdAt || "").slice(0, 10)}
-                      </td>
+      {syncing && contacts.length === 0 ? (
+        <p className="text-sm text-ink/50">Memuat data terbaru dari Google Sheets…</p>
+      ) : (
+        categoryOptions.map((cat) => (
+          <div key={cat} className="mb-8">
+            <h2 className="font-display text-lg text-ink mb-3">
+              {cat} ({(grouped[cat] || []).length})
+            </h2>
+            {(grouped[cat] || []).length === 0 ? (
+              <div className="bg-card border border-dashed border-ink/20 rounded-lg px-5 py-6 text-center text-sm text-ink/50">
+                Belum ada data untuk kategori ini.
+              </div>
+            ) : (
+              <div className="overflow-x-auto bg-card border border-ink/10 rounded-lg shadow-stamp">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left border-b border-ink/10 text-ink/50 text-xs uppercase tracking-wide select-none">
+                      <th className="px-4 py-3">Nama</th>
+                      <th className="px-4 py-3">Profesi</th>
+                      <th className="px-4 py-3">Member</th>
+                      <th className="px-4 py-3">Tanggal Tercatat</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      ))}
+                  </thead>
+                  <tbody>
+                    {(grouped[cat] || []).map((c) => (
+                      <tr key={c.id} className="border-b border-ink/5 last:border-0">
+                        <td className="px-4 py-3 font-semibold text-charcoal">{c.name}</td>
+                        <td className="px-4 py-3 text-charcoal/70">{c.profession || "—"}</td>
+                        <td className="px-4 py-3 text-ink/60 text-xs">{memberName(c.memberId)}</td>
+                        <td className="px-4 py-3 font-mono text-xs text-ink/45 whitespace-nowrap">
+                          {(c.createdAt || "").slice(0, 10)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        ))
+      )}
     </div>
   );
 }

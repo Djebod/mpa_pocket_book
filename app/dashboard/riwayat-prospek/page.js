@@ -12,13 +12,26 @@ export default function RiwayatProspekPage() {
   const [preview, setPreview] = useState(null);
   const [search, setSearch] = useState("");
   const [selectedContactId, setSelectedContactId] = useState(null);
+  const [syncing, setSyncing] = useState(false);
 
   const categories = store.getActivityCategories();
   const isAdmin = session?.role === "admin";
 
   useEffect(() => {
     if (!session) return;
-    setActivities(isAdmin ? store.getActivities() : store.getActivitiesByMember(session.memberId));
+    async function load() {
+      if (isAdmin) {
+        // Admin melihat data dari semua member — tarik ulang langsung
+        // dari Google Sheets tiap kali halaman ini dibuka, supaya tidak
+        // ketinggalan data yang baru diinput member lain setelah sesi
+        // Admin dimulai.
+        setSyncing(true);
+        await store.syncAllFromSheets();
+        setSyncing(false);
+      }
+      setActivities(isAdmin ? store.getActivities() : store.getActivitiesByMember(session.memberId));
+    }
+    load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
@@ -75,10 +88,13 @@ export default function RiwayatProspekPage() {
           📄 Unduh PDF
         </button>
       </div>
-      <p className="text-sm text-ink/60 mb-6 no-print">
+      <p className="text-sm text-ink/60 mb-1 no-print">
         {isAdmin
           ? "Riwayat aktivitas seluruh member per calon prospek. Klik nama untuk melihat detail kunjungan."
           : "Riwayat aktivitas Anda per calon prospek. Klik nama untuk melihat detail kunjungan."}
+      </p>
+      <p className="text-xs text-ink/40 mb-6 no-print">
+        {isAdmin && syncing ? "Memuat data terbaru dari Google Sheets…" : "\u00A0"}
       </p>
 
       {!detailView && (

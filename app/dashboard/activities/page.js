@@ -29,6 +29,7 @@ export default function ActivitiesPage() {
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [savingContact, setSavingContact] = useState(false);
   const [justStamped, setJustStamped] = useState(false);
 
   const categories = store.getActivityCategories();
@@ -82,14 +83,15 @@ export default function ActivitiesPage() {
     setError("");
   }
 
-  function handleSaveNewContact() {
+  async function handleSaveNewContact() {
     setError("");
     if (!newContactName.trim() || !newContactProfession.trim() || !newContactCategory) {
       setError("Nama, Profesi, dan Kategori kontak baru wajib diisi.");
       return;
     }
+    setSavingContact(true);
     try {
-      const created = store.addContact({
+      const created = await store.addContact({
         memberId: session.memberId,
         name: newContactName.trim(),
         profession: newContactProfession.trim(),
@@ -103,6 +105,7 @@ export default function ActivitiesPage() {
     } catch (err) {
       setError(err.message || "Kontak gagal disimpan.");
     }
+    setSavingContact(false);
   }
 
   function startEdit(act) {
@@ -371,9 +374,10 @@ export default function ActivitiesPage() {
               <button
                 type="button"
                 onClick={handleSaveNewContact}
-                className="text-xs font-semibold bg-ink text-paper px-4 py-2 rounded-md hover:bg-ink-light transition-colors"
+                disabled={savingContact}
+                className="text-xs font-semibold bg-ink text-paper px-4 py-2 rounded-md hover:bg-ink-light transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Simpan Kontak
+                {savingContact ? "Menyimpan…" : "Simpan Kontak"}
               </button>
               <p className="text-xs text-ink/40 mt-2">Tanggal kontak ini tercatat otomatis: {today()}</p>
             </div>

@@ -115,7 +115,11 @@ laporan aktivitas — lengkap dengan export ke Excel.
   Calon Prospek** (lihat semua member) dan daftar semua menu Kelola
   (After Sales & Claim, Analisa Kebutuhan Asuransi, Komisi &
   Kompensasi, Member, Produk, Promo & Kontes, Recruit, Tutorial) sebagai
-  kartu yang bisa diklik.
+  kartu yang bisa diklik. **Database Calon Prospek** dan **Riwayat
+  Calon Prospek** (khusus tampilan Admin) otomatis menarik ulang data
+  langsung dari Google Sheets setiap kali halamannya dibuka — supaya
+  Admin selalu melihat data terbaru dari semua member, bukan cuma
+  cache lama dari awal sesi browsernya.
 - Menu di sidebar (member maupun Admin) pada dasarnya **terurut
   alfabetis A-Z**, dengan beberapa pengecualian posisi manual (lihat
   poin "Urutan menu" di atas).
@@ -450,13 +454,21 @@ disimpan bisa "hilang" lagi. Ada **dua penyebab berlapis**:
    pengiriman ke Sheets yang belum selesai — jadi walaupun penyebab #1
    sudah diperbaiki, kalau refresh terjadi **di tengah-tengah**
    pengiriman (bukan cuma setelahnya), datanya memang belum sempat
-   "sampai" ke Sheets sama sekali. → **Diperbaiki** khusus di **Kelola
-   Komisi & Kompensasi** dan **Kelola After Sales & Claim**: tombol
-   Simpan sekarang menunggu (`await`) sampai pengiriman ke Sheets
-   benar-benar selesai sebelum dianggap tersimpan (tombol nonaktif +
-   teks "Menyimpan…" selama proses), dan muncul peringatan browser
-   kalau Anda coba tutup/refresh halaman **persis saat** masih dalam
-   proses menyimpan.
+   "sampai" ke Sheets sama sekali. → **Diperbaiki** di: **Kelola
+   Komisi & Kompensasi**, **Kelola After Sales & Claim**, **Database
+   Calon Prospek** (member), form "Tambah Kontak Baru" di **Catat
+   Aktivitas**, dan form "Data Nasabah" di **Kalkulator Finansial** —
+   semua penyimpanan kontak/data ini sekarang menunggu (`await`) sampai
+   pengiriman ke Sheets benar-benar selesai sebelum dianggap tersimpan
+   (tombol nonaktif + teks "Menyimpan…" selama proses), dan muncul
+   peringatan browser kalau Anda coba tutup/refresh halaman **persis
+   saat** masih dalam proses menyimpan. Perbaikan khusus untuk **fungsi
+   Contacts** (`addContact`/`updateContact`/`deleteContact` di
+   `lib/store.js`) ini penting karena sebelumnya kontak yang ditambah
+   member lewat alur "cepat" (quick-add) berisiko tidak pernah benar-
+   benar sampai ke tab `Contacts` di Sheets — itulah sebabnya Admin
+   sempat tidak melihat sebagian data Nasabah di halaman **Database
+   Calon Prospek**.
 
 Halaman lain (Promo, Recruit, Analisa Kebutuhan Asuransi, dst) sudah
 ikut terlindungi dari penyebab #1, tapi belum punya perlindungan
