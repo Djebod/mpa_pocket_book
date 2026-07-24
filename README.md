@@ -8,25 +8,17 @@ laporan aktivitas — lengkap dengan export ke Excel.
 ## Fitur
 
 - **Login** email & password, password tersimpan ter-enkripsi (hashed).
-- **Dokumen (PDF/foto) yang diupload Admin bersifat lihat-saja** — semua
-  halaman yang menampilkan lampiran (Produk, Promo, Recruit, dst)
-  **tidak punya tombol download**, klik kanan dan seleksi teks pada
-  area viewer dinonaktifkan (kecuali di halaman **Kalkulator
-  Finansial**, yang tetap punya tombol "Unduh PDF" khusus untuk hasil
-  kalkulasinya sendiri). File baru yang diupload dilayani lewat proxy
-  milik aplikasi sendiri (`/api/drive-file/[fileId]`) — bukan lagi lewat
-  halaman viewer Google — supaya URL Drive asli tidak pernah terkirim
-  ke browser dan tombol "Pop-out" bawaan Google tidak muncul. Preview
-  inline tetap tampil di semua device, dan selalu ada tombol **"⤢ Buka
-  PDF Layar Penuh"** (buka di tab baru) sebagai opsi tambahan — berguna
-  di browser mobile (semua browser di iOS, termasuk Chrome, wajib pakai
-  mesin WebKit dari Apple sehingga preview PDF di dalam iframe kadang
-  tidak sempurna; membuka di tab baru memakai viewer PDF native browser
-  yang bekerja penuh). Lihat catatan penting soal batas kemampuan
-  proteksi ini di bagian bawah README.
+- **Dokumen (PDF/foto) yang diupload Admin** — semua halaman yang
+  menampilkan lampiran (Produk, Promo, Recruit, dst) punya tombol
+  **"⬇ Download"** dan **"⤢ Perbesar"** untuk PDF; klik kanan dan
+  seleksi teks pada area viewer tetap dinonaktifkan. File baru yang
+  diupload dilayani lewat proxy milik aplikasi sendiri
+  (`/api/drive-file/[fileId]`) — bukan lagi lewat halaman viewer
+  Google — supaya tombol "Pop-out" bawaan Google tidak muncul. Preview
+  inline tetap tampil di semua device.
 - **Katalog Produk** — tampilan default menampilkan **Piramida Asuransi**
   (gambar ringkasan kebutuhan nasabah); klik "Lihat Semua Produk" atau
-  isi pencarian/filter untuk menjelajah katalog. Tiap produk berisi
+  isi pencarian untuk menjelajah katalog. Tiap produk berisi
   Nama, **Kategori** (dropdown tetap, cuma "Unit Link" / "Non Unit
   Link"), **Sub Kategori** (bebas isi, ada saran ketik dari sub kategori
   yang sudah ada supaya tidak dobel), lalu field konten: **Materi
@@ -34,9 +26,9 @@ laporan aktivitas — lengkap dengan export ke Excel.
   masing upload 1 file PDF/foto), **Tabel Premi** (upload 1 file
   PDF/foto), **Resume** dan **Tabel Medical** (upload **banyak file**
   PDF/foto), **File Ketsus** (link Google Drive), dan **Video** (link
-  YouTube, otomatis disesuaikan ke format embed). Filter **Sub
-  Kategori** (filter Kategori sudah dihilangkan dari halaman katalog
-  member), pencarian, dan search di Kelola Produk tersedia.
+  YouTube, otomatis disesuaikan ke format embed). Halaman katalog
+  member cuma punya **pencarian** (filter Kategori & Sub Kategori sudah
+  dihilangkan dari sana); search juga tersedia di Kelola Produk.
 - **Rekomendasi Produk** — wizard tap-pilih untuk agen: jawab 2-4
   pertanyaan tentang kebutuhan nasabah (proteksi kesehatan, sakit
   kritis, jiwa berjangka, warisan, dana pendidikan, dana pensiun,
@@ -108,11 +100,13 @@ laporan aktivitas — lengkap dengan export ke Excel.
   cuma berisi kartu kalkulatornya).
 - **Komisi & Kompensasi** — halaman tunggal (dikelola Admin): deskripsi
   + banyak lampiran PDF/foto.
-- **Urutan menu** — "Kalkulator Aktivitas" muncul tepat di bawah
-  "Aktivitas"; "Analisa Kebutuhan Asuransi" di bawahnya; "Rekomendasi
-  Produk" muncul tepat di bawah "Kalkulator Finansial"; "Komisi &
-  Kompensasi" tepat di bawah "Rekomendasi Produk"; "After Sales & Claim"
-  tepat di atas "Tutorial Digital"; sisanya tetap terurut alfabetis A-Z.
+- **Urutan menu sidebar (member)**, dari atas ke bawah: Aktivitas →
+  Kalkulator Aktivitas → Analisa Kebutuhan Asuransi → Database Calon
+  Prospek (disembunyikan khusus untuk Admin, lihat poin di bawah) →
+  Riwayat Calon Prospek → Kalkulator Finansial → Rekomendasi Produk →
+  Produk → Komisi & Kompensasi → Promo & Kontes → Recruit → After Sales
+  & Claim → Tutorial Digital → (khusus Admin) Menu Administratif. Ini
+  urutan manual, bukan alfabetis murni.
 - **Menu Administratif** — sidebar admin diringkas jadi satu link
   ("Menu Administratif") yang membuka halaman index berisi **Database
   Calon Prospek** (lihat semua member) dan daftar semua menu Kelola
@@ -123,9 +117,6 @@ laporan aktivitas — lengkap dengan export ke Excel.
   langsung dari Google Sheets setiap kali halamannya dibuka — supaya
   Admin selalu melihat data terbaru dari semua member, bukan cuma
   cache lama dari awal sesi browsernya.
-- Menu di sidebar (member maupun Admin) pada dasarnya **terurut
-  alfabetis A-Z**, dengan beberapa pengecualian posisi manual (lihat
-  poin "Urutan menu" di atas).
 - **Database Calon Nasabah / Calon Agen**: tiap member punya database
   kontak sendiri (Nama, Nomor Telepon, Kategori — Calon Agen / Calon
   Nasabah / Calon Agen & Nasabah — tanggal tercatat otomatis). Kontak

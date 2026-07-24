@@ -6,7 +6,6 @@ import * as store from "@/lib/store";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
-  const [subCategory, setSubCategory] = useState("all");
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [browsing, setBrowsing] = useState(false);
@@ -15,21 +14,8 @@ export default function ProductsPage() {
     setProducts(store.getProducts());
   }, []);
 
-  const subCategories = useMemo(() => {
-    const seen = new Map(); // key: versi lowercase+trim, value: penulisan asli yang tampil
-    products.forEach((p) => {
-      const raw = (p.subCategory || "").trim();
-      if (!raw) return;
-      const key = raw.toLowerCase();
-      if (!seen.has(key)) seen.set(key, raw);
-    });
-    return Array.from(seen.values()).sort();
-  }, [products]);
-
   const filtered = useMemo(() => {
     return products.filter((p) => {
-      if (subCategory !== "all" && (p.subCategory || "").trim().toLowerCase() !== subCategory.trim().toLowerCase())
-        return false;
       if (search.trim()) {
         const q = search.trim().toLowerCase();
         const haystack = `${p.name} ${p.category} ${p.subCategory || ""}`.toLowerCase();
@@ -37,7 +23,7 @@ export default function ProductsPage() {
       }
       return true;
     });
-  }, [products, subCategory, search]);
+  }, [products, search]);
 
   function handleSearchSubmit(e) {
     e.preventDefault();
@@ -47,7 +33,6 @@ export default function ProductsPage() {
 
   function backToPyramid() {
     setBrowsing(false);
-    setSubCategory("all");
     setSearch("");
     setSearchInput("");
   }
@@ -76,26 +61,6 @@ export default function ProductsPage() {
             Cari
           </button>
         </form>
-
-        <div>
-          <label className="block text-xs font-semibold text-ink/60 mb-1.5">Sub Kategori</label>
-          <select
-            value={subCategory}
-            onChange={(e) => {
-              setSubCategory(e.target.value);
-              setBrowsing(true);
-            }}
-            disabled={subCategories.length === 0}
-            className="w-full sm:w-64 rounded-md border border-ink/20 bg-paper px-3 py-2 text-sm focus:border-brass focus:outline-none disabled:opacity-50"
-          >
-            <option value="all">Semua Sub Kategori</option>
-            {subCategories.map((sc) => (
-              <option key={sc} value={sc}>
-                {sc}
-              </option>
-            ))}
-          </select>
-        </div>
 
         {!browsing ? (
           <button
