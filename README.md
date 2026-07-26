@@ -105,8 +105,14 @@ laporan aktivitas — lengkap dengan export ke Excel.
   Prospek (disembunyikan khusus untuk Admin, lihat poin di bawah) →
   Riwayat Calon Prospek → Kalkulator Finansial → Rekomendasi Produk →
   Produk → Komisi & Kompensasi → Promo & Kontes → Recruit → After Sales
-  & Claim → Tutorial Digital → (khusus Admin) Menu Administratif. Ini
+  & Claim → Tutorial Digital → (khusus Admin) Menu Administratif →
+  **Kelola Profil** (paling bawah, untuk member maupun Admin). Ini
   urutan manual, bukan alfabetis murni.
+- **Kelola Profil** — halaman untuk semua akun (member maupun Admin)
+  melihat info akun sendiri (Nama, Email, No. Telepon, Peran) dan
+  **mengganti password sendiri** — wajib masukkan password lama yang
+  benar dulu, password baru minimal 6 karakter + konfirmasi. Untuk
+  ubah Nama/Email/No. Telepon, tetap lewat Admin (Kelola Member).
 - **Menu Administratif** — sidebar admin diringkas jadi satu link
   ("Menu Administratif") yang membuka halaman index berisi **Database
   Calon Prospek** (lihat semua member) dan daftar semua menu Kelola

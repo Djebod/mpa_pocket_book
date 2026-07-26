@@ -14,6 +14,7 @@ export default function AdminMembersPage() {
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState("name");
   const [sortDir, setSortDir] = useState("asc");
@@ -78,7 +79,7 @@ export default function AdminMembersPage() {
     setError("");
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     if (!form.name.trim() || !form.email.trim() || (!editingId && !form.password.trim())) {
@@ -96,13 +97,19 @@ export default function AdminMembersPage() {
     const payload = { ...form, email: form.email.trim() };
     if (!payload.password) delete payload.password; // saat edit, kosong = biarkan password lama
 
-    if (editingId) {
-      store.updateMember(editingId, payload);
-    } else {
-      store.addMember(payload);
+    setSaving(true);
+    try {
+      if (editingId) {
+        await store.updateMember(editingId, payload);
+      } else {
+        await store.addMember(payload);
+      }
+      refresh();
+      resetForm();
+    } catch (err) {
+      setError(err.message || "Gagal menyimpan.");
     }
-    refresh();
-    resetForm();
+    setSaving(false);
   }
 
   function handleEdit(member) {
@@ -118,10 +125,10 @@ export default function AdminMembersPage() {
     setError("");
   }
 
-  function handleDelete(member) {
+  async function handleDelete(member) {
     if (!store.canDeleteMember(session.email, member)) return;
     if (!confirm(`Hapus member "${member.name}"? Riwayat aktivitasnya akan tetap tersimpan.`)) return;
-    store.deleteMember(member.id, session.email);
+    await store.deleteMember(member.id, session.email);
     refresh();
     if (editingId === member.id) resetForm();
   }
@@ -221,9 +228,10 @@ export default function AdminMembersPage() {
         <div className="flex gap-3">
           <button
             type="submit"
-            className="bg-brass text-ink font-semibold text-sm px-5 py-2.5 rounded-md hover:bg-brass-light transition-colors"
+            disabled={saving}
+            className="bg-brass text-ink font-semibold text-sm px-5 py-2.5 rounded-md hover:bg-brass-light transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {editingId ? "Simpan Perubahan" : "Tambah Member"}
+            {saving ? "Menyimpan…" : editingId ? "Simpan Perubahan" : "Tambah Member"}
           </button>
           {editingId && (
             <button

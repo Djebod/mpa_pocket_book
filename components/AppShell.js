@@ -24,6 +24,8 @@ const MEMBER_TABS = [
 
 const ADMIN_TABS = [{ href: "/dashboard/admin", label: "Menu Administratif" }];
 
+const PROFILE_TAB = { href: "/dashboard/profile", label: "Kelola Profil" };
+
 export default function AppShell({ children }) {
   const { session, logout } = useAuth();
   const pathname = usePathname();
@@ -36,6 +38,7 @@ export default function AppShell({ children }) {
   const tabs = [
     MONITORING_TAB,
     ...(isAdmin ? [...memberTabsForAdmin, ...ADMIN_TABS] : MEMBER_TABS),
+    PROFILE_TAB,
   ];
 
   function handleLogout() {
