@@ -14,6 +14,7 @@ export default function DatabaseProspekPage() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [saving, setSaving] = useState(false);
+  const [syncing, setSyncing] = useState(true);
 
   const categoryOptions = store.getContactCategories();
 
@@ -22,7 +23,25 @@ export default function DatabaseProspekPage() {
     setContacts(store.getContactsByMember(session.memberId));
   }
 
-  useEffect(refresh, [session]);
+  useEffect(() => {
+    if (!session) return;
+    let cancelled = false;
+    (async () => {
+      // Tarik ulang langsung dari Google Sheets tiap kali halaman ini
+      // dibuka — supaya data yang baru saja ditambahkan (dari device
+      // lain, atau baru saja tersimpan sesaat sebelum browser ditutup)
+      // selalu ikut muncul, bukan cuma mengandalkan sinkronisasi awal
+      // sesi yang mungkin sudah agak lama.
+      setSyncing(true);
+      await store.syncAllFromSheets();
+      if (cancelled) return;
+      setContacts(store.getContactsByMember(session.memberId));
+      setSyncing(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [session]);
 
   useEffect(() => {
     function handleBeforeUnload(e) {
@@ -99,9 +118,12 @@ export default function DatabaseProspekPage() {
   return (
     <div>
       <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-1">Database Calon Prospek</h1>
-      <p className="text-sm text-ink/60 mb-8">
+      <p className="text-sm text-ink/60 mb-1">
         Kelola database Calon Nasabah / Calon Agen / Calon Agen & Nasabah milik Anda sendiri — data ini yang
         muncul saat memilih nama di halaman Catat Aktivitas.
+      </p>
+      <p className="text-xs text-ink/40 mb-8">
+        {syncing ? "Memuat data terbaru dari Google Sheets…" : "\u00A0"}
       </p>
 
       <form

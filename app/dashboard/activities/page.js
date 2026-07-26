@@ -42,7 +42,23 @@ export default function ActivitiesPage() {
     setContacts(store.getContactsByMember(session.memberId));
   }
 
-  useEffect(refresh, [session]);
+  useEffect(() => {
+    if (!session) return;
+    let cancelled = false;
+    (async () => {
+      // Tarik ulang langsung dari Google Sheets saat halaman ini pertama
+      // dibuka — supaya database kontak yang baru ditambahkan (dari
+      // sesi/device lain, atau baru saja tersimpan sesaat sebelum
+      // browser sebelumnya ditutup) selalu ikut muncul di dropdown Nama.
+      await store.syncAllFromSheets();
+      if (cancelled) return;
+      refresh();
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session]);
 
   const activeCategory = jalur ? categories.find((c) => c.key === jalur) : null;
   const activeTypeConfig = activeCategory && typeKey ? store.getActivityTypeConfig(jalur, typeKey) : null;

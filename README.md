@@ -40,9 +40,13 @@ laporan aktivitas — lengkap dengan export ke Excel.
   **Kategori Promo** (radio button "Agen"/"Nasabah") + banyak lampiran
   PDF/foto per promo. Member bisa filter Semua/Agen/Nasabah.
 - **After Sales & Claim** — daftar data (dikelola Admin): tiap entri
-  wajib pilih **Kategori** (radio button "After Sales" / "Claim") +
-  banyak lampiran PDF/foto. Tampilan member terpisah jadi 2 tab sesuai
-  kategori.
+  wajib pilih **Kategori** (radio button "After Sales" / "Claim"), lalu
+  tambahkan file lewat skema **Nama File + Upload File** (bisa lebih
+  dari satu file per entri, tiap file punya nama bebas yang ditentukan
+  Admin sendiri — bukan otomatis dari nama file mentah hasil upload).
+  Tampilan member terpisah jadi 2 tab sesuai kategori. Ada pencarian
+  (berdasarkan Nama File) di halaman **Kelola After Sales & Claim**
+  (Admin) maupun halaman **After Sales & Claim** (member).
 - **Tutorial Digital** — daftar tutorial (dikelola Admin): judul + link
   Google Drive, klik untuk membuka. Ada pencarian + urut A-Z.
 - **Recruit** — halaman tunggal (dikelola Admin): panduan proses recruit
@@ -124,10 +128,16 @@ laporan aktivitas — lengkap dengan export ke Excel.
   Admin selalu melihat data terbaru dari semua member, bukan cuma
   cache lama dari awal sesi browsernya.
 - **Database Calon Nasabah / Calon Agen**: tiap member punya database
-  kontak sendiri (Nama, Nomor Telepon, Kategori — Calon Agen / Calon
+  kontak sendiri (Nama, **Profesi**, Kategori — Calon Agen / Calon
   Nasabah / Calon Agen & Nasabah — tanggal tercatat otomatis). Kontak
   ditambahkan langsung dari form Catat Aktivitas (opsi "➕ Tambah Kontak
-  Baru").
+  Baru"), dari halaman **Database Calon Prospek**, atau dari **Data
+  Nasabah** di Kalkulator Finansial. Ketiga halaman ini (plus Database
+  Calon Prospek) otomatis **tarik ulang data terbaru dari Google
+  Sheets setiap kali dibuka** — supaya kontak yang baru ditambahkan
+  (dari sesi/device lain, atau baru tersimpan sesaat sebelum browser
+  ditutup) selalu ikut muncul, bukan cuma mengandalkan sinkronisasi
+  satu kali di awal sesi.
 - **Aktivitas Member (sistem poin, alur terpadu)**: form Catat Aktivitas
   sekarang satu alur — pilih **Jalur Penjualan** atau **Jalur
   Rekrutmen** dulu, baru form menyesuaikan:
@@ -140,10 +150,11 @@ laporan aktivitas — lengkap dengan export ke Excel.
     / Calon Agen & Nasabah) → Type Activity: Fact Finding, Presentation,
     atau Recruit (10 poin, field catatan berubah jadi **"Level Agen
     yang Direkrut"**, foto wajib berlabel **"Bukti Transfer AAJI"**).
-  - Nomor Telepon otomatis terisi begitu nama dipilih. **Tanggal
+  - **Profesi** otomatis terisi begitu nama dipilih. **Tanggal
     terkunci ke hari ini** (tidak bisa back-date). Field **"Hasil
     Pertemuan"** (atau label khusus di atas) **wajib diisi**, foto
-    bukti **selalu wajib** di semua jenis aktivitas.
+    bukti **selalu wajib** di semua jenis aktivitas — bisa **ambil foto
+    baru dari kamera atau pilih dari galeri** (tidak dipaksa kamera).
   - Poin baru terhitung sebagai **Valid Point** setelah Admin menekan
     tombol **"Valid"** — sebelum itu poin tampil sebagai **Unconfirmed
     Point**. Kedua angka ini tampil di sisi member (Ringkasan &

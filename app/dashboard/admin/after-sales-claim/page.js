@@ -2,18 +2,21 @@
 
 import { useEffect, useMemo, useState } from "react";
 import * as store from "@/lib/store";
-import MultiFileInput from "@/components/MultiFileInput";
+import NamedFileListInput from "@/components/NamedFileListInput";
 
 const CATEGORY_OPTIONS = ["After Sales", "Claim"];
 
-const emptyForm = { category: "", files: [] };
+const emptyForm = { category: "" };
+const emptyFileItems = [];
 
 export default function AdminAfterSalesClaimPage() {
   const [list, setList] = useState([]);
   const [form, setForm] = useState(emptyForm);
+  const [fileItems, setFileItems] = useState(emptyFileItems);
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [search, setSearch] = useState("");
 
   function refresh() {
     setList(store.getAfterSalesClaimList());
@@ -38,6 +41,7 @@ export default function AdminAfterSalesClaimPage() {
 
   function resetForm() {
     setForm(emptyForm);
+    setFileItems(emptyFileItems);
     setEditingId(null);
     setError("");
   }
@@ -49,12 +53,17 @@ export default function AdminAfterSalesClaimPage() {
       setError("Kategori wajib dipilih (After Sales atau Claim).");
       return;
     }
+    const files = fileItems
+      .filter((row) => row.file)
+      .map((row) => ({ ...row.file, name: row.namaFile.trim() || row.file.name }));
+
     setSaving(true);
     try {
+      const payload = { category: form.category, files };
       if (editingId) {
-        await store.updateAfterSalesClaimEntry(editingId, form);
+        await store.updateAfterSalesClaimEntry(editingId, payload);
       } else {
-        await store.addAfterSalesClaimEntry(form);
+        await store.addAfterSalesClaimEntry(payload);
       }
       refresh();
       resetForm();
@@ -65,9 +74,13 @@ export default function AdminAfterSalesClaimPage() {
   }
 
   function handleEdit(entry) {
-    setForm({ category: entry.category || "", files: entry.files || [] });
+    setForm({ category: entry.category || "" });
+    setFileItems((entry.files || []).map((f) => ({ namaFile: f.name || "", file: f })));
     setEditingId(entry.id);
     setError("");
+    setTimeout(() => {
+      document.getElementById("asc-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
   }
 
   async function handleDelete(id) {
@@ -80,26 +93,35 @@ export default function AdminAfterSalesClaimPage() {
   }
 
   const grouped = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const filtered = q
+      ? list.filter((entry) => (entry.files || []).some((f) => (f.name || "").toLowerCase().includes(q)))
+      : list;
+
     const map = { "After Sales": [], Claim: [] };
-    list.forEach((entry) => {
+    filtered.forEach((entry) => {
       if (map[entry.category]) map[entry.category].push(entry);
       else (map[entry.category] = map[entry.category] || []).push(entry);
     });
     return map;
-  }, [list]);
+  }, [list, search]);
 
   return (
     <div>
       <h1 className="font-display italic text-2xl sm:text-3xl text-ink mb-1">Kelola After Sales & Claim</h1>
       <p className="text-sm text-ink/60 mb-8">
-        Pilih kategori (After Sales atau Claim) lalu lampirkan file (PDF/foto) — bisa lebih dari satu. Tampilan
-        member akan otomatis terpisah berdasarkan kategori ini.
+        Pilih kategori (After Sales atau Claim), lalu tambahkan file — tiap file punya Nama File sendiri (bebas
+        Anda tentukan) beserta upload-nya. Tampilan member akan otomatis terpisah berdasarkan kategori ini.
       </p>
 
-      <form onSubmit={handleSubmit} className="bg-card border border-ink/10 rounded-lg shadow-stamp px-4 sm:px-6 py-5 sm:py-6 mb-10 perforated">
+      <form
+        id="asc-form"
+        onSubmit={handleSubmit}
+        className="bg-card border border-ink/10 rounded-lg shadow-stamp px-4 sm:px-6 py-5 sm:py-6 mb-10 perforated"
+      >
         <h2 className="font-display text-lg text-ink mb-4">{editingId ? "Ubah Data" : "Tambah Data Baru"}</h2>
 
-        <div className="mb-5">
+        <div className="mb-6">
           <label className="block text-sm font-semibold text-ink mb-1.5">
             Kategori <span className="text-rust">*</span>
           </label>
@@ -121,11 +143,7 @@ export default function AdminAfterSalesClaimPage() {
         </div>
 
         <div className="mb-6">
-          <MultiFileInput
-            value={form.files}
-            onChange={(files) => setForm({ ...form, files })}
-            label="Lampiran (PDF / Foto) — Attach File 1, 2, dst"
-          />
+          <NamedFileListInput value={fileItems} onChange={setFileItems} label="Lampiran" />
         </div>
 
         {error && <p className="text-sm text-rust mb-4">{error}</p>}
@@ -151,6 +169,13 @@ export default function AdminAfterSalesClaimPage() {
         )}
       </form>
 
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Cari nama file lampiran..."
+        className="w-full sm:w-96 rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none mb-8"
+      />
+
       {CATEGORY_OPTIONS.map((cat) => (
         <div key={cat} className="mb-8">
           <h2 className="font-display text-lg text-ink mb-3">
@@ -163,7 +188,9 @@ export default function AdminAfterSalesClaimPage() {
                   <span className="font-mono text-[10px] uppercase tracking-wide text-brass bg-brass/10 px-2 py-0.5 rounded-full">
                     {entry.category}
                   </span>
-                  <p className="text-xs text-ink/50 mt-1.5">{(entry.files || []).length} file terlampir</p>
+                  <p className="text-xs text-ink/50 mt-1.5">
+                    {(entry.files || []).map((f) => f.name).join(", ") || "Belum ada file"}
+                  </p>
                 </div>
                 <div className="flex gap-3 shrink-0 pt-1">
                   <button onClick={() => handleEdit(entry)} className="text-xs font-semibold text-ink/60 hover:text-brass">
@@ -177,7 +204,7 @@ export default function AdminAfterSalesClaimPage() {
             ))}
             {(grouped[cat] || []).length === 0 && (
               <div className="bg-card border border-dashed border-ink/20 rounded-lg px-5 py-6 text-center text-sm text-ink/50">
-                Belum ada data untuk kategori {cat}.
+                {search.trim() ? "Tidak ada file yang cocok." : `Belum ada data untuk kategori ${cat}.`}
               </div>
             )}
           </div>

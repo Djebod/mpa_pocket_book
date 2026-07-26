@@ -175,7 +175,18 @@ export default function KalkulatorFinansialPage() {
 
   useEffect(() => {
     if (!session) return;
-    setContacts(store.getContactsByMember(session.memberId));
+    let cancelled = false;
+    (async () => {
+      // Sama seperti halaman Aktivitas & Database Calon Prospek: tarik
+      // ulang dari Sheets dulu supaya dropdown Data Nasabah selalu
+      // menampilkan data terbaru.
+      await store.syncAllFromSheets();
+      if (cancelled) return;
+      setContacts(store.getContactsByMember(session.memberId));
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [session]);
 
   // Nasabah relevan: kategori Calon Nasabah atau Calon Agen & Nasabah —

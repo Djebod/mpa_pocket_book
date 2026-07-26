@@ -106,7 +106,6 @@ export default function PhotoInput({ value, onChange, required = true, label = "
         ref={inputRef}
         type="file"
         accept="image/*"
-        capture="environment"
         className="hidden"
         onChange={handleFile}
       />
