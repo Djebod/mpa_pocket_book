@@ -29,7 +29,9 @@ export default function AfterSalesClaimPage() {
     if (q) {
       result = result.filter((entry) => (entry.files || []).some((f) => (f.name || "").toLowerCase().includes(q)));
     }
-    return result;
+    return [...result].sort((a, b) =>
+      entryLabel(a, 0).localeCompare(entryLabel(b, 0), "id", { sensitivity: "base" })
+    );
   }, [list, activeCategory, search]);
 
   return (
