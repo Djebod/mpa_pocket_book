@@ -6,6 +6,13 @@ import { FileListDisplay } from "@/components/FileDisplay";
 
 const CATEGORY_OPTIONS = ["After Sales", "Claim"];
 
+/** Label accordion: pakai nama file asli (bisa lebih dari satu, digabung koma), fallback ke "Data N" kalau belum ada nama sama sekali. */
+function entryLabel(entry, index) {
+  const names = (entry.files || []).map((f) => f.name).filter(Boolean);
+  if (names.length === 0) return `${entry.category} — Data ${index + 1}`;
+  return names.join(", ");
+}
+
 export default function AfterSalesClaimPage() {
   const [list, setList] = useState([]);
   const [activeCategory, setActiveCategory] = useState(CATEGORY_OPTIONS[0]);
@@ -73,7 +80,7 @@ export default function AfterSalesClaimPage() {
                   className="w-full flex items-center justify-between px-5 py-4 text-left"
                 >
                   <span className="font-display text-lg text-ink">
-                    {activeCategory} — Data {i + 1}
+                    {entryLabel(entry, i)}
                   </span>
                   <span className="text-xs text-ink/50">{open ? "Tutup ▲" : "Lihat ▼"}</span>
                 </button>
