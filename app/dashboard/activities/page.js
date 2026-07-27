@@ -441,17 +441,27 @@ export default function ActivitiesPage() {
                 </div>
               )}
 
-              {/* Catatan / Hasil Pertemuan (atau Level Agen untuk Recruit) */}
+              {/* Catatan / Hasil Pertemuan / Nomor Polis / Level Agen (tergantung jenis aktivitas) */}
               <div className="mb-5">
                 <label className="block text-sm font-semibold text-ink mb-1.5">
                   {activeTypeConfig.noteLabel} <span className="text-rust">*</span>
                 </label>
-                <textarea
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  rows={3}
-                  className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
-                />
+                {activeTypeConfig.noteInputType === "text" ? (
+                  <input
+                    type="text"
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    placeholder="Contoh: 0123456789"
+                    className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
+                  />
+                ) : (
+                  <textarea
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    rows={3}
+                    className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
+                  />
+                )}
               </div>
 
               {/* Foto bukti — selalu wajib */}
