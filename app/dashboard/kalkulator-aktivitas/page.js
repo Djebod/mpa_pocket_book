@@ -120,10 +120,32 @@ export default function KalkulatorAktivitasPage() {
     window.print();
   }
 
+  // Sisa waktu dari Tanggal Mulai sampai akhir tahun (endDate) — dipakai
+  // untuk menyesuaikan target /bulan, /minggu, /hari supaya realistis
+  // kalau perhitungan dimulai di tengah tahun (bukan dari 1 Januari).
+  const remainingYear = useMemo(() => {
+    const msPerDay = 24 * 60 * 60 * 1000;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const totalDaysRemaining = Math.max(1, Math.round((end - start) / msPerDay) + 1);
+    const startYear = start.getFullYear();
+    const isLeap = (startYear % 4 === 0 && startYear % 100 !== 0) || startYear % 400 === 0;
+    const daysInYear = isLeap ? 366 : 365;
+    const fractionRemaining = Math.min(1, totalDaysRemaining / daysInYear);
+
+    return {
+      totalDaysRemaining,
+      fractionRemaining,
+      monthsRemaining: Math.max(0.1, 12 * fractionRemaining),
+      weeksRemaining: Math.max(0.1, 48 * fractionRemaining),
+      workingDaysRemaining: Math.max(1, 240 * fractionRemaining),
+    };
+  }, [startDate, endDate]);
+
   const perWaktu = (n) => ({
-    bulan: n / 12,
-    minggu: n / 48, // 48 minggu kerja per tahun
-    hari: n / 240, // 240 hari kerja per tahun
+    bulan: n / remainingYear.monthsRemaining,
+    minggu: n / remainingYear.weeksRemaining,
+    hari: n / remainingYear.workingDaysRemaining,
   });
 
   const tampil = (x) => {
@@ -388,6 +410,21 @@ export default function KalkulatorAktivitasPage() {
         <h2 style={{ fontSize: 18, fontWeight: 800, margin: "28px 4px 12px" }}>
           Target Aktivitas Agen
         </h2>
+
+        <div className="no-print" style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", margin: "0 4px 14px" }}>
+          <label style={{ ...labelStyle, marginBottom: 0 }}>Mulai Menghitung Dari</label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            style={{ ...inputStyle, fontSize: 15, padding: "8px 10px", width: "auto" }}
+          />
+          <span style={{ fontSize: 12, color: "#5B7268" }}>
+            sampai akhir tahun ({endDate}) — {Math.round(remainingYear.fractionRemaining * 100)}% dari satu
+            tahun penuh tersisa
+          </span>
+        </div>
+
         <div
           style={{
             background: "#fff",
@@ -468,7 +505,8 @@ export default function KalkulatorAktivitasPage() {
           <strong>Kesimpulan:</strong> untuk mencapai target premi{" "}
           <strong>{fmtRp(hasil.targetTahunan)}</strong> setahun dengan rata-rata polis{" "}
           <strong>{fmtRp(avgPremi)}</strong>, Anda butuh{" "}
-          <strong>{fmt.format(hasil.closing)} closing</strong> — artinya cukup konsisten menemui{" "}
+          <strong>{fmt.format(hasil.closing)} closing</strong> — dihitung dari{" "}
+          <strong>{startDate}</strong> sampai akhir tahun, artinya cukup konsisten menemui{" "}
           <strong>{tampil(perWaktu(hasil.prospek).hari)} prospek baru per hari kerja</strong>.
         </div>
 
@@ -685,8 +723,9 @@ export default function KalkulatorAktivitasPage() {
         </div>
 
         <p style={{ fontSize: 12, color: "#5B7268", marginTop: 16, textAlign: "center" }}>
-          Asumsi: 48 minggu kerja & 240 hari kerja per tahun · Rasio dapat disesuaikan dengan
-          pengalaman masing-masing agen.
+          Asumsi: 48 minggu kerja & 240 hari kerja per tahun penuh, otomatis diskalakan sesuai
+          sisa waktu dari Tanggal Mulai yang dipilih · Rasio dapat disesuaikan dengan pengalaman
+          masing-masing agen.
         </p>
       </div>
     </div>

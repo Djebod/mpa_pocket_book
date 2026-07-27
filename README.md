@@ -85,14 +85,22 @@ laporan aktivitas — lengkap dengan export ke Excel.
   tahunan/bulanan ke jumlah aktivitas harian (Prospek → Janji Temu →
   Presentasi → Closing) berbasis rasio sales cycle LIMRA (bisa
   disesuaikan). Menampilkan funnel visual + tabel target aktivitas per
-  bulan/minggu/hari. Di bagian bawah ada **Perbandingan Target vs
-  Aktivitas Valid**: pilih **Tanggal Mulai** (Tanggal Akhir otomatis
-  akhir tahun dari tahun itu), sistem membandingkan target yang
-  diprorata sampai hari ini dengan data aktual (Prospek = jumlah
-  database Calon Nasabah/Agen yang diinput pada rentang itu; Janji
-  Temu/Presentasi/Closing = jumlah aktivitas **valid** Jalur Penjualan
-  sesuai jenisnya), lengkap dengan grafik milestone dan kesimpulan
-  otomatis. Ada tombol **"Unduh PDF"**.
+  bulan/minggu/hari — ada kontrol **"Mulai Menghitung Dari"** (tanggal)
+  di atas tabel ini: target /bulan, /minggu, /hari otomatis diskalakan
+  ke **sisa waktu** dari tanggal itu sampai akhir tahun (bukan lagi
+  selalu dibagi rata ke satu tahun penuh) — jadi kalau perhitungan baru
+  dimulai di tengah tahun (mis. Juli), target hariannya otomatis lebih
+  tinggi untuk mengejar sisa waktu yang lebih sedikit. Kesimpulan di
+  bawah tabel ikut menyebutkan tanggal mulai yang dipakai. Field
+  tanggal ini sama dengan **Tanggal Mulai** di section **Perbandingan
+  Target vs Aktivitas Valid** (bagian bawah halaman) — ubah di satu
+  tempat, otomatis ikut berubah di keduanya. Section perbandingan itu
+  sendiri: sistem membandingkan target yang diprorata sampai hari ini
+  dengan data aktual (Prospek = jumlah database Calon Nasabah/Agen
+  yang diinput pada rentang itu; Janji Temu/Presentasi/Closing =
+  jumlah aktivitas **valid** Jalur Penjualan sesuai jenisnya), lengkap
+  dengan grafik milestone dan kesimpulan otomatis. Ada tombol **"Unduh
+  PDF"**.
 - **Kalkulator Finansial** — halaman React native (bukan iframe) dengan
   4 modul (Asuransi Jiwa, Sakit Kritis, Dana Pensiun, Dana Pendidikan),
   hitung otomatis real-time saat mengetik, dengan **Data Nasabah**
