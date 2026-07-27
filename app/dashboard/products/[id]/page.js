@@ -99,6 +99,15 @@ export default function ProductDetailPage() {
           <>
             {product[activeTab.key] ? (
               <FileDisplay file={product[activeTab.key]} />
+            ) : product[`${activeTab.key}LinkUrl`] ? (
+              <a
+                href={product[`${activeTab.key}LinkUrl`]}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-ink text-paper text-sm font-semibold px-4 py-2.5 rounded-md hover:bg-ink-light transition-colors"
+              >
+                🔗 Buka {activeTab.label} di Google Drive
+              </a>
             ) : (
               <p className="text-sm text-ink/50">Belum ada {activeTab.label.toLowerCase()} untuk produk ini.</p>
             )}

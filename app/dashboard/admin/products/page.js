@@ -16,6 +16,7 @@ const emptyForm = {
   materiTrainingManulife: null,
   materiTrainingMPA: null,
   tabelPremi: null,
+  tabelPremiLinkUrl: "",
   resume: [],
   tabelMedical: [],
   fileKetsusUrl: "",
@@ -102,6 +103,7 @@ export default function AdminProductsPage() {
       materiTrainingManulife: product.materiTrainingManulife || null,
       materiTrainingMPA: product.materiTrainingMPA || null,
       tabelPremi: product.tabelPremi || null,
+      tabelPremiLinkUrl: product.tabelPremiLinkUrl || "",
       resume: product.resume || [],
       tabelMedical: product.tabelMedical || [],
       fileKetsusUrl: product.fileKetsusUrl || "",
@@ -129,6 +131,7 @@ export default function AdminProductsPage() {
       p.materiTrainingManulife,
       p.materiTrainingMPA,
       p.tabelPremi,
+      p.tabelPremiLinkUrl,
       ...(p.resume || []),
       ...(p.tabelMedical || []),
     ].filter(Boolean).length;
@@ -222,6 +225,22 @@ export default function AdminProductsPage() {
             value={form.tabelPremi}
             onChange={(v) => setForm({ ...form, tabelPremi: v })}
           />
+          <div className="mt-3">
+            <label className="block text-xs font-semibold text-ink/60 mb-1.5">
+              Atau Link Google Drive <span className="font-normal text-ink/45">(opsional, untuk file berukuran besar)</span>
+            </label>
+            <input
+              value={form.tabelPremiLinkUrl}
+              onChange={(e) => setForm({ ...form, tabelPremiLinkUrl: e.target.value })}
+              placeholder="https://drive.google.com/..."
+              className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
+            />
+            <p className="text-xs text-ink/45 mt-1">
+              Untuk file yang terlalu besar diunggah lewat tombol di atas — upload manual ke Google Drive Anda,
+              atur akses "Siapa saja yang punya link" jadi bisa melihat, lalu tempel link-nya di sini. Kalau
+              diisi, member akan diarahkan ke link ini alih-alih file yang diunggah lewat tombol di atas.
+            </p>
+          </div>
         </div>
 
         <div className="mb-6">
@@ -308,6 +327,7 @@ export default function AdminProductsPage() {
               <p className="font-display text-lg text-ink mb-1">{p.name}</p>
               <p className="text-xs text-ink/45">
                 {countAttachments(p)} dokumen terlampir
+                {p.tabelPremiLinkUrl ? " · Tabel Premi (Link) ✓" : ""}
                 {p.fileKetsusUrl ? " · File Ketsus ✓" : ""}
                 {p.videoUrl ? " · Video ✓" : ""}
               </p>

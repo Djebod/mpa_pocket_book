@@ -24,7 +24,10 @@ laporan aktivitas — lengkap dengan export ke Excel.
   yang sudah ada supaya tidak dobel), lalu field konten: **Materi
   Training** (2 versi terpisah — **MPA** dan **Manulife Pusat**, masing-
   masing upload 1 file PDF/foto), **Tabel Premi** (upload 1 file
-  PDF/foto), **Resume** dan **Tabel Medical** (upload **banyak file**
+  PDF/foto — **atau** isi **Link Google Drive** sebagai alternatif untuk
+  file berukuran besar yang gagal/lambat kalau diunggah langsung; kalau
+  link-nya diisi, member diarahkan ke link itu, bukan file yang
+  diunggah), **Resume** dan **Tabel Medical** (upload **banyak file**
   PDF/foto), **File Ketsus** (link Google Drive), dan **Video** (link
   YouTube, otomatis disesuaikan ke format embed). Halaman katalog
   member cuma punya **pencarian** (filter Kategori & Sub Kategori sudah
