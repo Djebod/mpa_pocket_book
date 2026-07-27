@@ -49,31 +49,14 @@ export default function AdminActivitiesPage() {
     refresh();
   }
 
+  function handleMarkInvalid(activity) {
+    store.markActivityInvalid(activity.id, session?.name);
+    refresh();
+  }
+
   function handleUnvalidate(activity) {
-    if (!confirm("Batalkan validasi aktivitas ini? Poinnya akan kembali jadi Unconfirmed.")) return;
+    if (!confirm("Kembalikan status aktivitas ini ke \"Menunggu Validasi\"?")) return;
     store.unvalidateActivity(activity.id);
-    refresh();
-  }
-
-  function handleDelete(activity) {
-    if (
-      !confirm(
-        `Hapus aktivitas "${activity.type}" milik ${activity.memberName} tanggal ${activity.date}? Tindakan ini tidak bisa dibatalkan.`
-      )
-    )
-      return;
-    store.deleteActivity(activity.id);
-    refresh();
-  }
-
-  function handleClearAll() {
-    const first = confirm(
-      `Hapus SEMUA data aktivitas (${activities.length} aktivitas)? Ini akan menghapus seluruhnya dari sistem dan Google Sheets, tidak bisa dibatalkan.`
-    );
-    if (!first) return;
-    const second = confirm("Konfirmasi sekali lagi — benar-benar hapus SEMUA aktivitas?");
-    if (!second) return;
-    store.clearAllActivities();
     refresh();
   }
 
@@ -82,7 +65,8 @@ export default function AdminActivitiesPage() {
       if (filterMember !== "all" && a.memberId !== filterMember) return false;
       if (filterCategory !== "all" && a.category !== filterCategory) return false;
       if (filterStatus === "valid" && !a.validated) return false;
-      if (filterStatus === "unconfirmed" && a.validated) return false;
+      if (filterStatus === "unconfirmed" && (a.validated || a.invalid)) return false;
+      if (filterStatus === "invalid" && !a.invalid) return false;
       if (from && a.date < from) return false;
       if (to && a.date > to) return false;
       return true;
@@ -127,13 +111,6 @@ export default function AdminActivitiesPage() {
             className="bg-ink text-paper text-xs font-semibold px-4 py-2.5 rounded-md hover:bg-ink-light transition-colors"
           >
             ⬇ Download Excel
-          </button>
-          <button
-            onClick={handleClearAll}
-            disabled={activities.length === 0}
-            className="bg-rust text-paper text-xs font-semibold px-4 py-2.5 rounded-md hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            Hapus Semua Aktivitas
           </button>
         </div>
       </div>
@@ -182,6 +159,7 @@ export default function AdminActivitiesPage() {
             <option value="all">Semua Status</option>
             <option value="valid">Valid</option>
             <option value="unconfirmed">Menunggu Validasi</option>
+            <option value="invalid">Tidak Valid</option>
           </select>
         </div>
         <div>
@@ -204,7 +182,7 @@ export default function AdminActivitiesPage() {
         </div>
       </div>
 
-      <div className="grid sm:grid-cols-3 gap-4 mb-8">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-ink text-paper rounded-lg px-5 py-5 shadow-stamp">
           <p className="font-mono text-3xl">{filtered.length}</p>
           <p className="text-xs text-paper/70 mt-1">Total aktivitas (sesuai filter)</p>
@@ -216,6 +194,10 @@ export default function AdminActivitiesPage() {
         <div className="bg-card border border-brass/30 rounded-lg px-5 py-5 shadow-stamp">
           <p className="font-mono text-3xl text-brass">{pointsSummary.unconfirmedPoints}</p>
           <p className="text-xs text-ink/60 mt-1">Total Unconfirmed Point</p>
+        </div>
+        <div className="bg-card border border-rust/30 rounded-lg px-5 py-5 shadow-stamp">
+          <p className="font-mono text-3xl text-rust">{pointsSummary.invalidPoints}</p>
+          <p className="text-xs text-ink/60 mt-1">Total Tidak Valid Point</p>
         </div>
       </div>
 
@@ -284,30 +266,32 @@ export default function AdminActivitiesPage() {
                   )}
                 </td>
                 <td className="px-4 py-3">
-                  <ValidationBadge validated={a.validated} small />
+                  <ValidationBadge validated={a.validated} invalid={a.invalid} small />
                 </td>
                 <td className="px-4 py-3 text-right whitespace-nowrap">
-                  {a.validated ? (
+                  {a.validated || a.invalid ? (
                     <button
                       onClick={() => handleUnvalidate(a)}
-                      className="text-xs font-semibold text-ink/50 hover:text-ink mr-3"
+                      className="text-xs font-semibold text-ink/50 hover:text-ink"
                     >
                       Batalkan
                     </button>
                   ) : (
-                    <button
-                      onClick={() => handleValidate(a)}
-                      className="text-xs font-semibold text-sage hover:text-sage/80 mr-3"
-                    >
-                      Valid
-                    </button>
+                    <>
+                      <button
+                        onClick={() => handleValidate(a)}
+                        className="text-xs font-semibold text-sage hover:text-sage/80 mr-3"
+                      >
+                        Valid
+                      </button>
+                      <button
+                        onClick={() => handleMarkInvalid(a)}
+                        className="text-xs font-semibold text-rust hover:text-rust/80"
+                      >
+                        Tidak Valid
+                      </button>
+                    </>
                   )}
-                  <button
-                    onClick={() => handleDelete(a)}
-                    className="text-xs font-semibold text-rust/70 hover:text-rust"
-                  >
-                    Hapus
-                  </button>
                 </td>
               </tr>
             ))}

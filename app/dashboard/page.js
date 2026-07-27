@@ -38,7 +38,7 @@ export default function MemberDashboardPage() {
       </div>
       <p className="text-sm text-ink/60 mb-8">Ringkasan aktivitas Anda di Mulia Putri Agency.</p>
 
-      <div className="grid grid-cols-2 gap-4 mb-10">
+      <div className="grid grid-cols-3 gap-4 mb-10">
         <div className="bg-ink text-paper rounded-lg px-5 py-5 shadow-stamp">
           <p className="font-mono text-3xl">{summary.validPoints}</p>
           <p className="text-xs text-paper/70 mt-1">Valid Point</p>
@@ -46,6 +46,10 @@ export default function MemberDashboardPage() {
         <div className="bg-card border border-brass/30 rounded-lg px-5 py-5 shadow-stamp">
           <p className="font-mono text-3xl text-brass">{summary.unconfirmedPoints}</p>
           <p className="text-xs text-ink/60 mt-1">Unconfirmed Point</p>
+        </div>
+        <div className="bg-card border border-rust/30 rounded-lg px-5 py-5 shadow-stamp">
+          <p className="font-mono text-3xl text-rust">{summary.invalidPoints}</p>
+          <p className="text-xs text-ink/60 mt-1">Tidak Valid</p>
         </div>
       </div>
 
@@ -104,7 +108,7 @@ export default function MemberDashboardPage() {
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    <ValidationBadge validated={a.validated} small />
+                    <ValidationBadge validated={a.validated} invalid={a.invalid} small />
                   </td>
                 </tr>
               ))}

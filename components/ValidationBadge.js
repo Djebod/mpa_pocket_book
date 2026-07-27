@@ -1,9 +1,16 @@
-export default function ValidationBadge({ validated, small = false }) {
+export default function ValidationBadge({ validated, invalid = false, small = false }) {
   const base = small ? "text-[10px] px-2 py-0.5" : "text-xs px-2.5 py-1";
   if (validated) {
     return (
       <span className={`${base} font-semibold uppercase rounded-full bg-sage/15 text-sage`}>
         ✓ Valid
+      </span>
+    );
+  }
+  if (invalid) {
+    return (
+      <span className={`${base} font-semibold uppercase rounded-full bg-rust/15 text-rust`}>
+        ✗ Tidak Valid
       </span>
     );
   }

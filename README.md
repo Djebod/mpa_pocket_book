@@ -168,12 +168,22 @@ laporan aktivitas — lengkap dengan export ke Excel.
     Pertemuan"** (atau label khusus di atas) **wajib diisi**, foto
     bukti **selalu wajib** di semua jenis aktivitas — bisa **ambil foto
     baru dari kamera atau pilih dari galeri** (tidak dipaksa kamera).
-  - Poin baru terhitung sebagai **Valid Point** setelah Admin menekan
-    tombol **"Valid"** — sebelum itu poin tampil sebagai **Unconfirmed
-    Point**. Kedua angka ini tampil di sisi member (Ringkasan &
+  - Status validasi ada **3**: **Menunggu Validasi** (default), **Valid**
+    (Admin menekan tombol "Valid" — poinnya terhitung sebagai **Valid
+    Point**), atau **Tidak Valid** (Admin menekan tombol "Tidak Valid" —
+    dipakai untuk aktivitas yang datanya tidak sesuai/mencurigakan;
+    poinnya **tidak** ikut terhitung ke Valid Point maupun Unconfirmed
+    Point). Admin bisa menekan **"Batalkan"** untuk mengembalikan status
+    Valid/Tidak Valid ke Menunggu Validasi lagi. Ketiga angka (Valid,
+    Unconfirmed, Tidak Valid) tampil di sisi member (Ringkasan
     Aktivitas) maupun Admin (Ringkasan Aktivitas & detail per member).
-    Aktivitas bisa **diedit di hari yang sama** (edit otomatis
-    membatalkan validasi, perlu divalidasi ulang).
+    **Tidak ada tombol Hapus** untuk aktivitas di halaman Ringkasan
+    Aktivitas Admin (sengaja dihilangkan untuk meminimalisir kesalahan
+    penghapusan data) — Admin dan member sama-sama tidak bisa menghapus
+    aktivitas lewat UI, tinggal ubah statusnya jadi Tidak Valid kalau
+    memang datanya keliru. Aktivitas bisa **diedit di hari yang sama**
+    oleh member yang bersangkutan (edit otomatis mengembalikan status
+    ke Menunggu Validasi, perlu divalidasi ulang).
 - **Direct Leader**: tiap member bisa diberi satu Direct Leader (member
   lain). Direct Leader bisa melihat riwayat aktivitas anak buahnya lewat
   halaman **Tim Saya** — member lain (bukan diri sendiri, bukan Direct

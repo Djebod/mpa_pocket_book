@@ -105,7 +105,7 @@ export default function TeamMemberDetailPage() {
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <Stamp type={config?.label || act.type} category={act.category} small />
                     <span className="font-mono text-[11px] text-brass font-semibold">{act.points} poin</span>
-                    <ValidationBadge validated={act.validated} small />
+                    <ValidationBadge validated={act.validated} invalid={act.invalid} small />
                     <span className="font-mono text-[11px] text-ink/45">{act.date}</span>
                   </div>
                   {(act.contactName || act.contactProfession) && (

@@ -162,7 +162,7 @@ export default function RiwayatProspekPage() {
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <ValidationBadge validated={a.validated} small />
+                      <ValidationBadge validated={a.validated} invalid={a.invalid} small />
                     </td>
                   </tr>
                 ))}
@@ -221,7 +221,7 @@ export default function RiwayatProspekPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <Stamp type={typeLabel(a)} category={a.category} small />
-                    <ValidationBadge validated={a.validated} small />
+                    <ValidationBadge validated={a.validated} invalid={a.invalid} small />
                     <span className="font-mono text-[11px] text-ink/45">{a.date}</span>
                   </div>
                   {a.productSold && (
