@@ -81,13 +81,24 @@ export function FileDisplay({ file }) {
   }
 
   if (isImage) {
+    const downloadSrc = file.downloadUrl || file.url;
     return (
-      <>
+      <div className="mt-4">
+        <div className="flex items-center justify-end mb-2">
+          <a
+            href={downloadSrc}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-semibold text-ink/60 hover:text-brass border border-ink/20 rounded-md px-3 py-1.5"
+          >
+            ⬇ Download
+          </a>
+        </div>
         <button
           type="button"
           onClick={() => setFullscreen(true)}
           onContextMenu={blockContextMenu}
-          className="block mt-4 w-full text-left select-none"
+          className="block w-full text-left select-none"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -112,7 +123,7 @@ export function FileDisplay({ file }) {
             />
           </div>
         )}
-      </>
+      </div>
     );
   }
 

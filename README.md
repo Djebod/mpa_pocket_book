@@ -10,7 +10,8 @@ laporan aktivitas — lengkap dengan export ke Excel.
 - **Login** email & password, password tersimpan ter-enkripsi (hashed).
 - **Dokumen (PDF/foto) yang diupload Admin** — semua halaman yang
   menampilkan lampiran (Produk, Promo, Recruit, dst) punya tombol
-  **"⬇ Download"** dan **"⤢ Perbesar"** untuk PDF; klik kanan dan
+  **"⬇ Download"** untuk PDF **maupun foto**, plus **"⤢ Perbesar"**
+  khusus PDF (foto klik-untuk-perbesar langsung); klik kanan dan
   seleksi teks pada area viewer tetap dinonaktifkan. File baru yang
   diupload dilayani lewat proxy milik aplikasi sendiri
   (`/api/drive-file/[fileId]`) — bukan lagi lewat halaman viewer
