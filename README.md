@@ -13,16 +13,19 @@ laporan aktivitas — lengkap dengan export ke Excel.
   **"⬇ Download"** untuk PDF **maupun foto**, plus untuk PDF juga ada
   **"⤴ Buka di Tab Baru"** dan **"⤢ Perbesar"** (foto klik-untuk-
   perbesar langsung); klik kanan dan seleksi teks pada area viewer
-  tetap dinonaktifkan. File baru yang diupload dilayani lewat proxy
-  milik aplikasi sendiri (`/api/drive-file/[fileId]`) — bukan lagi
-  lewat halaman viewer Google — supaya tombol "Pop-out" bawaan Google
-  tidak muncul. Preview inline tetap tampil di semua device, TAPI
-  sebagian browser Android (termasuk Chrome di Android) **tidak
-  sanggup merender PDF di dalam iframe** — bukannya menampilkan isi
-  PDF, muncul kotak generik bawaan Android (ikon PDF + nama file
-  mentah + tombol "Open") — kalau ini terjadi, tombol **"Buka di Tab
-  Baru"** adalah solusinya (PDF akan tampil penuh di tab baru, karena
-  di situ dipakai viewer PDF native browser, bukan iframe).
+  tetap dinonaktifkan. **Semua file, baru maupun lama** (dari sebelum
+  proxy `/api/drive-file/[fileId]` dibuat), sekarang otomatis
+  dialirkan lewat proxy ini — `components/FileDisplay.js` mengekstrak
+  ID file Google Drive dari URL apa pun yang tersimpan (previewUrl,
+  url, atau downloadUrl), jadi file lama yang field `previewUrl`-nya
+  kosong tidak lagi langsung memuat URL Google Drive asli di dalam
+  iframe (yang gagal dirender di banyak browser mobile, terutama
+  Android — biasanya cuma muncul kotak generik: ikon PDF + ID file
+  mentah sebagai "nama file" + tombol "Open"). Kalau di device
+  tertentu previewnya tetap tidak tampil, tombol **"Buka di Tab
+  Baru"** adalah solusi cadangannya (PDF akan tampil penuh di tab
+  baru, karena di situ dipakai viewer PDF native browser, bukan
+  iframe).
 - **Katalog Produk** — tampilan default menampilkan **Piramida Asuransi**
   (gambar ringkasan kebutuhan nasabah); klik "Lihat Semua Produk" atau
   isi pencarian untuk menjelajah katalog. Tiap produk berisi

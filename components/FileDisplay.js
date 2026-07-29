@@ -7,6 +7,31 @@ function blockContextMenu(e) {
 }
 
 /**
+ * Mengekstrak ID file Google Drive dari URL apa pun yang tersimpan di
+ * objek file (previewUrl, url, atau downloadUrl) — dipakai supaya file
+ * LAMA (diupload sebelum proxy `/api/drive-file/[fileId]` dibuat, jadi
+ * field `previewUrl`-nya kosong) tetap bisa dialirkan lewat proxy kita
+ * sendiri tanpa perlu diupload ulang. Tanpa ini, file lama akan
+ * langsung memuat URL Google Drive asli di dalam iframe — yang di
+ * banyak browser mobile (terutama Android) gagal dirender dan cuma
+ * menampilkan kotak "stub" generik (ikon PDF + ID file mentah + tombol
+ * "Open") alih-alih isi filenya.
+ */
+function extractDriveFileId(file) {
+  if (!file) return null;
+  const candidates = [file.previewUrl, file.url, file.downloadUrl].filter(Boolean);
+  for (const url of candidates) {
+    const proxyMatch = url.match(/\/api\/drive-file\/([a-zA-Z0-9_-]+)/);
+    if (proxyMatch) return proxyMatch[1];
+    const idParamMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (idParamMatch) return idParamMatch[1];
+    const pathMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (pathMatch) return pathMatch[1];
+  }
+  return null;
+}
+
+/**
  * Menampilkan satu file: gambar tampil langsung, PDF tampil lewat proxy
  * milik aplikasi sendiri (`/api/drive-file/[fileId]`, lihat
  * `lib/google/driveClient.js`) — file baru yang diupload TIDAK lagi
@@ -22,7 +47,13 @@ export function FileDisplay({ file }) {
   const isImage = file.mimeType?.startsWith("image/");
 
   if (isPdf) {
-    const rawSrc = file.previewUrl || file.url;
+    const driveFileId = extractDriveFileId(file);
+    // Kalau ID file Drive-nya ketemu (dari field mana pun), SELALU pakai
+    // proxy kita sendiri — ini yang membuat file lama (belum punya
+    // previewUrl) ikut dapat manfaat proxy tanpa perlu diupload ulang.
+    // Kalau tidak ketemu (file lokal murni / data URL base64), baru
+    // pakai previewUrl/url apa adanya.
+    const rawSrc = driveFileId ? `/api/drive-file/${driveFileId}` : file.previewUrl || file.url;
     // Untuk PDF yang dilayani langsung (proxy kita sendiri atau data URL
     // lokal — bukan halaman viewer Google), minta browser sembunyikan
     // toolbar viewer PDF bawaannya sendiri juga (didukung Chrome/Edge,
@@ -103,7 +134,8 @@ export function FileDisplay({ file }) {
   }
 
   if (isImage) {
-    const downloadSrc = file.downloadUrl || file.url;
+    const imgDriveFileId = extractDriveFileId(file);
+    const downloadSrc = file.downloadUrl || (imgDriveFileId ? `/api/drive-file/${imgDriveFileId}` : file.url);
     return (
       <div className="mt-4">
         <div className="flex items-center justify-end mb-2">
