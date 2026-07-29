@@ -43,6 +43,14 @@ export function FileDisplay({ file }) {
           >
             ⬇ Download
           </a>
+          <a
+            href={rawSrc}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-semibold text-ink/60 hover:text-brass border border-ink/20 rounded-md px-3 py-1.5"
+          >
+            ⤴ Buka di Tab Baru
+          </a>
           <button
             type="button"
             onClick={() => setFullscreen(true)}
@@ -51,6 +59,10 @@ export function FileDisplay({ file }) {
             ⤢ Perbesar
           </button>
         </div>
+        <p className="text-xs text-ink/40 mb-2">
+          Kalau preview di bawah tidak tampil (kadang terjadi di sebagian browser Android), pakai tombol
+          "Buka di Tab Baru" — filenya akan tampil penuh di tab baru.
+        </p>
         <div
           onContextMenu={blockContextMenu}
           className="w-full h-[70vh] min-h-[420px] max-h-[820px] rounded-md overflow-hidden border border-ink/10 bg-paper-dark/30 shadow-stamp select-none"
@@ -62,14 +74,24 @@ export function FileDisplay({ file }) {
           <div className="fixed inset-0 z-50 bg-ink/90 flex flex-col">
             <div className="flex items-center justify-between px-4 py-3 bg-ink text-paper shrink-0">
               <p className="text-sm font-semibold truncate pr-3">{file.name || "Lampiran PDF"}</p>
-              <button
-                type="button"
-                onClick={() => setFullscreen(false)}
-                aria-label="Tutup"
-                className="w-9 h-9 flex items-center justify-center rounded-md hover:bg-ink-light text-2xl leading-none shrink-0"
-              >
-                ×
-              </button>
+              <div className="flex items-center gap-3 shrink-0">
+                <a
+                  href={rawSrc}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-semibold text-paper/80 hover:text-paper underline underline-offset-2"
+                >
+                  ⤴ Buka di Tab Baru
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setFullscreen(false)}
+                  aria-label="Tutup"
+                  className="w-9 h-9 flex items-center justify-center rounded-md hover:bg-ink-light text-2xl leading-none"
+                >
+                  ×
+                </button>
+              </div>
             </div>
             <div className="flex-1 bg-paper-dark/30 select-none" onContextMenu={blockContextMenu}>
               <iframe src={embedSrc} title={file.name || "Lampiran PDF"} className="w-full h-full" />

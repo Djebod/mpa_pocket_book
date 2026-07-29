@@ -10,13 +10,19 @@ laporan aktivitas — lengkap dengan export ke Excel.
 - **Login** email & password, password tersimpan ter-enkripsi (hashed).
 - **Dokumen (PDF/foto) yang diupload Admin** — semua halaman yang
   menampilkan lampiran (Produk, Promo, Recruit, dst) punya tombol
-  **"⬇ Download"** untuk PDF **maupun foto**, plus **"⤢ Perbesar"**
-  khusus PDF (foto klik-untuk-perbesar langsung); klik kanan dan
-  seleksi teks pada area viewer tetap dinonaktifkan. File baru yang
-  diupload dilayani lewat proxy milik aplikasi sendiri
-  (`/api/drive-file/[fileId]`) — bukan lagi lewat halaman viewer
-  Google — supaya tombol "Pop-out" bawaan Google tidak muncul. Preview
-  inline tetap tampil di semua device.
+  **"⬇ Download"** untuk PDF **maupun foto**, plus untuk PDF juga ada
+  **"⤴ Buka di Tab Baru"** dan **"⤢ Perbesar"** (foto klik-untuk-
+  perbesar langsung); klik kanan dan seleksi teks pada area viewer
+  tetap dinonaktifkan. File baru yang diupload dilayani lewat proxy
+  milik aplikasi sendiri (`/api/drive-file/[fileId]`) — bukan lagi
+  lewat halaman viewer Google — supaya tombol "Pop-out" bawaan Google
+  tidak muncul. Preview inline tetap tampil di semua device, TAPI
+  sebagian browser Android (termasuk Chrome di Android) **tidak
+  sanggup merender PDF di dalam iframe** — bukannya menampilkan isi
+  PDF, muncul kotak generik bawaan Android (ikon PDF + nama file
+  mentah + tombol "Open") — kalau ini terjadi, tombol **"Buka di Tab
+  Baru"** adalah solusinya (PDF akan tampil penuh di tab baru, karena
+  di situ dipakai viewer PDF native browser, bukan iframe).
 - **Katalog Produk** — tampilan default menampilkan **Piramida Asuransi**
   (gambar ringkasan kebutuhan nasabah); klik "Lihat Semua Produk" atau
   isi pencarian untuk menjelajah katalog. Tiap produk berisi
