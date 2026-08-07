@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import * as store from "@/lib/store";
 import { FileListDisplay } from "@/components/FileDisplay";
 
-const CATEGORY_OPTIONS = ["After Sales", "Claim"];
+const CATEGORY_OPTIONS = ["After Sales", "Claim", "Bukti Claim"];
 
 /** Label accordion: pakai nama file asli (bisa lebih dari satu, digabung koma), fallback ke "Data N" kalau belum ada nama sama sekali. */
 function entryLabel(entry, index) {
@@ -46,7 +46,7 @@ export default function AfterSalesClaimPage() {
         className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none mb-4"
       />
 
-      <div className="flex gap-2 mb-6">
+      <div className="flex flex-wrap gap-2 mb-6">
         {CATEGORY_OPTIONS.map((cat) => (
           <button
             key={cat}

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import * as store from "@/lib/store";
 import NamedFileListInput from "@/components/NamedFileListInput";
 
-const CATEGORY_OPTIONS = ["After Sales", "Claim"];
+const CATEGORY_OPTIONS = ["After Sales", "Claim", "Bukti Claim"];
 
 const emptyForm = { category: "" };
 const emptyFileItems = [];
@@ -98,10 +98,11 @@ export default function AdminAfterSalesClaimPage() {
       ? list.filter((entry) => (entry.files || []).some((f) => (f.name || "").toLowerCase().includes(q)))
       : list;
 
-    const map = { "After Sales": [], Claim: [] };
+    const map = {};
+    CATEGORY_OPTIONS.forEach((cat) => (map[cat] = []));
     filtered.forEach((entry) => {
-      if (map[entry.category]) map[entry.category].push(entry);
-      else (map[entry.category] = map[entry.category] || []).push(entry);
+      if (!map[entry.category]) map[entry.category] = [];
+      map[entry.category].push(entry);
     });
     return map;
   }, [list, search]);
@@ -125,7 +126,7 @@ export default function AdminAfterSalesClaimPage() {
           <label className="block text-sm font-semibold text-ink mb-1.5">
             Kategori <span className="text-rust">*</span>
           </label>
-          <div className="flex gap-5">
+          <div className="flex flex-wrap gap-5">
             {CATEGORY_OPTIONS.map((opt) => (
               <label key={opt} className="flex items-center gap-2 text-sm text-charcoal cursor-pointer">
                 <input

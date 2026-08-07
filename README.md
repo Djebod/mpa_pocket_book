@@ -53,13 +53,14 @@ laporan aktivitas — lengkap dengan export ke Excel.
   **Kategori Promo** (radio button "Agen"/"Nasabah") + banyak lampiran
   PDF/foto per promo. Member bisa filter Semua/Agen/Nasabah.
 - **After Sales & Claim** — daftar data (dikelola Admin): tiap entri
-  wajib pilih **Kategori** (radio button "After Sales" / "Claim"), lalu
-  tambahkan file lewat skema **Nama File + Upload File** (bisa lebih
-  dari satu file per entri, tiap file punya nama bebas yang ditentukan
-  Admin sendiri — bukan otomatis dari nama file mentah hasil upload).
-  Tampilan member terpisah jadi 2 tab sesuai kategori. Ada pencarian
-  (berdasarkan Nama File) di halaman **Kelola After Sales & Claim**
-  (Admin) maupun halaman **After Sales & Claim** (member).
+  wajib pilih **Kategori** (radio button "After Sales" / "Claim" /
+  "Bukti Claim"), lalu tambahkan file lewat skema **Nama File + Upload
+  File** (bisa lebih dari satu file per entri, tiap file punya nama
+  bebas yang ditentukan Admin sendiri — bukan otomatis dari nama file
+  mentah hasil upload). Tampilan member terpisah jadi 3 tab sesuai
+  kategori. Ada pencarian (berdasarkan Nama File) di halaman **Kelola
+  After Sales & Claim** (Admin) maupun halaman **After Sales & Claim**
+  (member).
 - **Tutorial Digital** — daftar tutorial (dikelola Admin): judul + link
   Google Drive, klik untuk membuka. Ada pencarian + urut A-Z.
 - **Recruit** — halaman tunggal (dikelola Admin): panduan proses recruit
