@@ -16,7 +16,18 @@ export function AppProviders({ children }) {
       // ke localStorage dulu, sebelum halaman mana pun membaca data.
       await store.syncAllFromSheets();
       if (cancelled) return;
-      setSession(store.getSession());
+
+      // Setelah data Members terbaru ditarik dari Sheets, cek ulang: kalau
+      // member yang tersimpan di sesi lokal ternyata sudah dihapus Admin,
+      // paksa logout supaya dia tidak bisa terus memakai aplikasi
+      // (termasuk mencatat aktivitas) dengan sesi "basi".
+      const currentSession = store.getSession();
+      if (currentSession && !store.isMemberActive(currentSession.memberId)) {
+        store.logout();
+        setSession(null);
+      } else {
+        setSession(currentSession);
+      }
       setReady(true);
     })();
     return () => {
