@@ -532,3 +532,54 @@ git push
 ```
 
 Vercel otomatis deploy ulang setelah push ke `main`.
+
+## Laporan Analitik Pipeline & Email Harian Otomatis
+
+### Halaman "Laporan Analitik" (di aplikasi)
+
+Membaca **seluruh aktivitas dari awal sampai terakhir**, lalu
+mengelompokkannya **per calon prospek** (bukan per aktivitas) — mirip
+lembar review one-on-one:
+
+- **KPI**: jumlah nama di pipeline, closing, total premi, prospek urgent.
+- **Highlight & Saran Tindakan**: sorotan otomatis — prospek terlantar
+  >30 hari, closing yang belum dikawal, prospek mentok di Fact Finding,
+  presentasi yang belum ada keputusan, prospek yang baru sebatas
+  WhatsApp.
+- **Tabel per jalur** (Penjualan & Rekrutmen): nama & profesi, posisi
+  terakhir + jejak perjalanan (Fact Finding → Presentation → dst),
+  catatan terakhir apa adanya, dan **Next Action**.
+- Baris ditandai warna: merah = urgent (>30 hari diam), kuning = perlu
+  perhatian (>14 hari). Urutan otomatis: yang paling lama diam di atas.
+- Admin bisa memilih laporan per member atau seluruh tim; member biasa
+  hanya melihat pipeline-nya sendiri. Ada tombol **"Unduh PDF"**.
+
+### Batas Kemampuan Laporan Analitik (penting)
+
+Kolom **"Next Action"** dan **"Highlight"** dihasilkan secara
+**rule-based** — berdasarkan jenis aktivitas terakhir, berapa lama
+prospek didiamkan, dan nilai closing. Ini **bukan** hasil analisa
+bahasa alami atas isi catatan.
+
+Artinya: sistem bisa bilang *"Kebutuhan sudah digali — susun ilustrasi,
+lalu jadwalkan presentasi. Sudah 45 hari sejak kontak terakhir"*, tapi
+**tidak bisa** menulis saran sespesifik *"buatkan ilustrasi plan
+kesehatan untuk Mikaela dan follow up peluang keagenan untuk Verawati"*
+— saran sedetail itu butuh AI yang membaca & memahami isi catatan.
+
+Karena itu, kolom **"Catatan Terakhir"** sengaja ditampilkan apa adanya
+di sebelah Next Action: detail spesifiknya tetap ada di situ, agen
+tinggal membacanya sendiri. Kalau suatu saat ingin saran senarasi
+contoh PDF review, itu perlu integrasi API AI (berbayar per pemakaian).
+
+### Email Analitik Harian Otomatis (Google Apps Script)
+
+File `LaporanHarian.gs` (dikirim terpisah, bukan bagian dari repo ini)
+dipasang di Google Sheet yang sama yang dipakai aplikasi. Script ini
+membaca tab `Activities`, `Contacts`, dan `Members`, menyusun laporan
+yang sama seperti di aplikasi, lalu mengirimkannya sebagai email HTML
+**otomatis tiap hari pukul 21:00**.
+
+Konfigurasi ada di bagian atas file: email penerima, opsi kirim ke tiap
+member, dan ambang hari urgent/warn. Jadwal dipasang sekali dengan
+menjalankan fungsi `pasangJadwalHarian()`.

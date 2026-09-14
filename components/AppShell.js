@@ -12,6 +12,7 @@ const MEMBER_TABS = [
   { href: "/dashboard/analisa-kebutuhan", label: "Analisa Kebutuhan Asuransi" },
   { href: "/dashboard/database-prospek", label: "Database Calon Prospek" },
   { href: "/dashboard/riwayat-prospek", label: "Riwayat Calon Prospek" },
+  { href: "/dashboard/laporan-analitik", label: "Laporan Analitik" },
   { href: "/dashboard/kalkulator-finansial", label: "Kalkulator Finansial" },
   { href: "/dashboard/rekomendasi", label: "Rekomendasi Produk" },
   { href: "/dashboard/products", label: "Produk" },
