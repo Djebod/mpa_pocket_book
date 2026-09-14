@@ -165,15 +165,17 @@ laporan aktivitas — lengkap dengan export ke Excel.
   Rekrutmen** dulu, baru form menyesuaikan:
   - **Jalur Penjualan**: pilih nama dari database (kategori Calon
     Nasabah / Calon Agen & Nasabah) → **Type Activity** (radio wajib):
-    Fact Finding (3 poin), Presentation (5 poin), atau Closing (10
-    poin, ada field tambahan **Produk yang Dijual** + **Nominal
-    Premi/Tahun** — angka saja; field catatan untuk Closing juga
-    berubah jadi **"Nomor Polis"** (isian satu baris, wajib) —
+    **WhatsApp Chat / Call** (0 poin — cuma pencatatan, tidak
+    menghasilkan poin), Fact Finding (3 poin), Presentation (5 poin),
+    atau Closing (10 poin, ada field tambahan **Produk yang Dijual** +
+    **Nominal Premi/Tahun** — angka saja; field catatan untuk Closing
+    juga berubah jadi **"Nomor Polis"** (isian satu baris, wajib) —
     menggantikan "Hasil Pertemuan" khusus untuk jenis aktivitas ini).
   - **Jalur Rekrutmen**: pilih nama dari database (kategori Calon Agen
-    / Calon Agen & Nasabah) → Type Activity: Fact Finding, Presentation,
-    atau Recruit (10 poin, field catatan berubah jadi **"Level Agen
-    yang Direkrut"**, foto wajib berlabel **"Bukti Transfer AAJI"**).
+    / Calon Agen & Nasabah) → Type Activity: **WhatsApp Chat / Call**
+    (0 poin), Fact Finding, Presentation, atau Recruit (10 poin, field
+    catatan berubah jadi **"Level Agen yang Direkrut"**, foto wajib
+    berlabel **"Bukti Transfer AAJI"**).
   - **Profesi** otomatis terisi begitu nama dipilih. **Tanggal
     terkunci ke hari ini** (tidak bisa back-date). Field **"Hasil
     Pertemuan"** (atau label khusus di atas) **wajib diisi**, foto

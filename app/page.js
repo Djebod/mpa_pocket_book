@@ -18,6 +18,10 @@ export default function LoginPage() {
   function handleSubmit(e) {
     e.preventDefault();
     setError("");
+    if (!ready) {
+      setError("Sedang menyiapkan data terbaru, coba lagi sesaat lagi.");
+      return;
+    }
     const result = login(email, password);
     if (!result.ok) {
       setError(result.error);
@@ -87,9 +91,10 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full bg-ink text-paper font-semibold text-sm py-2.5 rounded-md hover:bg-ink-light transition-colors"
+            disabled={!ready}
+            className="w-full bg-ink text-paper font-semibold text-sm py-2.5 rounded-md hover:bg-ink-light transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Masuk
+            {ready ? "Masuk" : "Memuat data terbaru…"}
           </button>
         </form>
       </div>
