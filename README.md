@@ -584,3 +584,31 @@ yang sama seperti di aplikasi, lalu mengirimkannya sebagai email HTML
 Konfigurasi ada di bagian atas file: email penerima, opsi kirim ke tiap
 member, dan ambang hari urgent/warn. Jadwal dipasang sekali dengan
 menjalankan fungsi `pasangJadwalHarian()`.
+
+## Catatan Perbaikan: Kolom Sheet Tergeser (Sept 2026)
+
+Pernah terjadi tampilan aneh di aplikasi — kolom Tanggal menampilkan
+`TRUE`, kolom Aktivitas menampilkan angka poin, dan Kontak menampilkan
+profesi. Penyebabnya: `readSheet()` di `lib/google/sheetsClient.js` dulu
+memetakan kolom **berdasarkan posisi** (`A2:<kolom terakhir>`, lalu
+`headers.forEach((h,i) => obj[h] = row[i])`). Begitu ada kolom baru
+(`method`) disisipkan di **tengah** daftar `SHEET_HEADERS`, seluruh data
+lama di Sheet ikut bergeser satu kolom.
+
+**Sudah diperbaiki**: `readSheet()` sekarang membaca **baris header asli
+di Sheet (baris 1)** dan memetakan berdasarkan **nama kolom**, bukan
+posisi. Konsekuensinya:
+
+- Urutan kolom di Sheet boleh berbeda dari `SHEET_HEADERS` — data tetap
+  terbaca benar.
+- Kolom baru yang belum pernah ditulis ke Sheet otomatis terisi string
+  kosong, tidak menggeser apa pun.
+- `writeSheet()` juga sekarang membersihkan **seluruh tab** (bukan cuma
+  sampai kolom terakhir yang dikenal), supaya kolom sisa dari struktur
+  lama (mis. `phone`/`contactPhone` sebelum diganti `profession`) tidak
+  tertinggal sebagai kolom hantu.
+
+**Aturan untuk ke depannya**: menambah kolom baru di `SHEET_HEADERS`
+sekarang aman di posisi mana pun, tapi **jangan mengganti nama kolom**
+yang sudah ada tanpa memikirkan data lama — pemetaan sekarang
+bergantung pada nama, bukan posisi.
