@@ -163,24 +163,25 @@ laporan aktivitas — lengkap dengan export ke Excel.
 - **Aktivitas Member (sistem poin, alur terpadu)**: form Catat Aktivitas
   sekarang satu alur — pilih **Jalur Penjualan** atau **Jalur
   Rekrutmen** dulu, baru form menyesuaikan:
-  - **Jalur Penjualan**: pilih nama dari database (kategori Calon
-    Nasabah / Calon Agen & Nasabah) → **Type Activity** (radio wajib):
-    **WhatsApp Chat / Call** (0 poin — cuma pencatatan, tidak
-    menghasilkan poin), Fact Finding (3 poin), Presentation (5 poin),
-    atau Closing (10 poin, ada field tambahan **Produk yang Dijual** +
-    **Nominal Premi/Tahun** — angka saja; field catatan untuk Closing
-    juga berubah jadi **"Nomor Polis"** (isian satu baris, wajib) —
-    menggantikan "Hasil Pertemuan" khusus untuk jenis aktivitas ini).
-  - **Jalur Rekrutmen**: pilih nama dari database (kategori Calon Agen
-    / Calon Agen & Nasabah) → Type Activity: **WhatsApp Chat / Call**
-    (0 poin), Fact Finding, Presentation, atau Recruit (10 poin, field
-    catatan berubah jadi **"Level Agen yang Direkrut"**, foto wajib
-    berlabel **"Bukti Transfer AAJI"**).
-  - **Profesi** otomatis terisi begitu nama dipilih. **Tanggal
-    terkunci ke hari ini** (tidak bisa back-date). Field **"Hasil
-    Pertemuan"** (atau label khusus di atas) **wajib diisi**, foto
-    bukti **selalu wajib** di semua jenis aktivitas — bisa **ambil foto
-    baru dari kamera atau pilih dari galeri** (tidak dipaksa kamera).
+  - Setelah memilih jalur, pilih **Metode Aktivitas** — ini menentukan
+    jenis aktivitas yang tersedia dan apakah dapat poin:
+    - **Non Tatap Muka** (WhatsApp, Sosmed, Call) — **semuanya 0 poin**,
+      murni pencatatan jejak komunikasi.
+    - **Tatap Muka** (Zoom / Offline) — **mendapat poin**: Fact Finding
+      (3 poin), Presentation (5 poin), lalu Closing (10 poin) untuk
+      Jalur Penjualan atau Recruit (10 poin) untuk Jalur Rekrutmen.
+  - **Jalur Penjualan**: nama dipilih dari database (kategori Calon
+    Nasabah / Calon Agen & Nasabah). Khusus **Closing** ada field
+    tambahan **Produk yang Dijual** + **Nominal Premi/Tahun** (angka
+    saja), dan field catatannya berubah jadi **"Nomor Polis"** (isian
+    satu baris, wajib) menggantikan "Hasil Pertemuan".
+  - **Jalur Rekrutmen**: nama dipilih dari database (kategori Calon Agen
+    / Calon Agen & Nasabah). Khusus **Recruit**, field catatan berubah
+    jadi **"Level Agen yang Direkrut"** dan foto wajib berlabel **"Bukti
+    Transfer AAJI"**.
+  - Jenis aktivitas lama (`whatsapp_call` dari sebelum pemisahan metode)
+    tetap terbaca di Riwayat/Ringkasan/Laporan sebagai "WhatsApp Chat /
+    Call" — data historis tidak rusak.
   - Status validasi ada **3**: **Menunggu Validasi** (default), **Valid**
     (Admin menekan tombol "Valid" — poinnya terhitung sebagai **Valid
     Point**), atau **Tidak Valid** (Admin menekan tombol "Tidak Valid" —

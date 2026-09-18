@@ -17,6 +17,7 @@ export default function ActivitiesPage() {
   const [contacts, setContacts] = useState([]);
 
   const [jalur, setJalur] = useState(null); // "nasabah" | "agen" | null
+  const [methodKey, setMethodKey] = useState(""); // "non_tatap_muka" | "tatap_muka"
   const [typeKey, setTypeKey] = useState("");
   const [contactSelect, setContactSelect] = useState(""); // id kontak, atau NEW_CONTACT_VALUE
   const [newContactName, setNewContactName] = useState("");
@@ -61,6 +62,8 @@ export default function ActivitiesPage() {
   }, [session]);
 
   const activeCategory = jalur ? categories.find((c) => c.key === jalur) : null;
+  const activeMethod =
+    activeCategory && methodKey ? activeCategory.methods.find((m) => m.key === methodKey) : null;
   const activeTypeConfig = activeCategory && typeKey ? store.getActivityTypeConfig(jalur, typeKey) : null;
 
   const filteredContacts = activeCategory
@@ -71,6 +74,7 @@ export default function ActivitiesPage() {
 
   function resetForm() {
     setJalur(null);
+    setMethodKey("");
     setTypeKey("");
     setContactSelect("");
     setNewContactName("");
@@ -86,6 +90,7 @@ export default function ActivitiesPage() {
 
   function chooseJalur(key) {
     setJalur(key);
+    setMethodKey("");
     setTypeKey("");
     setContactSelect("");
     setNewContactName("");
@@ -126,6 +131,9 @@ export default function ActivitiesPage() {
 
   function startEdit(act) {
     setJalur(act.category);
+    // Data lama belum menyimpan `method` — turunkan dari konfigurasi jenisnya.
+    const cfg = store.getActivityTypeConfig(act.category, act.type);
+    setMethodKey(act.method || cfg?.methodKey || "");
     setTypeKey(act.type);
     setContactSelect(act.contactId || "");
     setNewContactName("");
@@ -167,6 +175,10 @@ export default function ActivitiesPage() {
     e.preventDefault();
     setError("");
 
+    if (!activeMethod) {
+      setError("Pilih Metode Aktivitas terlebih dahulu (Non Tatap Muka atau Tatap Muka).");
+      return;
+    }
     if (!activeTypeConfig) {
       setError("Pilih Type Activity terlebih dahulu.");
       return;
@@ -200,6 +212,7 @@ export default function ActivitiesPage() {
     try {
       const payload = {
         category: jalur,
+        method: methodKey,
         type: typeKey,
         points: activeTypeConfig.points,
         date: today(),
@@ -296,27 +309,70 @@ export default function ActivitiesPage() {
             </button>
           </div>
 
-          {/* Type Activity: radio wajib */}
+          {/* Langkah 2a: Metode Aktivitas */}
           <div className="mb-5">
             <label className="block text-sm font-semibold text-ink mb-2">
-              Type Activity <span className="text-rust">*</span>
+              Metode Aktivitas <span className="text-rust">*</span>
             </label>
-            <div className="flex flex-wrap gap-4">
-              {activeCategory.types.map((t) => (
-                <label key={t.key} className="flex items-center gap-2 text-sm text-charcoal cursor-pointer">
-                  <input
-                    type="radio"
-                    name="activityType"
-                    value={t.key}
-                    checked={typeKey === t.key}
-                    onChange={() => setTypeKey(t.key)}
-                    className="accent-brass w-4 h-4"
-                  />
-                  {t.label} <span className="text-xs text-ink/40">({t.points} poin)</span>
-                </label>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {activeCategory.methods.map((m) => (
+                <button
+                  key={m.key}
+                  type="button"
+                  onClick={() => {
+                    setMethodKey(m.key);
+                    setTypeKey("");
+                  }}
+                  className={`text-left rounded-md border px-4 py-3 transition-colors ${
+                    methodKey === m.key
+                      ? "bg-ink text-paper border-ink"
+                      : "bg-paper text-ink/70 border-ink/20 hover:border-brass"
+                  }`}
+                >
+                  <span className="block text-sm font-semibold">{m.label}</span>
+                  <span
+                    className={`block text-xs mt-0.5 ${
+                      methodKey === m.key ? "text-paper/70" : "text-ink/45"
+                    }`}
+                  >
+                    {m.sublabel}
+                  </span>
+                </button>
               ))}
             </div>
           </div>
+
+          {/* Langkah 2b: Type Activity — menyesuaikan metode yang dipilih */}
+          {activeMethod && (
+            <div className="mb-5">
+              <label className="block text-sm font-semibold text-ink mb-2">
+                Type Activity <span className="text-rust">*</span>
+              </label>
+              <div className="flex flex-wrap gap-4">
+                {activeMethod.types.map((t) => (
+                  <label key={t.key} className="flex items-center gap-2 text-sm text-charcoal cursor-pointer">
+                    <input
+                      type="radio"
+                      name="activityType"
+                      value={t.key}
+                      checked={typeKey === t.key}
+                      onChange={() => setTypeKey(t.key)}
+                      className="accent-brass w-4 h-4"
+                    />
+                    {t.label}{" "}
+                    <span className="text-xs text-ink/40">
+                      {t.points > 0 ? `(${t.points} poin)` : "(tanpa poin)"}
+                    </span>
+                  </label>
+                ))}
+              </div>
+              {!activeMethod.earnsPoints && (
+                <p className="text-xs text-ink/45 mt-2">
+                  Aktivitas non tatap muka dicatat sebagai jejak komunikasi, tapi tidak menghasilkan poin.
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Tanggal — tetap, tidak bisa diubah */}
           <div className="mb-5">
