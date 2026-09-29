@@ -20,6 +20,8 @@ const emptyForm = {
   resume: [],
   tabelMedical: [],
   fileKetsusUrl: "",
+  revampDescription: "",
+  revampLinkUrl: "",
   videoUrl: "",
 };
 
@@ -107,6 +109,8 @@ export default function AdminProductsPage() {
       resume: product.resume || [],
       tabelMedical: product.tabelMedical || [],
       fileKetsusUrl: product.fileKetsusUrl || "",
+      revampDescription: product.revampDescription || "",
+      revampLinkUrl: product.revampLinkUrl || "",
       videoUrl: product.videoUrl || "",
     });
     setEditingId(product.id);
@@ -259,6 +263,34 @@ export default function AdminProductsPage() {
           />
         </div>
 
+        <p className="text-xs font-semibold text-ink/50 uppercase tracking-wide mb-2">Revamp</p>
+        <div className="mb-6 border border-ink/15 rounded-md px-4 py-4 bg-paper-dark/20">
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-ink mb-1.5">Deskripsi Revamp</label>
+            <textarea
+              value={form.revampDescription}
+              onChange={(e) => setForm({ ...form, revampDescription: e.target.value })}
+              rows={4}
+              placeholder="Jelaskan perubahan/pembaruan produk ini..."
+              className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
+            />
+            <p className="text-xs text-ink/45 mt-1">
+              Link (http/https) di dalam teks ini otomatis jadi bisa diklik di halaman member.
+            </p>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-ink mb-1.5">
+              Google Drive Link <span className="font-normal text-ink/45">(opsional)</span>
+            </label>
+            <input
+              value={form.revampLinkUrl}
+              onChange={(e) => setForm({ ...form, revampLinkUrl: e.target.value })}
+              placeholder="https://drive.google.com/..."
+              className="w-full rounded-md border border-ink/20 bg-paper px-3.5 py-2.5 text-sm focus:border-brass focus:outline-none"
+            />
+          </div>
+        </div>
+
         <div className="grid sm:grid-cols-2 gap-5 mb-6">
           <div>
             <label className="block text-sm font-semibold text-ink mb-1.5">
@@ -329,6 +361,7 @@ export default function AdminProductsPage() {
                 {countAttachments(p)} dokumen terlampir
                 {p.tabelPremiLinkUrl ? " · Tabel Premi (Link) ✓" : ""}
                 {p.fileKetsusUrl ? " · File Ketsus ✓" : ""}
+                {p.revampDescription || p.revampLinkUrl ? " · Revamp ✓" : ""}
                 {p.videoUrl ? " · Video ✓" : ""}
               </p>
             </div>

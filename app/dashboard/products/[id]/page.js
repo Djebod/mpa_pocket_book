@@ -6,6 +6,7 @@ import Link from "next/link";
 import * as store from "@/lib/store";
 import { toYouTubeEmbedUrl } from "@/lib/youtube";
 import { FileDisplay, FileListDisplay } from "@/components/FileDisplay";
+import Linkified from "@/components/Linkified";
 
 const TABS = [
   { key: "materiTraining", label: "Materi Training", kind: "materiTraining" },
@@ -13,6 +14,7 @@ const TABS = [
   { key: "resume", label: "Resume", kind: "fileList" },
   { key: "tabelMedical", label: "Tabel Medical", kind: "fileList" },
   { key: "fileKetsusUrl", label: "File Ketsus", kind: "link" },
+  { key: "revamp", label: "Revamp", kind: "revamp" },
   { key: "videoUrl", label: "Video", kind: "video" },
 ];
 
@@ -129,6 +131,39 @@ export default function ProductDetailPage() {
               </a>
             ) : (
               <p className="text-sm text-ink/50">Belum ada File Ketsus untuk produk ini.</p>
+            )}
+          </>
+        )}
+
+        {activeTab.kind === "revamp" && (
+          <>
+            {product.revampDescription || product.revampLinkUrl ? (
+              <div className="space-y-5">
+                {product.revampDescription && (
+                  <div>
+                    <p className="text-xs font-semibold text-ink/50 uppercase tracking-wide mb-2">
+                      Deskripsi Revamp
+                    </p>
+                    <p className="text-sm text-charcoal/85 leading-relaxed whitespace-pre-wrap">
+                      <Linkified text={product.revampDescription} />
+                    </p>
+                  </div>
+                )}
+                {product.revampLinkUrl && (
+                  <div>
+                    <a
+                      href={product.revampLinkUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-ink text-paper text-sm font-semibold px-4 py-2.5 rounded-md hover:bg-ink-light transition-colors"
+                    >
+                      🔗 Buka Materi Revamp di Google Drive
+                    </a>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-ink/50">Belum ada materi Revamp untuk produk ini.</p>
             )}
           </>
         )}

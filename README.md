@@ -42,6 +42,12 @@ laporan aktivitas — lengkap dengan export ke Excel.
   YouTube, otomatis disesuaikan ke format embed). Halaman katalog
   member cuma punya **pencarian** (filter Kategori & Sub Kategori sudah
   dihilangkan dari sana); search juga tersedia di Kelola Produk.
+- **Revamp (per produk)** — tab tambahan di halaman detail produk berisi
+  **Deskripsi Revamp** (teks bebas, link http/https di dalamnya otomatis
+  bisa diklik) dan **Google Drive Link** (opsional). Diisi Admin lewat
+  Kelola Produk. Tab Revamp muncul di antara "File Ketsus" dan "Video".
+  Kalau kedua isian kosong, halaman menampilkan "Belum ada materi
+  Revamp untuk produk ini."
 - **Rekomendasi Produk** — wizard tap-pilih untuk agen: jawab 2-4
   pertanyaan tentang kebutuhan nasabah (proteksi kesehatan, sakit
   kritis, jiwa berjangka, warisan, dana pendidikan, dana pensiun,
