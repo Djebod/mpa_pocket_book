@@ -33,7 +33,7 @@ export default function TeamMemberDetailPage() {
     return (
       <div>
         <p className="text-sm text-rust mb-4">
-          Anda tidak punya akses untuk melihat aktivitas member ini — hanya Direct Leader dan Admin yang bisa.
+          Anda tidak punya akses untuk melihat aktivitas member ini — hanya leader (berjenjang) dan Admin yang bisa.
         </p>
         <Link href="/dashboard/team" className="text-sm text-brass underline">
           Kembali ke Tim Saya
